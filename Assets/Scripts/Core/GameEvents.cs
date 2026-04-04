@@ -1,0 +1,19 @@
+using System;
+using UnityEngine;
+
+public static class GameEvents
+{
+    public static event Action<PieceView> OnPiecePickedUp;
+    public static event Action<PieceView> OnPieceReleased;
+    public static event Action<PieceView, Vector2Int> OnPiecePlaced;
+    public static event Action<int> OnScoreChanged;
+    public static event Action OnGameOver;
+    public static event Action OnTrayRefilled;
+
+    public static void PiecePickedUp(PieceView piece) => OnPiecePickedUp?.Invoke(piece);
+    public static void PieceReleased(PieceView piece) => OnPieceReleased?.Invoke(piece);
+    public static void PiecePlaced(PieceView piece, Vector2Int boardPos) => OnPiecePlaced?.Invoke(piece, boardPos);
+    public static void ScoreChanged(int score) => OnScoreChanged?.Invoke(score);
+    public static void GameOver() => OnGameOver?.Invoke();
+    public static void TrayRefilled() => OnTrayRefilled?.Invoke();
+}
