@@ -29,7 +29,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _CutoutRadius: 0.02
+    - _CutoutRadius: 0.008
     m_Colors:
     - _Color: {r: 0, g: 0, b: 0, a: 0.7}
     - _CutoutCenter: {r: 0.5, g: 0.5, b: 0, a: 0}

@@ -50,7 +50,12 @@ public static class BoardSetupTool
     private static BoardConfig CreateOrLoadBoardConfig()
     {
         var config = AssetDatabase.LoadAssetAtPath<BoardConfig>(BoardConfigPath);
-        if (config != null) return config;
+        if (config != null)
+        {
+            if (config.Theme == null)
+                config.Theme = CreateOrLoadTheme();
+            return config;
+        }
 
         config = ScriptableObject.CreateInstance<BoardConfig>();
         config.Rows = 8;
@@ -58,8 +63,22 @@ public static class BoardSetupTool
         config.CellSpacing = 4f;
         config.MinBlockValue = 1;
         config.MaxBlockValue = 4;
-        config.EmptyCellColor = new Color(0.9f, 0.9f, 0.9f, 1f);
-        config.BlockColors = new BlockColorEntry[]
+        config.Theme = CreateOrLoadTheme();
+
+        AssetDatabase.CreateAsset(config, BoardConfigPath);
+        return config;
+    }
+
+    private static ThemeData CreateOrLoadTheme()
+    {
+        var themePath = SOPath + "/DefaultTheme.asset";
+        var theme = AssetDatabase.LoadAssetAtPath<ThemeData>(themePath);
+        if (theme != null) return theme;
+
+        theme = ScriptableObject.CreateInstance<ThemeData>();
+        theme.BackgroundColor = new Color(0.15f, 0.15f, 0.3f);
+        theme.EmptyCellColor = new Color(0.85f, 0.85f, 0.85f);
+        theme.BlockVisuals = new BlockVisual[]
         {
             new() { Value = 1, Color = new Color(0.55f, 0.83f, 0.78f) },
             new() { Value = 2, Color = new Color(0.99f, 0.75f, 0.44f) },
@@ -67,8 +86,8 @@ public static class BoardSetupTool
             new() { Value = 4, Color = new Color(0.91f, 0.54f, 0.54f) }
         };
 
-        AssetDatabase.CreateAsset(config, BoardConfigPath);
-        return config;
+        AssetDatabase.CreateAsset(theme, themePath);
+        return theme;
     }
 
     private static GameObject CreateOrLoadCellPrefab()
@@ -80,11 +99,26 @@ public static class BoardSetupTool
         var image = cellGo.GetComponent<Image>();
         image.color = new Color(0.9f, 0.9f, 0.9f, 1f);
 
+        // Highlight overlay
+        var highlightGo = new GameObject("Highlight", typeof(RectTransform), typeof(Image));
+        highlightGo.transform.SetParent(cellGo.transform, false);
+        var hlRect = highlightGo.GetComponent<RectTransform>();
+        hlRect.anchorMin = Vector2.zero;
+        hlRect.anchorMax = Vector2.one;
+        hlRect.sizeDelta = Vector2.zero;
+        var hlImage = highlightGo.GetComponent<Image>();
+        hlImage.color = Color.clear;
+        hlImage.raycastTarget = false;
+
         var textGo = CreateValueText(cellGo.transform);
         var text = textGo.GetComponent<TextMeshProUGUI>();
 
         var cellView = cellGo.AddComponent<CellView>();
-        BindSerializedFields(cellView, "_background", image, "_valueText", text);
+        var so = new SerializedObject(cellView);
+        so.FindProperty("_background").objectReferenceValue = image;
+        so.FindProperty("_highlight").objectReferenceValue = hlImage;
+        so.FindProperty("_valueText").objectReferenceValue = text;
+        so.ApplyModifiedPropertiesWithoutUndo();
 
         var prefab = PrefabUtility.SaveAsPrefabAsset(cellGo, CellPrefabPath);
         Object.DestroyImmediate(cellGo);
@@ -143,10 +177,30 @@ public static class BoardSetupTool
         return config;
     }
 
+    private static void EnsureBackground(Transform canvasTransform)
+    {
+        if (canvasTransform.Find("Background") != null) return;
+
+        var bgGo = new GameObject("Background", typeof(RectTransform), typeof(Image));
+        bgGo.transform.SetParent(canvasTransform, false);
+        bgGo.transform.SetAsFirstSibling();
+        var bgRect = bgGo.GetComponent<RectTransform>();
+        bgRect.anchorMin = Vector2.zero;
+        bgRect.anchorMax = Vector2.one;
+        bgRect.sizeDelta = Vector2.zero;
+        var bgImage = bgGo.GetComponent<Image>();
+        bgImage.color = new Color(0.15f, 0.15f, 0.3f);
+        bgImage.raycastTarget = false;
+    }
+
     private static Canvas FindOrCreateCanvas()
     {
         var canvas = Object.FindAnyObjectByType<Canvas>();
-        if (canvas != null) return canvas;
+        if (canvas != null)
+        {
+            EnsureBackground(canvas.transform);
+            return canvas;
+        }
 
         var canvasGo = new GameObject("Canvas");
         canvas = canvasGo.AddComponent<Canvas>();
@@ -158,6 +212,21 @@ public static class BoardSetupTool
         scaler.matchWidthOrHeight = 0.5f;
 
         canvasGo.AddComponent<GraphicRaycaster>();
+
+        // Background image (first child so it renders behind everything)
+        if (canvasGo.transform.Find("Background") == null)
+        {
+            var bgGo = new GameObject("Background", typeof(RectTransform), typeof(Image));
+            bgGo.transform.SetParent(canvasGo.transform, false);
+            bgGo.transform.SetAsFirstSibling();
+            var bgRect = bgGo.GetComponent<RectTransform>();
+            bgRect.anchorMin = Vector2.zero;
+            bgRect.anchorMax = Vector2.one;
+            bgRect.sizeDelta = Vector2.zero;
+            var bgImage = bgGo.GetComponent<Image>();
+            bgImage.color = new Color(0.15f, 0.15f, 0.3f);
+            bgImage.raycastTarget = false;
+        }
 
         if (Object.FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
         {
@@ -189,6 +258,24 @@ public static class BoardSetupTool
         rect.anchoredPosition = new Vector2(0, 100);
         rect.sizeDelta = new Vector2(832, 832);
 
+        // Board frame (sibling, behind board)
+        var existingFrame = canvasTransform.Find("BoardFrame");
+        if (existingFrame != null) Object.DestroyImmediate(existingFrame.gameObject);
+
+        var frameGo = new GameObject("BoardFrame", typeof(RectTransform), typeof(Image));
+        frameGo.transform.SetParent(canvasTransform, false);
+        frameGo.transform.SetSiblingIndex(boardGo.transform.GetSiblingIndex());
+        var frameRect = frameGo.GetComponent<RectTransform>();
+        frameRect.anchorMin = rect.anchorMin;
+        frameRect.anchorMax = rect.anchorMax;
+        frameRect.pivot = rect.pivot;
+        frameRect.anchoredPosition = rect.anchoredPosition;
+        frameRect.sizeDelta = rect.sizeDelta + new Vector2(20, 20);
+        var frameImage = frameGo.GetComponent<Image>();
+        frameImage.color = Color.white;
+        frameImage.raycastTarget = false;
+        frameGo.SetActive(false);
+
         var boardView = boardGo.AddComponent<BoardView>();
         var cellPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(CellPrefabPath);
 
@@ -196,6 +283,7 @@ public static class BoardSetupTool
         bvSo.FindProperty("_cellPrefab").objectReferenceValue = cellPrefab;
         bvSo.FindProperty("_gridLayout").objectReferenceValue = boardGo.GetComponent<GridLayoutGroup>();
         bvSo.FindProperty("_boardRect").objectReferenceValue = rect;
+        bvSo.FindProperty("_boardFrame").objectReferenceValue = frameImage;
         bvSo.ApplyModifiedPropertiesWithoutUndo();
 
         return boardView;

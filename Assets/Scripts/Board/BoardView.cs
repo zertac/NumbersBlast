@@ -12,10 +12,56 @@ public class BoardView : MonoBehaviour
     public CellView[,] CellViews => _cellViews;
     public float CellSize { get; private set; }
 
+    [SerializeField] private Image _boardFrame;
+
     public void Initialize(BoardModel model, BoardConfig config)
     {
+        ApplyTheme(config.Theme);
         ConfigureGrid(config);
         CreateCells(model, config);
+    }
+
+    private void ApplyTheme(ThemeData theme)
+    {
+        var camera = Camera.main;
+        if (camera != null)
+            camera.backgroundColor = theme.BackgroundColor;
+
+        var canvas = GetComponentInParent<Canvas>();
+        if (canvas != null)
+        {
+            var bgTransform = canvas.transform.Find("Background");
+            if (bgTransform != null)
+            {
+                var bgImage = bgTransform.GetComponent<Image>();
+                if (bgImage != null)
+                {
+                    if (theme.BackgroundSprite != null)
+                    {
+                        bgImage.sprite = theme.BackgroundSprite;
+                        bgImage.color = Color.white;
+                    }
+                    else
+                    {
+                        bgImage.color = theme.BackgroundColor;
+                    }
+                }
+            }
+        }
+
+        if (_boardFrame != null)
+        {
+            if (theme.BoardFrameSprite != null)
+            {
+                _boardFrame.sprite = theme.BoardFrameSprite;
+                _boardFrame.color = theme.BoardFrameColor;
+                _boardFrame.gameObject.SetActive(true);
+            }
+            else
+            {
+                _boardFrame.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void ConfigureGrid(BoardConfig config)
@@ -55,7 +101,7 @@ public class BoardView : MonoBehaviour
                 cellGo.name = $"Cell_{r}_{c}";
 
                 var cellView = cellGo.GetComponent<CellView>();
-                cellView.Initialize(model.GetCell(r, c), config);
+                cellView.Initialize(model.GetCell(r, c), config.Theme);
                 _cellViews[r, c] = cellView;
             }
         }

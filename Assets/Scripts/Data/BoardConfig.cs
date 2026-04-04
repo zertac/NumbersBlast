@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "BoardConfig", menuName = "NumbersBlast/Board Config")]
@@ -16,19 +15,8 @@ public class BoardConfig : ScriptableObject
     public int MinBlockValue = 1;
     public int MaxBlockValue = 4;
 
-    [Header("Cell Visuals")]
-    public Color EmptyCellColor = Color.white;
-    public BlockColorEntry[] BlockColors;
-
-    public Color GetBlockColor(int value)
-    {
-        for (int i = 0; i < BlockColors.Length; i++)
-        {
-            if (BlockColors[i].Value == value)
-                return BlockColors[i].Color;
-        }
-        return Color.gray;
-    }
+    [Header("Theme")]
+    public ThemeData Theme;
 
     public bool ValidatePieceShape(PieceShapeData shape)
     {
@@ -51,11 +39,4 @@ public class BoardConfig : ScriptableObject
             }
         }
     }
-}
-
-[Serializable]
-public struct BlockColorEntry
-{
-    public int Value;
-    public Color Color;
 }

@@ -15,44 +15,43 @@ public enum HighlightType
 public class CellView : MonoBehaviour
 {
     [SerializeField] private Image _background;
+    [SerializeField] private Image _highlight;
     [SerializeField] private TextMeshProUGUI _valueText;
 
-    private static readonly Color PlacementColor = new(0.4f, 0.85f, 0.5f, 1f);
-    private static readonly Color InvalidColor = new(0.9f, 0.4f, 0.4f, 0.6f);
-    private static readonly Color MergeColor = new(1f, 0.9f, 0.3f, 0.7f);
-    private static readonly Color LineClearColor = new(0.3f, 0.7f, 1f, 0.7f);
-    private static readonly Color TutorialTargetColor = new(1f, 0.9f, 0.2f, 1f);
-
     private CellData _data;
-    private BoardConfig _config;
+    private ThemeData _theme;
     private HighlightType _highlightType;
 
     public HighlightType CurrentHighlight => _highlightType;
-
     public CellData Data => _data;
     public RectTransform RectTransform { get; private set; }
 
-    public void Initialize(CellData data, BoardConfig config)
+    public void Initialize(CellData data, ThemeData theme)
     {
         _data = data;
-        _config = config;
+        _theme = theme;
         RectTransform = GetComponent<RectTransform>();
+
+        if (_theme.HighlightSprite != null)
+            _highlight.sprite = _theme.HighlightSprite;
+        _highlight.gameObject.SetActive(false);
         Refresh();
     }
 
     public void Refresh()
     {
-        if (_highlightType != HighlightType.None) return;
-
         if (_data.IsEmpty)
         {
             _valueText.text = "";
-            _background.color = _config.EmptyCellColor;
+            _background.sprite = _theme.EmptyCellSprite;
+            _background.color = _theme.EmptyCellColor;
             return;
         }
 
+        var visual = _theme.GetBlockVisual(_data.Value);
         _valueText.text = _data.Value.ToString();
-        _background.color = _config.GetBlockColor(_data.Value);
+        _background.sprite = visual.Sprite != null ? visual.Sprite : _theme.BlockSprite;
+        _background.color = visual.Color;
     }
 
     public void SetHighlight(HighlightType type)
@@ -61,18 +60,20 @@ public class CellView : MonoBehaviour
 
         if (type == HighlightType.None)
         {
+            _highlight.gameObject.SetActive(false);
             Refresh();
             return;
         }
 
-        _background.color = type switch
+        _highlight.gameObject.SetActive(true);
+        _highlight.color = type switch
         {
-            HighlightType.Placement => PlacementColor,
-            HighlightType.Invalid => InvalidColor,
-            HighlightType.Merge => MergeColor,
-            HighlightType.LineClear => LineClearColor,
-            HighlightType.TutorialTarget => TutorialTargetColor,
-            _ => _config.EmptyCellColor
+            HighlightType.Placement => _theme.PlacementHighlight,
+            HighlightType.Invalid => _theme.InvalidHighlight,
+            HighlightType.Merge => _theme.MergeHighlight,
+            HighlightType.LineClear => _theme.LineClearHighlight,
+            HighlightType.TutorialTarget => _theme.TutorialTargetHighlight,
+            _ => Color.clear
         };
     }
 }

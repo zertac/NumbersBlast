@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dc07ff65a96da340a3eaefa57ebc6d9, type: 3}
+  m_Name: DefaultTheme
+  m_EditorClassIdentifier: Assembly-CSharp::ThemeData
+  BackgroundColor: {r: 1, g: 1, b: 1, a: 1}
+  BackgroundSprite: {fileID: 21300000, guid: bcb3485bc794e8040b3f9475cb8f8c7d, type: 3}
+  BoardFrameSprite: {fileID: 21300000, guid: bbd66fca9f079b1468e5eddf2d7392f4, type: 3}
+  BoardFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  EmptyCellSprite: {fileID: 21300000, guid: e7ed0a654bca7ea43991f47f41ade5eb, type: 3}
+  EmptyCellColor: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  BlockSprite: {fileID: -6420916621572684596, guid: 070f2068a3381c747a62d1a7a9c7c22b, type: 3}
+  BlockVisuals:
+  - Value: 1
+    Color: {r: 0.55, g: 0.83, b: 0.78, a: 1}
+    Sprite: {fileID: 0}
+  - Value: 2
+    Color: {r: 0.99, g: 0.75, b: 0.44, a: 1}
+    Sprite: {fileID: 0}
+  - Value: 3
+    Color: {r: 0.55, g: 0.63, b: 0.8, a: 1}
+    Sprite: {fileID: 0}
+  - Value: 4
+    Color: {r: 0.91, g: 0.54, b: 0.54, a: 1}
+    Sprite: {fileID: 0}
+  HighlightSprite: {fileID: 21300000, guid: ea6dc015b691beb4aaf3369cc112bc4d, type: 3}
+  PlacementHighlight: {r: 0.4, g: 0.85, b: 0.5, a: 1}
+  InvalidHighlight: {r: 0.9, g: 0.4, b: 0.4, a: 0.6}
+  MergeHighlight: {r: 1, g: 0.9, b: 0.3, a: 0.7}
+  LineClearHighlight: {r: 0.3, g: 0.7, b: 1, a: 0.7}
+  TutorialTargetHighlight: {r: 1, g: 0.9, b: 0.2, a: 1}
+  ScoreTextColor: {r: 1, g: 1, b: 1, a: 1}
+  ButtonColor: {r: 0.3, g: 0.7, b: 0.4, a: 1}
+  ButtonTextColor: {r: 1, g: 1, b: 1, a: 1}

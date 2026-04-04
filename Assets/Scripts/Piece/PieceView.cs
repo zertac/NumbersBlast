@@ -42,7 +42,7 @@ public class PieceView : MonoBehaviour
         {
             var cellGo = Instantiate(_cellPrefab, transform);
             var cellView = cellGo.GetComponent<PieceCellView>();
-            cellView.Initialize(_model.GetValueAt(i), _config);
+            cellView.Initialize(_model.GetValueAt(i), _config.Theme);
 
             var rect = cellView.RectTransform;
             rect.sizeDelta = new Vector2(_cellSize, _cellSize);
