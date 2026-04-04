@@ -39,6 +39,7 @@ public class PlacementHandler
         _boardView.RefreshAll();
 
         _mergeResolver.Resolve(model, pieceModel, boardPos, _boardView);
+        _boardView.RefreshAll();
 
         int clearedScore = _lineClearResolver.Resolve(model, _boardView);
         if (clearedScore > 0)
@@ -48,7 +49,7 @@ public class PlacementHandler
 
         _boardView.RefreshAll();
 
-        if (!HasValidMove())
+        if (!HasValidMoveForTray())
         {
             GameEvents.GameOver();
         }
@@ -64,16 +65,16 @@ public class PlacementHandler
         }
     }
 
-    private bool HasValidMove()
+    private bool HasValidMoveForTray()
     {
         var model = _boardManager.Model;
-        var spawnConfig = _boardManager.Config.PieceSpawnConfig;
+        var remainingPieces = _pieceTray.GetRemainingPieces();
 
-        // Check current tray pieces first
-        // Then check if any shape from config can fit
-        for (int s = 0; s < spawnConfig.Shapes.Length; s++)
+        for (int i = 0; i < remainingPieces.Length; i++)
         {
-            var positions = spawnConfig.Shapes[s].GetNormalizedPositions();
+            if (remainingPieces[i] == null) continue;
+
+            var positions = remainingPieces[i].Model.Positions;
 
             for (int r = 0; r < model.Rows; r++)
             {

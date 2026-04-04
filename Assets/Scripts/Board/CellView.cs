@@ -2,17 +2,28 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+public enum HighlightType
+{
+    None,
+    Placement,
+    Invalid,
+    Merge,
+    LineClear
+}
+
 public class CellView : MonoBehaviour
 {
     [SerializeField] private Image _background;
     [SerializeField] private TextMeshProUGUI _valueText;
 
-    private static readonly Color ValidHighlightColor = new(0.5f, 0.9f, 0.5f, 0.6f);
-    private static readonly Color InvalidHighlightColor = new(0.9f, 0.4f, 0.4f, 0.6f);
+    private static readonly Color PlacementColor = new(0.5f, 0.9f, 0.5f, 0.6f);
+    private static readonly Color InvalidColor = new(0.9f, 0.4f, 0.4f, 0.6f);
+    private static readonly Color MergeColor = new(1f, 0.9f, 0.3f, 0.7f);
+    private static readonly Color LineClearColor = new(0.3f, 0.7f, 1f, 0.7f);
 
     private CellData _data;
     private BoardConfig _config;
-    private bool _isHighlighted;
+    private HighlightType _highlightType;
 
     public CellData Data => _data;
     public RectTransform RectTransform { get; private set; }
@@ -27,7 +38,7 @@ public class CellView : MonoBehaviour
 
     public void Refresh()
     {
-        if (_isHighlighted) return;
+        if (_highlightType != HighlightType.None) return;
 
         if (_data.IsEmpty)
         {
@@ -40,17 +51,23 @@ public class CellView : MonoBehaviour
         _background.color = _config.GetBlockColor(_data.Value);
     }
 
-    public void SetHighlight(bool active, bool canPlace)
+    public void SetHighlight(HighlightType type)
     {
-        _isHighlighted = active;
+        _highlightType = type;
 
-        if (active)
-        {
-            _background.color = canPlace ? ValidHighlightColor : InvalidHighlightColor;
-        }
-        else
+        if (type == HighlightType.None)
         {
             Refresh();
+            return;
         }
+
+        _background.color = type switch
+        {
+            HighlightType.Placement => PlacementColor,
+            HighlightType.Invalid => InvalidColor,
+            HighlightType.Merge => MergeColor,
+            HighlightType.LineClear => LineClearColor,
+            _ => _config.EmptyCellColor
+        };
     }
 }

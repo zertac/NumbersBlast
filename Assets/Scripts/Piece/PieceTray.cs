@@ -48,6 +48,11 @@ public class PieceTray : MonoBehaviour
         }
     }
 
+    public PieceView[] GetRemainingPieces()
+    {
+        return _pieceViews;
+    }
+
     public bool IsEmpty()
     {
         for (int i = 0; i < _pieceViews.Length; i++)

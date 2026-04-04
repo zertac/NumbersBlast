@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
@@ -16,6 +17,11 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     private float _originalScale;
     private Vector2 _dragOffset;
     private bool _isDragging;
+
+    private static readonly Vector2Int[] MergeDirections =
+    {
+        new(-1, 0), new(1, 0), new(0, -1), new(0, 1)
+    };
 
     private const float DragScale = 1f;
     private const float PickupDuration = 0.15f;
@@ -92,18 +98,143 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         var boardPos = GetBoardPosition();
         if (!boardPos.HasValue) return;
 
-        var positions = _pieceView.Model.Positions;
         bool canPlace = CanPlace(boardPos.Value);
+
+        if (!canPlace)
+        {
+            HighlightPlacement(boardPos.Value, HighlightType.Invalid);
+            return;
+        }
+
+        HighlightPlacement(boardPos.Value, HighlightType.Placement);
+        HighlightMerges(boardPos.Value);
+        HighlightLineClear(boardPos.Value);
+    }
+
+    private void HighlightPlacement(Vector2Int boardPos, HighlightType type)
+    {
+        var positions = _pieceView.Model.Positions;
 
         for (int i = 0; i < positions.Length; i++)
         {
-            int row = boardPos.Value.x + positions[i].x;
-            int col = boardPos.Value.y + positions[i].y;
+            int row = boardPos.x + positions[i].x;
+            int col = boardPos.y + positions[i].y;
 
             var cellView = _boardView.GetCellView(row, col);
             if (cellView != null)
             {
-                cellView.SetHighlight(true, canPlace);
+                cellView.SetHighlight(type);
+            }
+        }
+    }
+
+    private void HighlightMerges(Vector2Int boardPos)
+    {
+        var model = _boardManager.Model;
+        var pieceModel = _pieceView.Model;
+        var placedSet = new HashSet<Vector2Int>();
+
+        for (int i = 0; i < pieceModel.CellCount; i++)
+        {
+            placedSet.Add(new Vector2Int(
+                boardPos.x + pieceModel.Positions[i].x,
+                boardPos.y + pieceModel.Positions[i].y
+            ));
+        }
+
+        for (int i = 0; i < pieceModel.CellCount; i++)
+        {
+            int cellRow = boardPos.x + pieceModel.Positions[i].x;
+            int cellCol = boardPos.y + pieceModel.Positions[i].y;
+            int value = pieceModel.GetValueAt(i);
+
+            for (int d = 0; d < MergeDirections.Length; d++)
+            {
+                int nRow = cellRow + MergeDirections[d].x;
+                int nCol = cellCol + MergeDirections[d].y;
+
+                if (placedSet.Contains(new Vector2Int(nRow, nCol))) continue;
+
+                var neighbor = model.GetCell(nRow, nCol);
+                if (neighbor != null && !neighbor.IsEmpty && neighbor.Value == value)
+                {
+                    var cellView = _boardView.GetCellView(nRow, nCol);
+                    if (cellView != null)
+                    {
+                        cellView.SetHighlight(HighlightType.Merge);
+                    }
+                }
+            }
+        }
+    }
+
+    private void HighlightLineClear(Vector2Int boardPos)
+    {
+        var model = _boardManager.Model;
+        var pieceModel = _pieceView.Model;
+
+        var occupiedAfterPlace = new HashSet<Vector2Int>();
+
+        // Collect currently occupied cells
+        for (int r = 0; r < model.Rows; r++)
+        {
+            for (int c = 0; c < model.Columns; c++)
+            {
+                if (!model.IsCellEmpty(r, c))
+                    occupiedAfterPlace.Add(new Vector2Int(r, c));
+            }
+        }
+
+        // Add piece cells
+        for (int i = 0; i < pieceModel.CellCount; i++)
+        {
+            occupiedAfterPlace.Add(new Vector2Int(
+                boardPos.x + pieceModel.Positions[i].x,
+                boardPos.y + pieceModel.Positions[i].y
+            ));
+        }
+
+        // Check rows
+        for (int r = 0; r < model.Rows; r++)
+        {
+            bool full = true;
+            for (int c = 0; c < model.Columns; c++)
+            {
+                if (!occupiedAfterPlace.Contains(new Vector2Int(r, c)))
+                {
+                    full = false;
+                    break;
+                }
+            }
+
+            if (full)
+            {
+                for (int c = 0; c < model.Columns; c++)
+                {
+                    _boardView.GetCellView(r, c)?.SetHighlight(HighlightType.LineClear);
+                }
+            }
+        }
+
+        // Check columns
+        for (int c = 0; c < model.Columns; c++)
+        {
+            bool full = true;
+            for (int r = 0; r < model.Rows; r++)
+            {
+                if (!occupiedAfterPlace.Contains(new Vector2Int(r, c)))
+                {
+                    full = false;
+                    break;
+                }
+            }
+
+            if (full)
+            {
+                for (int r = 0; r < model.Rows; r++)
+                {
+                    _boardView.GetCellView(r, c)?.SetHighlight(HighlightType.LineClear);
+                }
             }
         }
     }
@@ -115,7 +246,7 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         {
             for (int c = 0; c < cellViews.GetLength(1); c++)
             {
-                cellViews[r, c].SetHighlight(false, false);
+                cellViews[r, c].SetHighlight(HighlightType.None);
             }
         }
     }
@@ -124,9 +255,6 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     {
         var positions = _pieceView.Model.Positions;
         if (positions.Length == 0) return null;
-
-        var firstCellView = _boardView.GetCellView(0, 0);
-        if (firstCellView == null) return null;
 
         var boardRect = _boardView.GetComponent<RectTransform>();
         var pieceWorldPos = _pieceView.RectTransform.position;

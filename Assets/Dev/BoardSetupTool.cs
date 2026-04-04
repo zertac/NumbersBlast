@@ -26,7 +26,9 @@ public static class BoardSetupTool
         var canvas = FindOrCreateCanvas();
         var boardView = SetupBoardView(canvas.transform);
         var pieceTray = SetupPieceTray(canvas.transform);
-        SetupGameplayScope(config, boardView, pieceTray);
+        var scoreUI = SetupScoreUI(canvas.transform);
+        var gameOverUI = SetupGameOverUI(canvas.transform);
+        SetupGameplayScope(config, boardView, pieceTray, scoreUI, gameOverUI);
 
         AssetDatabase.SaveAssets();
         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
@@ -252,7 +254,174 @@ public static class BoardSetupTool
         return pieceTray;
     }
 
-    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray)
+    private static ScoreUI SetupScoreUI(Transform canvasTransform)
+    {
+        var existing = canvasTransform.Find("ScorePanel");
+        if (existing != null)
+        {
+            var existingUI = existing.GetComponent<ScoreUI>();
+            if (existingUI != null) return existingUI;
+            Object.DestroyImmediate(existing.gameObject);
+        }
+
+        var panelGo = new GameObject("ScorePanel", typeof(RectTransform));
+        panelGo.transform.SetParent(canvasTransform, false);
+
+        var panelRect = panelGo.GetComponent<RectTransform>();
+        panelRect.anchorMin = new Vector2(0.5f, 1f);
+        panelRect.anchorMax = new Vector2(0.5f, 1f);
+        panelRect.pivot = new Vector2(0.5f, 1f);
+        panelRect.anchoredPosition = new Vector2(0, -50);
+        panelRect.sizeDelta = new Vector2(400, 100);
+
+        var labelGo = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
+        labelGo.transform.SetParent(panelGo.transform, false);
+
+        var labelRect = labelGo.GetComponent<RectTransform>();
+        labelRect.anchorMin = new Vector2(0, 0.5f);
+        labelRect.anchorMax = new Vector2(1, 1);
+        labelRect.sizeDelta = Vector2.zero;
+        labelRect.offsetMin = Vector2.zero;
+        labelRect.offsetMax = Vector2.zero;
+
+        var labelText = labelGo.GetComponent<TextMeshProUGUI>();
+        labelText.text = "SCORE";
+        labelText.alignment = TextAlignmentOptions.Center;
+        labelText.fontSize = 28;
+        labelText.color = Color.white;
+
+        var scoreGo = new GameObject("ScoreText", typeof(RectTransform), typeof(TextMeshProUGUI));
+        scoreGo.transform.SetParent(panelGo.transform, false);
+
+        var scoreRect = scoreGo.GetComponent<RectTransform>();
+        scoreRect.anchorMin = new Vector2(0, 0);
+        scoreRect.anchorMax = new Vector2(1, 0.5f);
+        scoreRect.sizeDelta = Vector2.zero;
+        scoreRect.offsetMin = Vector2.zero;
+        scoreRect.offsetMax = Vector2.zero;
+
+        var scoreText = scoreGo.GetComponent<TextMeshProUGUI>();
+        scoreText.text = "0";
+        scoreText.alignment = TextAlignmentOptions.Center;
+        scoreText.fontSize = 48;
+        scoreText.color = Color.white;
+        scoreText.fontStyle = FontStyles.Bold;
+
+        var scoreUI = panelGo.AddComponent<ScoreUI>();
+        var so = new SerializedObject(scoreUI);
+        so.FindProperty("_scoreText").objectReferenceValue = scoreText;
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        return scoreUI;
+    }
+
+    private static GameOverUI SetupGameOverUI(Transform canvasTransform)
+    {
+        var existing = canvasTransform.Find("GameOverPanel");
+        if (existing != null)
+        {
+            var existingUI = existing.GetComponent<GameOverUI>();
+            if (existingUI != null) return existingUI;
+            Object.DestroyImmediate(existing.gameObject);
+        }
+
+        var rootGo = new GameObject("GameOverPanel", typeof(RectTransform));
+        rootGo.transform.SetParent(canvasTransform, false);
+
+        // Overlay panel (full screen, dark background)
+        var panelGo = new GameObject("Panel", typeof(RectTransform), typeof(Image), typeof(CanvasGroup));
+        panelGo.transform.SetParent(rootGo.transform, false);
+
+        var panelRect = panelGo.GetComponent<RectTransform>();
+        panelRect.anchorMin = Vector2.zero;
+        panelRect.anchorMax = Vector2.one;
+        panelRect.sizeDelta = Vector2.zero;
+
+        var panelImage = panelGo.GetComponent<Image>();
+        panelImage.color = new Color(0, 0, 0, 0.7f);
+
+        // Content container
+        var contentGo = new GameObject("Content", typeof(RectTransform));
+        contentGo.transform.SetParent(panelGo.transform, false);
+
+        var contentRect = contentGo.GetComponent<RectTransform>();
+        contentRect.anchorMin = new Vector2(0.5f, 0.5f);
+        contentRect.anchorMax = new Vector2(0.5f, 0.5f);
+        contentRect.sizeDelta = new Vector2(500, 400);
+
+        // Game Over title
+        var titleGo = new GameObject("Title", typeof(RectTransform), typeof(TextMeshProUGUI));
+        titleGo.transform.SetParent(contentGo.transform, false);
+
+        var titleRect = titleGo.GetComponent<RectTransform>();
+        titleRect.anchorMin = new Vector2(0, 0.7f);
+        titleRect.anchorMax = new Vector2(1, 1);
+        titleRect.offsetMin = Vector2.zero;
+        titleRect.offsetMax = Vector2.zero;
+
+        var titleText = titleGo.GetComponent<TextMeshProUGUI>();
+        titleText.text = "GAME OVER";
+        titleText.alignment = TextAlignmentOptions.Center;
+        titleText.fontSize = 56;
+        titleText.color = Color.white;
+        titleText.fontStyle = FontStyles.Bold;
+
+        // Score text
+        var scoreGo = new GameObject("FinalScore", typeof(RectTransform), typeof(TextMeshProUGUI));
+        scoreGo.transform.SetParent(contentGo.transform, false);
+
+        var scoreRect = scoreGo.GetComponent<RectTransform>();
+        scoreRect.anchorMin = new Vector2(0, 0.35f);
+        scoreRect.anchorMax = new Vector2(1, 0.7f);
+        scoreRect.offsetMin = Vector2.zero;
+        scoreRect.offsetMax = Vector2.zero;
+
+        var scoreText = scoreGo.GetComponent<TextMeshProUGUI>();
+        scoreText.text = "0";
+        scoreText.alignment = TextAlignmentOptions.Center;
+        scoreText.fontSize = 72;
+        scoreText.color = Color.white;
+        scoreText.fontStyle = FontStyles.Bold;
+
+        // Restart button
+        var buttonGo = new GameObject("RestartButton", typeof(RectTransform), typeof(Image), typeof(Button));
+        buttonGo.transform.SetParent(contentGo.transform, false);
+
+        var buttonRect = buttonGo.GetComponent<RectTransform>();
+        buttonRect.anchorMin = new Vector2(0.2f, 0.05f);
+        buttonRect.anchorMax = new Vector2(0.8f, 0.3f);
+        buttonRect.offsetMin = Vector2.zero;
+        buttonRect.offsetMax = Vector2.zero;
+
+        var buttonImage = buttonGo.GetComponent<Image>();
+        buttonImage.color = new Color(0.3f, 0.7f, 0.4f);
+
+        var buttonTextGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+        buttonTextGo.transform.SetParent(buttonGo.transform, false);
+
+        var btnTextRect = buttonTextGo.GetComponent<RectTransform>();
+        btnTextRect.anchorMin = Vector2.zero;
+        btnTextRect.anchorMax = Vector2.one;
+        btnTextRect.sizeDelta = Vector2.zero;
+
+        var btnText = buttonTextGo.GetComponent<TextMeshProUGUI>();
+        btnText.text = "RESTART";
+        btnText.alignment = TextAlignmentOptions.Center;
+        btnText.fontSize = 36;
+        btnText.color = Color.white;
+        btnText.fontStyle = FontStyles.Bold;
+
+        var gameOverUI = rootGo.AddComponent<GameOverUI>();
+        var so = new SerializedObject(gameOverUI);
+        so.FindProperty("_panel").objectReferenceValue = panelGo;
+        so.FindProperty("_finalScoreText").objectReferenceValue = scoreText;
+        so.FindProperty("_restartButton").objectReferenceValue = buttonGo.GetComponent<Button>();
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        return gameOverUI;
+    }
+
+    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, GameOverUI gameOverUI)
     {
         var existingScope = Object.FindAnyObjectByType<GameplayLifetimeScope>();
         if (existingScope != null)
@@ -261,6 +430,8 @@ public static class BoardSetupTool
             so.FindProperty("_boardConfig").objectReferenceValue = config;
             so.FindProperty("_boardView").objectReferenceValue = boardView;
             so.FindProperty("_pieceTray").objectReferenceValue = pieceTray;
+            so.FindProperty("_scoreUI").objectReferenceValue = scoreUI;
+            so.FindProperty("_gameOverUI").objectReferenceValue = gameOverUI;
             so.ApplyModifiedPropertiesWithoutUndo();
             return;
         }
@@ -272,6 +443,8 @@ public static class BoardSetupTool
         scopeSo.FindProperty("_boardConfig").objectReferenceValue = config;
         scopeSo.FindProperty("_boardView").objectReferenceValue = boardView;
         scopeSo.FindProperty("_pieceTray").objectReferenceValue = pieceTray;
+        scopeSo.FindProperty("_scoreUI").objectReferenceValue = scoreUI;
+        scopeSo.FindProperty("_gameOverUI").objectReferenceValue = gameOverUI;
         scopeSo.ApplyModifiedPropertiesWithoutUndo();
     }
 
