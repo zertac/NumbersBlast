@@ -8,7 +8,8 @@ public enum HighlightType
     Placement,
     Invalid,
     Merge,
-    LineClear
+    LineClear,
+    TutorialTarget
 }
 
 public class CellView : MonoBehaviour
@@ -16,14 +17,17 @@ public class CellView : MonoBehaviour
     [SerializeField] private Image _background;
     [SerializeField] private TextMeshProUGUI _valueText;
 
-    private static readonly Color PlacementColor = new(0.5f, 0.9f, 0.5f, 0.6f);
+    private static readonly Color PlacementColor = new(0.4f, 0.85f, 0.5f, 1f);
     private static readonly Color InvalidColor = new(0.9f, 0.4f, 0.4f, 0.6f);
     private static readonly Color MergeColor = new(1f, 0.9f, 0.3f, 0.7f);
     private static readonly Color LineClearColor = new(0.3f, 0.7f, 1f, 0.7f);
+    private static readonly Color TutorialTargetColor = new(1f, 0.9f, 0.2f, 1f);
 
     private CellData _data;
     private BoardConfig _config;
     private HighlightType _highlightType;
+
+    public HighlightType CurrentHighlight => _highlightType;
 
     public CellData Data => _data;
     public RectTransform RectTransform { get; private set; }
@@ -67,6 +71,7 @@ public class CellView : MonoBehaviour
             HighlightType.Invalid => InvalidColor,
             HighlightType.Merge => MergeColor,
             HighlightType.LineClear => LineClearColor,
+            HighlightType.TutorialTarget => TutorialTargetColor,
             _ => _config.EmptyCellColor
         };
     }

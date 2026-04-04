@@ -27,9 +27,14 @@ public class PieceView : MonoBehaviour
     {
         _cellViews = new PieceCellView[_model.CellCount];
 
-        var shapeSize = _model.Shape.GetNormalizedSize();
-        float totalWidth = shapeSize.y * _cellSize;
-        float totalHeight = shapeSize.x * _cellSize;
+        int maxRow = 0, maxCol = 0;
+        for (int i = 0; i < _model.CellCount; i++)
+        {
+            if (_model.Positions[i].x > maxRow) maxRow = _model.Positions[i].x;
+            if (_model.Positions[i].y > maxCol) maxCol = _model.Positions[i].y;
+        }
+        float totalWidth = (maxCol + 1) * _cellSize;
+        float totalHeight = (maxRow + 1) * _cellSize;
         float offsetX = -totalWidth * 0.5f;
         float offsetY = totalHeight * 0.5f;
 

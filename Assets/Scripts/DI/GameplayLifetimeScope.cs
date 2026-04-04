@@ -9,6 +9,9 @@ public class GameplayLifetimeScope : LifetimeScope
     [SerializeField] private PieceTray _pieceTray;
     [SerializeField] private ScoreUI _scoreUI;
     [SerializeField] private GameOverUI _gameOverUI;
+    [SerializeField] private TutorialOverlay _tutorialOverlay;
+    [SerializeField] private TutorialFeedbackPopup _tutorialPopup;
+    [SerializeField] private TutorialConfig _tutorialConfig;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -17,11 +20,17 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterInstance(_pieceTray);
         builder.RegisterInstance(_scoreUI);
         builder.RegisterInstance(_gameOverUI);
+        builder.RegisterInstance(_tutorialOverlay);
+        builder.RegisterInstance(_tutorialPopup);
+
+        if (_tutorialConfig != null)
+            builder.RegisterInstance(_tutorialConfig);
 
         builder.Register<BoardManager>(Lifetime.Singleton);
         builder.Register<MergeResolver>(Lifetime.Singleton);
         builder.Register<LineClearResolver>(Lifetime.Singleton);
         builder.Register<PlacementHandler>(Lifetime.Singleton);
+        builder.Register<TutorialManager>(Lifetime.Singleton);
 
         builder.RegisterEntryPoint<GameplayInitializer>();
     }

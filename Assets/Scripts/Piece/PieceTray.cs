@@ -11,14 +11,16 @@ public class PieceTray : MonoBehaviour
     private BoardManager _boardManager;
     private Canvas _canvas;
     private float _cellSize;
+    private TutorialManager _tutorialManager;
 
-    public void Initialize(BoardConfig config, float cellSize, Canvas canvas, BoardView boardView, BoardManager boardManager)
+    public void Initialize(BoardConfig config, float cellSize, Canvas canvas, BoardView boardView, BoardManager boardManager, TutorialManager tutorialManager = null)
     {
         _config = config;
         _cellSize = cellSize;
         _canvas = canvas;
         _boardView = boardView;
         _boardManager = boardManager;
+        _tutorialManager = tutorialManager;
         _pieceViews = new PieceView[_pieceSlots.Length];
     }
 
@@ -38,7 +40,7 @@ public class PieceTray : MonoBehaviour
             pieceView.Initialize(model, _config, _cellSize);
 
             var dragHandler = pieceGo.AddComponent<PieceDragHandler>();
-            dragHandler.Initialize(pieceView, _canvas, _boardView, _boardManager, _config);
+            dragHandler.Initialize(pieceView, _canvas, _boardView, _boardManager, _config, _tutorialManager);
 
             var slotRect = _pieceSlots[i].GetComponent<RectTransform>();
             float scale = CalculateFitScale(model.Shape, slotRect);
@@ -72,6 +74,75 @@ public class PieceTray : MonoBehaviour
         float scaleY = slotRect.sizeDelta.y / pieceHeight;
 
         return Mathf.Min(scaleX, scaleY, 0.6f);
+    }
+
+    public void SpawnTutorialPiece(PieceModel model)
+    {
+        ClearAll();
+
+        var pieceGo = Instantiate(_piecePrefab, _pieceSlots[0]);
+        var pieceView = pieceGo.GetComponent<PieceView>();
+        pieceView.Initialize(model, _config, _cellSize);
+
+        var dragHandler = pieceGo.AddComponent<PieceDragHandler>();
+        dragHandler.Initialize(pieceView, _canvas, _boardView, _boardManager, _config, _tutorialManager);
+
+        var slotRect = _pieceSlots[0].GetComponent<RectTransform>();
+        float pieceWidth = 1;
+        float pieceHeight = 1;
+        for (int i = 0; i < model.Positions.Length; i++)
+        {
+            if (model.Positions[i].y + 1 > pieceWidth) pieceWidth = model.Positions[i].y + 1;
+            if (model.Positions[i].x + 1 > pieceHeight) pieceHeight = model.Positions[i].x + 1;
+        }
+
+        float scaleX = slotRect.sizeDelta.x / (pieceWidth * _cellSize);
+        float scaleY = slotRect.sizeDelta.y / (pieceHeight * _cellSize);
+        pieceView.SetScale(Mathf.Min(scaleX, scaleY, 0.6f));
+
+        _pieceViews[0] = pieceView;
+    }
+
+    public void ClearAll()
+    {
+        for (int i = 0; i < _pieceViews.Length; i++)
+        {
+            if (_pieceViews[i] != null)
+            {
+                Destroy(_pieceViews[i].gameObject);
+                _pieceViews[i] = null;
+            }
+        }
+    }
+
+    public PieceView GetFirstOccupiedPiece()
+    {
+        for (int i = 0; i < _pieceViews.Length; i++)
+        {
+            if (_pieceViews[i] != null)
+                return _pieceViews[i];
+        }
+        return null;
+    }
+
+    public RectTransform GetFirstOccupiedPieceRect()
+    {
+        for (int i = 0; i < _pieceViews.Length; i++)
+        {
+            if (_pieceViews[i] != null)
+                return _pieceViews[i].RectTransform;
+        }
+        return null;
+    }
+
+    public RectTransform GetFirstOccupiedSlotRect()
+    {
+        for (int i = 0; i < _pieceViews.Length; i++)
+        {
+            if (_pieceViews[i] != null)
+                return _pieceSlots[i].GetComponent<RectTransform>();
+        }
+        return null;
     }
 
     public void RemovePiece(PieceView piece)

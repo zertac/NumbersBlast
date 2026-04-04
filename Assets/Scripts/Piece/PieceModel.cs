@@ -18,6 +18,13 @@ public class PieceModel
         }
     }
 
+    public PieceModel(Vector2Int[] positions, int[] fixedValues)
+    {
+        Shape = null;
+        Positions = positions;
+        Values = fixedValues;
+    }
+
     public int GetValueAt(int index)
     {
         return Values[index];

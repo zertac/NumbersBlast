@@ -28,7 +28,9 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     private const float ReturnDuration = 0.2f;
     private const float DragOffsetY = 150f;
 
-    public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config)
+    private TutorialManager _tutorialManager;
+
+    public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null)
     {
         _pieceView = pieceView;
         _canvas = canvas;
@@ -36,6 +38,7 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         _boardView = boardView;
         _boardManager = boardManager;
         _config = config;
+        _tutorialManager = tutorialManager;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -56,6 +59,7 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
 
         _dragOffset = new Vector2(0, DragOffsetY);
 
+        _tutorialManager?.OnPiecePickedUp();
         GameEvents.PiecePickedUp(_pieceView);
     }
 
@@ -77,8 +81,22 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         _isDragging = false;
 
         var boardPos = GetBoardPosition();
+        var forcedPos = _tutorialManager?.ForcedPlacement;
 
-        if (boardPos.HasValue && CanPlace(boardPos.Value))
+        Debug.Log($"[Drag] boardPos={boardPos} forcedPos={forcedPos} tutorialMgr={(_tutorialManager != null ? "yes" : "null")}");
+
+        if (forcedPos.HasValue)
+        {
+            if (boardPos.HasValue && boardPos.Value == forcedPos.Value && CanPlace(boardPos.Value))
+            {
+                GameEvents.PiecePlaced(_pieceView, boardPos.Value);
+            }
+            else
+            {
+                ReturnToTray();
+            }
+        }
+        else if (boardPos.HasValue && CanPlace(boardPos.Value))
         {
             GameEvents.PiecePlaced(_pieceView, boardPos.Value);
         }
@@ -88,12 +106,12 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
             GameEvents.PieceReleased(_pieceView);
         }
 
-        ClearBoardHighlight();
+        ClearDragHighlight();
     }
 
     private void UpdateBoardHighlight()
     {
-        ClearBoardHighlight();
+        ClearDragHighlight();
 
         var boardPos = GetBoardPosition();
         if (!boardPos.HasValue) return;
@@ -247,6 +265,20 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
             for (int c = 0; c < cellViews.GetLength(1); c++)
             {
                 cellViews[r, c].SetHighlight(HighlightType.None);
+            }
+        }
+    }
+
+    private void ClearDragHighlight()
+    {
+        var cellViews = _boardView.CellViews;
+        for (int r = 0; r < cellViews.GetLength(0); r++)
+        {
+            for (int c = 0; c < cellViews.GetLength(1); c++)
+            {
+                var h = cellViews[r, c];
+                if (h.CurrentHighlight != HighlightType.TutorialTarget)
+                    h.SetHighlight(HighlightType.None);
             }
         }
     }
