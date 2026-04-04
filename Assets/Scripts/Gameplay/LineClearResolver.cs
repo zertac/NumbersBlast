@@ -2,12 +2,11 @@ using System.Collections.Generic;
 
 public class LineClearResolver
 {
-    public int Resolve(BoardModel model, BoardView boardView)
+    public LineClearResult Resolve(BoardModel model, BoardView boardView)
     {
         var rowsToClear = new List<int>();
         var columnsToClear = new List<int>();
 
-        // Find all full rows and columns FIRST
         for (int r = 0; r < model.Rows; r++)
         {
             if (IsRowFull(model, r))
@@ -20,12 +19,16 @@ public class LineClearResolver
                 columnsToClear.Add(c);
         }
 
-        if (rowsToClear.Count == 0 && columnsToClear.Count == 0)
-            return 0;
+        var result = new LineClearResult
+        {
+            Score = 0,
+            ClearedPositions = new List<UnityEngine.Vector2Int>()
+        };
 
-        // Track cleared cells to avoid double-scoring intersections
+        if (rowsToClear.Count == 0 && columnsToClear.Count == 0)
+            return result;
+
         var clearedCells = new HashSet<long>();
-        int totalScore = 0;
 
         for (int i = 0; i < rowsToClear.Count; i++)
         {
@@ -35,7 +38,8 @@ public class LineClearResolver
                 long key = (long)r * model.Columns + c;
                 if (clearedCells.Add(key))
                 {
-                    totalScore += model.GetCell(r, c).Value;
+                    result.Score += model.GetCell(r, c).Value;
+                    result.ClearedPositions.Add(new UnityEngine.Vector2Int(r, c));
                 }
             }
         }
@@ -48,12 +52,12 @@ public class LineClearResolver
                 long key = (long)r * model.Columns + c;
                 if (clearedCells.Add(key))
                 {
-                    totalScore += model.GetCell(r, c).Value;
+                    result.Score += model.GetCell(r, c).Value;
+                    result.ClearedPositions.Add(new UnityEngine.Vector2Int(r, c));
                 }
             }
         }
 
-        // Clear all at once
         foreach (long key in clearedCells)
         {
             int r = (int)(key / model.Columns);
@@ -61,7 +65,7 @@ public class LineClearResolver
             model.GetCell(r, c).Clear();
         }
 
-        return totalScore;
+        return result;
     }
 
     private bool IsRowFull(BoardModel model, int row)

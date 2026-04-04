@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ThemeData
   BackgroundColor: {r: 1, g: 1, b: 1, a: 1}
   BackgroundSprite: {fileID: 21300000, guid: bcb3485bc794e8040b3f9475cb8f8c7d, type: 3}
-  BoardFrameSprite: {fileID: 21300000, guid: bbd66fca9f079b1468e5eddf2d7392f4, type: 3}
-  BoardFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  BoardFrameSprite: {fileID: 21300000, guid: 658f7809c2acaed42ae3365a1052aae9, type: 3}
+  BoardFrameColor: {r: 0.22998215, g: 0.2693456, b: 0.4188679, a: 1}
   EmptyCellSprite: {fileID: 21300000, guid: e7ed0a654bca7ea43991f47f41ade5eb, type: 3}
   EmptyCellColor: {r: 0.85, g: 0.85, b: 0.85, a: 1}
   BlockSprite: {fileID: -6420916621572684596, guid: 070f2068a3381c747a62d1a7a9c7c22b, type: 3}

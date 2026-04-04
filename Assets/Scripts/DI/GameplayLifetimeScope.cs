@@ -12,6 +12,7 @@ public class GameplayLifetimeScope : LifetimeScope
     [SerializeField] private TutorialOverlay _tutorialOverlay;
     [SerializeField] private TutorialFeedbackPopup _tutorialPopup;
     [SerializeField] private TutorialConfig _tutorialConfig;
+    [SerializeField] private FeedbackManager _feedbackManager;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -25,6 +26,8 @@ public class GameplayLifetimeScope : LifetimeScope
 
         if (_tutorialConfig != null)
             builder.RegisterInstance(_tutorialConfig);
+
+        builder.RegisterInstance(_feedbackManager);
 
         builder.Register<BoardManager>(Lifetime.Singleton);
         builder.Register<MergeResolver>(Lifetime.Singleton);

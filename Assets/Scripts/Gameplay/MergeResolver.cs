@@ -5,16 +5,14 @@ public class MergeResolver
 {
     private static readonly Vector2Int[] Directions =
     {
-        new(-1, 0), // up
-        new(1, 0),  // down
-        new(0, -1), // left
-        new(0, 1)   // right
+        new(-1, 0), new(1, 0), new(0, -1), new(0, 1)
     };
 
     private readonly HashSet<Vector2Int> _placedPositions = new();
 
-    public void Resolve(BoardModel model, PieceModel pieceModel, Vector2Int boardPos, BoardView boardView)
+    public List<MergeEvent> Resolve(BoardModel model, PieceModel pieceModel, Vector2Int boardPos, BoardView boardView)
     {
+        var mergeEvents = new List<MergeEvent>();
         _placedPositions.Clear();
 
         var cellsToCheck = new List<Vector2Int>(pieceModel.CellCount);
@@ -29,7 +27,6 @@ public class MergeResolver
             _placedPositions.Add(pos);
         }
 
-        // First pass: merge only with pre-existing cells (not other placed cells)
         bool merged = true;
         bool isFirstPass = true;
 
@@ -49,6 +46,7 @@ public class MergeResolver
                 if (mergedNeighbors.Count > 0)
                 {
                     int sum = cellData.Value;
+                    var absorbedPositions = new List<Vector2Int>();
 
                     for (int j = 0; j < mergedNeighbors.Count; j++)
                     {
@@ -56,18 +54,28 @@ public class MergeResolver
                         Debug.Log($"[Merge] Cell ({cell.x},{cell.y}) val={cellData.Value} absorbs ({mergedNeighbors[j].x},{mergedNeighbors[j].y}) val={neighbor.Value} | isFirstPass={isFirstPass}");
                         sum += neighbor.Value;
                         neighbor.Clear();
+                        absorbedPositions.Add(mergedNeighbors[j]);
                     }
 
                     Debug.Log($"[Merge] Cell ({cell.x},{cell.y}) new value={sum}");
                     cellData.SetValue(sum);
                     merged = true;
                     nextCheck.Add(cell);
+
+                    mergeEvents.Add(new MergeEvent
+                    {
+                        TargetPos = cell,
+                        AbsorbedPositions = absorbedPositions,
+                        IsChain = !isFirstPass
+                    });
                 }
             }
 
             cellsToCheck = nextCheck;
             isFirstPass = false;
         }
+
+        return mergeEvents;
     }
 
     private List<Vector2Int> FindMatchingNeighbors(BoardModel model, Vector2Int pos, int value, bool excludePlaced)

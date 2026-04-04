@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlacementHandler
@@ -7,14 +8,16 @@ public class PlacementHandler
     private readonly LineClearResolver _lineClearResolver;
     private readonly PieceTray _pieceTray;
     private readonly BoardView _boardView;
+    private readonly FeedbackManager _feedbackManager;
 
-    public PlacementHandler(BoardManager boardManager, MergeResolver mergeResolver, LineClearResolver lineClearResolver, PieceTray pieceTray, BoardView boardView)
+    public PlacementHandler(BoardManager boardManager, MergeResolver mergeResolver, LineClearResolver lineClearResolver, PieceTray pieceTray, BoardView boardView, FeedbackManager feedbackManager)
     {
         _boardManager = boardManager;
         _mergeResolver = mergeResolver;
         _lineClearResolver = lineClearResolver;
         _pieceTray = pieceTray;
         _boardView = boardView;
+        _feedbackManager = feedbackManager;
     }
 
     public void Enable()
@@ -35,24 +38,68 @@ public class PlacementHandler
         PlaceCells(model, pieceModel, boardPos);
         Object.Destroy(pieceView.gameObject);
         _pieceTray.RemovePiece(pieceView);
-
         _boardView.RefreshAll();
 
-        _mergeResolver.Resolve(model, pieceModel, boardPos, _boardView);
+        // Place feedback
+        var placedCells = GetCellViews(pieceModel, boardPos);
+        _feedbackManager.PlayPlaceEffect(placedCells);
+
+        // Merge
+        var mergeResult = _mergeResolver.Resolve(model, pieceModel, boardPos, _boardView);
         _boardView.RefreshAll();
 
-        int clearedScore = _lineClearResolver.Resolve(model, _boardView);
-        if (clearedScore > 0)
+        // Merge feedback
+        for (int i = 0; i < mergeResult.Count; i++)
         {
-            GameEvents.ScoreChanged(clearedScore);
+            var merge = mergeResult[i];
+            var targetView = _boardView.GetCellView(merge.TargetPos.x, merge.TargetPos.y);
+            var absorbedViews = new CellView[merge.AbsorbedPositions.Count];
+            for (int j = 0; j < merge.AbsorbedPositions.Count; j++)
+            {
+                absorbedViews[j] = _boardView.GetCellView(merge.AbsorbedPositions[j].x, merge.AbsorbedPositions[j].y);
+            }
+
+            if (merge.IsChain)
+                _feedbackManager.PlayChainMergeSmash(targetView);
+            else
+                _feedbackManager.PlayMergeSmash(targetView, absorbedViews);
         }
 
-        _boardView.RefreshAll();
-
-        if (!HasValidMoveForTray())
+        // Line clear
+        var clearResult = _lineClearResolver.Resolve(model, _boardView);
+        if (clearResult.Score > 0)
         {
-            GameEvents.GameOver();
+            GameEvents.ScoreChanged(clearResult.Score);
+
+            var clearViews = new CellView[clearResult.ClearedPositions.Count];
+            for (int i = 0; i < clearResult.ClearedPositions.Count; i++)
+            {
+                clearViews[i] = _boardView.GetCellView(clearResult.ClearedPositions[i].x, clearResult.ClearedPositions[i].y);
+            }
+
+            _feedbackManager.PlayLineClearEffect(clearViews, () =>
+            {
+                _boardView.RefreshAll();
+                CheckGameOver();
+            });
         }
+        else
+        {
+            _boardView.RefreshAll();
+            CheckGameOver();
+        }
+    }
+
+    private CellView[] GetCellViews(PieceModel pieceModel, Vector2Int boardPos)
+    {
+        var views = new CellView[pieceModel.CellCount];
+        for (int i = 0; i < pieceModel.CellCount; i++)
+        {
+            int row = boardPos.x + pieceModel.Positions[i].x;
+            int col = boardPos.y + pieceModel.Positions[i].y;
+            views[i] = _boardView.GetCellView(row, col);
+        }
+        return views;
     }
 
     private void PlaceCells(BoardModel model, PieceModel pieceModel, Vector2Int boardPos)
@@ -62,6 +109,14 @@ public class PlacementHandler
             int row = boardPos.x + pieceModel.Positions[i].x;
             int col = boardPos.y + pieceModel.Positions[i].y;
             model.GetCell(row, col).SetValue(pieceModel.GetValueAt(i));
+        }
+    }
+
+    private void CheckGameOver()
+    {
+        if (!HasValidMoveForTray())
+        {
+            _feedbackManager.PlayGameOverEffect(() => GameEvents.GameOver());
         }
     }
 

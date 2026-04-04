@@ -28,9 +28,10 @@ public static class BoardSetupTool
         var pieceTray = SetupPieceTray(canvas.transform);
         var scoreUI = SetupScoreUI(canvas.transform);
         var gameOverUI = SetupGameOverUI(canvas.transform);
+        var feedbackManager = SetupFeedbackManager(canvas.transform);
         var tutorialOverlay = SetupTutorialOverlay(canvas.transform);
         var tutorialPopup = SetupTutorialFeedbackPopup(canvas.transform);
-        SetupGameplayScope(config, boardView, pieceTray, scoreUI, gameOverUI, tutorialOverlay, tutorialPopup);
+        SetupGameplayScope(config, boardView, pieceTray, scoreUI, gameOverUI, feedbackManager, tutorialOverlay, tutorialPopup);
 
         AssetDatabase.SaveAssets();
         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
@@ -679,7 +680,17 @@ public static class BoardSetupTool
         return popup;
     }
 
-    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, GameOverUI gameOverUI, TutorialOverlay tutorialOverlay, TutorialFeedbackPopup tutorialPopup)
+    private static FeedbackManager SetupFeedbackManager(Transform canvasTransform)
+    {
+        var existing = Object.FindAnyObjectByType<FeedbackManager>();
+        if (existing != null) return existing;
+
+        var go = new GameObject("FeedbackManager");
+        go.transform.SetParent(null);
+        return go.AddComponent<FeedbackManager>();
+    }
+
+    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, GameOverUI gameOverUI, FeedbackManager feedbackManager, TutorialOverlay tutorialOverlay, TutorialFeedbackPopup tutorialPopup)
     {
         var existingScope = Object.FindAnyObjectByType<GameplayLifetimeScope>();
         if (existingScope != null)
@@ -690,6 +701,7 @@ public static class BoardSetupTool
             so.FindProperty("_pieceTray").objectReferenceValue = pieceTray;
             so.FindProperty("_scoreUI").objectReferenceValue = scoreUI;
             so.FindProperty("_gameOverUI").objectReferenceValue = gameOverUI;
+            so.FindProperty("_feedbackManager").objectReferenceValue = feedbackManager;
             so.FindProperty("_tutorialOverlay").objectReferenceValue = tutorialOverlay;
             so.FindProperty("_tutorialPopup").objectReferenceValue = tutorialPopup;
             so.ApplyModifiedPropertiesWithoutUndo();
@@ -705,6 +717,7 @@ public static class BoardSetupTool
         scopeSo.FindProperty("_pieceTray").objectReferenceValue = pieceTray;
         scopeSo.FindProperty("_scoreUI").objectReferenceValue = scoreUI;
         scopeSo.FindProperty("_gameOverUI").objectReferenceValue = gameOverUI;
+        scopeSo.FindProperty("_feedbackManager").objectReferenceValue = feedbackManager;
         scopeSo.FindProperty("_tutorialOverlay").objectReferenceValue = tutorialOverlay;
         scopeSo.FindProperty("_tutorialPopup").objectReferenceValue = tutorialPopup;
         scopeSo.ApplyModifiedPropertiesWithoutUndo();

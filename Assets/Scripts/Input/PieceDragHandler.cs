@@ -29,8 +29,10 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     private const float DragOffsetY = 150f;
 
     private TutorialManager _tutorialManager;
+    private FeedbackManager _feedbackManager;
+    private CellView[] _currentMergeHoverCells;
 
-    public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null)
+    public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null)
     {
         _pieceView = pieceView;
         _canvas = canvas;
@@ -39,6 +41,7 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         _boardManager = boardManager;
         _config = config;
         _tutorialManager = tutorialManager;
+        _feedbackManager = feedbackManager;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -79,6 +82,12 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     {
         if (!_isDragging) return;
         _isDragging = false;
+
+        if (_feedbackManager != null && _currentMergeHoverCells != null)
+        {
+            _feedbackManager.StopMergeHover(_currentMergeHoverCells);
+            _currentMergeHoverCells = null;
+        }
 
         var boardPos = GetBoardPosition();
         var forcedPos = _tutorialManager?.ForcedPlacement;
@@ -125,8 +134,28 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         }
 
         HighlightPlacement(boardPos.Value, HighlightType.Placement);
-        HighlightMerges(boardPos.Value);
+        var mergeCells = HighlightMerges(boardPos.Value);
         HighlightLineClear(boardPos.Value);
+
+        if (_feedbackManager != null)
+        {
+            bool sameCells = AreSameCells(_currentMergeHoverCells, mergeCells);
+
+            if (!sameCells)
+            {
+                if (_currentMergeHoverCells != null)
+                {
+                    _feedbackManager.StopMergeHover(_currentMergeHoverCells);
+                    _currentMergeHoverCells = null;
+                }
+
+                if (mergeCells != null && mergeCells.Length > 0)
+                {
+                    _feedbackManager.StartMergeHover(mergeCells);
+                    _currentMergeHoverCells = mergeCells;
+                }
+            }
+        }
     }
 
     private void HighlightPlacement(Vector2Int boardPos, HighlightType type)
@@ -146,11 +175,12 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         }
     }
 
-    private void HighlightMerges(Vector2Int boardPos)
+    private CellView[] HighlightMerges(Vector2Int boardPos)
     {
         var model = _boardManager.Model;
         var pieceModel = _pieceView.Model;
         var placedSet = new HashSet<Vector2Int>();
+        var mergeCellList = new System.Collections.Generic.List<CellView>();
 
         for (int i = 0; i < pieceModel.CellCount; i++)
         {
@@ -176,14 +206,30 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
                 var neighbor = model.GetCell(nRow, nCol);
                 if (neighbor != null && !neighbor.IsEmpty && neighbor.Value == value)
                 {
+                    Debug.Log($"[MergeHighlight] Piece({cellRow},{cellCol})={value} matched neighbor({nRow},{nCol})={neighbor.Value}");
                     var cellView = _boardView.GetCellView(nRow, nCol);
                     if (cellView != null)
                     {
                         cellView.SetHighlight(HighlightType.Merge);
+                        mergeCellList.Add(cellView);
                     }
                 }
             }
         }
+
+        return mergeCellList.Count > 0 ? mergeCellList.ToArray() : null;
+    }
+
+    private bool AreSameCells(CellView[] a, CellView[] b)
+    {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        if (a.Length != b.Length) return false;
+        for (int i = 0; i < a.Length; i++)
+        {
+            if (a[i] != b[i]) return false;
+        }
+        return true;
     }
 
     private void HighlightLineClear(Vector2Int boardPos)
