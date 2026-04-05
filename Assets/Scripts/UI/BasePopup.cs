@@ -14,11 +14,13 @@ public abstract class BasePopup : MonoBehaviour
 
     private const float ShowDuration = 0.3f;
     private const float HideDuration = 0.2f;
-    private const float DimAlpha = 0.6f;
+    private float _dimTargetAlpha;
 
     protected virtual void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
+        if (_dimBackground != null)
+            _dimTargetAlpha = _dimBackground.color.a;
         gameObject.SetActive(false);
     }
 
@@ -38,7 +40,7 @@ public abstract class BasePopup : MonoBehaviour
             var dimColor = _dimBackground.color;
             dimColor.a = 0f;
             _dimBackground.color = dimColor;
-            _dimBackground.DOFade(DimAlpha, ShowDuration);
+            _dimBackground.DOFade(_dimTargetAlpha, ShowDuration);
         }
 
         var sequence = DOTween.Sequence();

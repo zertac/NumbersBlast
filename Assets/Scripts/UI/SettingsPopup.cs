@@ -12,6 +12,9 @@ public class SettingsPopup : BasePopup
     [SerializeField] private TextMeshProUGUI _sfxLabel;
     [SerializeField] private TextMeshProUGUI _hapticLabel;
 
+    [SerializeField] private Sprite _toggleOnSprite;
+    [SerializeField] private Sprite _toggleOffSprite;
+
     private AudioManager _audioManager;
 
     protected override void Awake()
@@ -64,10 +67,26 @@ public class SettingsPopup : BasePopup
     {
         if (_audioManager != null)
         {
-            _musicLabel.text = $"Music: {(_audioManager.MusicEnabled ? "ON" : "OFF")}";
-            _sfxLabel.text = $"SFX: {(_audioManager.SFXEnabled ? "ON" : "OFF")}";
+            bool musicOn = _audioManager.MusicEnabled;
+            _musicLabel.text = musicOn ? "ON" : "OFF";
+            SetToggleSprite(_musicToggle, musicOn);
+
+            bool sfxOn = _audioManager.SFXEnabled;
+            _sfxLabel.text = sfxOn ? "ON" : "OFF";
+            SetToggleSprite(_sfxToggle, sfxOn);
         }
-        _hapticLabel.text = $"Haptic: {(HapticManager.Enabled ? "ON" : "OFF")}";
+
+        bool hapticOn = HapticManager.Enabled;
+        _hapticLabel.text = hapticOn ? "ON" : "OFF";
+        SetToggleSprite(_hapticToggle, hapticOn);
+    }
+
+    private void SetToggleSprite(Button toggle, bool isOn)
+    {
+        var image = toggle.GetComponent<Image>();
+        var sprite = isOn ? _toggleOnSprite : _toggleOffSprite;
+        if (sprite != null)
+            image.sprite = sprite;
     }
 
     protected override void OnDestroy()
