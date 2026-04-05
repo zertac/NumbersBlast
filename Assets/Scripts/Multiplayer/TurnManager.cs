@@ -32,7 +32,11 @@ public class TurnManager
     {
         _coroutineRunner = coroutineRunner;
         _isActive = true;
-        StartPlayerTurn();
+
+        if (UnityEngine.Random.value > 0.5f)
+            StartPlayerTurn();
+        else
+            StartOpponentTurn();
     }
 
     public void Stop()
