@@ -16,7 +16,7 @@ public class PieceCellView : MonoBehaviour
     {
         _value = value;
         _theme = theme;
-        RectTransform = GetComponent<RectTransform>();
+        if (RectTransform == null) RectTransform = GetComponent<RectTransform>();
         Refresh();
     }
 

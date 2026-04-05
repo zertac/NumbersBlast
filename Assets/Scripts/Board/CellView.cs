@@ -30,7 +30,7 @@ public class CellView : MonoBehaviour
     {
         _data = data;
         _theme = theme;
-        RectTransform = GetComponent<RectTransform>();
+        if (RectTransform == null) RectTransform = GetComponent<RectTransform>();
 
         if (_theme.HighlightSprite != null)
             _highlight.sprite = _theme.HighlightSprite;

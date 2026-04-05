@@ -18,8 +18,7 @@ public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     private void Awake()
     {
         _originalScale = transform.localScale;
-        if (_button == null)
-            _button = GetComponent<Button>();
+        if (_button == null) _button = GetComponent<Button>();
     }
 
     public void OnPointerDown(PointerEventData eventData)

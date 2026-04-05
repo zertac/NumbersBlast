@@ -153,7 +153,7 @@ public class PieceTray : MonoBehaviour
         for (int i = 0; i < _pieceViews.Length; i++)
         {
             if (_pieceViews[i] != null)
-                return _pieceSlots[i].GetComponent<RectTransform>();
+                return _slotRects[i];
         }
         return null;
     }

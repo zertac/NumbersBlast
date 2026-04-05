@@ -18,7 +18,7 @@ public class PieceView : MonoBehaviour
         _model = model;
         _config = config;
         _cellSize = cellSize;
-        RectTransform = GetComponent<RectTransform>();
+        if (RectTransform == null) RectTransform = GetComponent<RectTransform>();
 
         CreateCells();
     }

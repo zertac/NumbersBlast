@@ -12,7 +12,7 @@ public class ScoreUI : MonoBehaviour
     public void Initialize()
     {
         _currentScore = 0;
-        _rectTransform = GetComponent<RectTransform>();
+        if (_rectTransform == null) _rectTransform = GetComponent<RectTransform>();
         UpdateDisplay();
         GameEvents.OnScoreChanged += HandleScoreChanged;
     }

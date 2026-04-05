@@ -19,7 +19,7 @@ public abstract class BasePopup : MonoBehaviour
 
     protected virtual void Awake()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
+        if (_canvasGroup == null) _canvasGroup = GetComponent<CanvasGroup>();
         if (_dimBackground != null)
             _dimTargetAlpha = _dimBackground.color.a;
         gameObject.SetActive(false);

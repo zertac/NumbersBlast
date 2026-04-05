@@ -15,17 +15,18 @@ public class SettingsPopup : BasePopup
     [SerializeField] private Sprite _toggleOnSprite;
     [SerializeField] private Sprite _toggleOffSprite;
 
+    [SerializeField] private Image _musicImage;
+    [SerializeField] private Image _sfxImage;
+    [SerializeField] private Image _hapticImage;
+
     private AudioManager _audioManager;
-    private Image _musicImage;
-    private Image _sfxImage;
-    private Image _hapticImage;
 
     protected override void Awake()
     {
         base.Awake();
-        _musicImage = _musicToggle.GetComponent<Image>();
-        _sfxImage = _sfxToggle.GetComponent<Image>();
-        _hapticImage = _hapticToggle.GetComponent<Image>();
+        if (_musicImage == null) _musicImage = _musicToggle.GetComponent<Image>();
+        if (_sfxImage == null) _sfxImage = _sfxToggle.GetComponent<Image>();
+        if (_hapticImage == null) _hapticImage = _hapticToggle.GetComponent<Image>();
         _musicToggle.onClick.AddListener(OnMusicToggle);
         _sfxToggle.onClick.AddListener(OnSFXToggle);
         _hapticToggle.onClick.AddListener(OnHapticToggle);
