@@ -21,7 +21,7 @@ MonoBehaviour:
   PiecePickup: {fileID: 8300000, guid: c9b554e6e443684409d943e08d0f7e8c, type: 3}
   PiecePlace: {fileID: 8300000, guid: 11c4970cecbb4394d8bea7197bc3a638, type: 3}
   PieceReturn: {fileID: 8300000, guid: 8b90ee0b2e6b6424ea2c9744ea62cdfe, type: 3}
-  Merge: {fileID: 8300000, guid: aaac1208d904d02489027f95a2f8d46b, type: 3}
+  Merge: {fileID: 8300000, guid: e6ccc46fc6893124a87d5c202c948351, type: 3}
   LineClear: {fileID: 8300000, guid: e215cba77fd21444e9c9f89767421ad6, type: 3}
   ScoreUp: {fileID: 8300000, guid: c9a17d1e23ed87d4ab1700b66018d7ec, type: 3}
   GameOver: {fileID: 8300000, guid: 474abd680b1b5ff4ebff628616621801, type: 3}
