@@ -13,12 +13,14 @@ public class TutorialOverlay : MonoBehaviour
     private Material _overlayMaterial;
     private Tween _handTween;
     private Tween _cutoutTween;
+    private Vector2 _handOffset;
 
     private static readonly int CutoutCenterProp = Shader.PropertyToID("_CutoutCenter");
     private static readonly int CutoutSizeProp = Shader.PropertyToID("_CutoutSize");
 
-    public void Initialize()
+    public void Initialize(Vector2 handOffset = default)
     {
+        _handOffset = handOffset == default ? new Vector2(30f, -30f) : handOffset;
         _overlayMaterial = new Material(_overlayImage.material);
         _overlayImage.material = _overlayMaterial;
         SetCutout(new Vector2(0.5f, 0.5f), Vector2.zero);
@@ -104,22 +106,58 @@ public class TutorialOverlay : MonoBehaviour
         return (center, size);
     }
 
-    public void ShowHandAt(Vector2 canvasPosition)
+    public void ShowHandAtPosition(RectTransform target)
     {
+        if (_handIcon == null || target == null) return;
+
         KillHandTween();
         _handIcon.gameObject.SetActive(true);
-        _handIcon.anchoredPosition = canvasPosition;
+        _handIcon.localScale = Vector3.one;
+        _handIcon.position = target.position;
+        _handIcon.anchoredPosition += _handOffset;
 
-        _handTween = _handIcon
-            .DOAnchorPosY(canvasPosition.y + 15f, 0.5f)
-            .SetEase(Ease.InOutSine)
-            .SetLoops(-1, LoopType.Yoyo);
+        // Gentle breathing animation
+        var seq = DOTween.Sequence();
+        seq.Append(_handIcon.DOScale(Vector3.one * 1.1f, 0.5f).SetEase(Ease.InOutSine));
+        seq.Append(_handIcon.DOScale(Vector3.one, 0.5f).SetEase(Ease.InOutSine));
+        seq.SetLoops(-1, LoopType.Restart);
+        seq.SetLink(_handIcon.gameObject);
+        _handTween = seq;
+    }
+
+    public void MoveHandToPosition(RectTransform target, float duration = 0.4f)
+    {
+        if (_handIcon == null || target == null) return;
+
+        KillHandTween();
+        _handIcon.gameObject.SetActive(true);
+
+        var targetPos = (Vector2)target.position + _handOffset;
+        _handIcon.DOMove(targetPos, duration)
+            .SetEase(Ease.InOutCubic)
+            .SetLink(_handIcon.gameObject)
+            .OnComplete(() =>
+            {
+                // Breathing at destination
+                var seq = DOTween.Sequence();
+                seq.Append(_handIcon.DOScale(Vector3.one * 1.1f, 0.5f).SetEase(Ease.InOutSine));
+                seq.Append(_handIcon.DOScale(Vector3.one, 0.5f).SetEase(Ease.InOutSine));
+                seq.SetLoops(-1, LoopType.Restart);
+                seq.SetLink(_handIcon.gameObject);
+                _handTween = seq;
+            });
     }
 
     public void HideHand()
     {
         KillHandTween();
-        _handIcon.gameObject.SetActive(false);
+        if (_handIcon != null)
+        {
+            _handIcon.DOScale(Vector3.zero, 0.2f)
+                .SetEase(Ease.InBack)
+                .SetLink(_handIcon.gameObject)
+                .OnComplete(() => _handIcon.gameObject.SetActive(false));
+        }
     }
 
     private void SetCutout(Vector2 center, Vector2 size)

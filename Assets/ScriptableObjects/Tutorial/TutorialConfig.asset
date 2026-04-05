@@ -16,3 +16,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 864f5f1026ae8494493d52798fbe426c, type: 2}
   - {fileID: 11400000, guid: aeca8bdfba27ad743b137635db7b1810, type: 2}
   - {fileID: 11400000, guid: 367ab94e30adfcc44bc187eb4eb470a4, type: 2}
+  HandOffset: {x: 100, y: -30}

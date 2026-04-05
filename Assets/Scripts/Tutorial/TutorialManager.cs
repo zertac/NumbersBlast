@@ -40,7 +40,7 @@ public class TutorialManager
     {
         _isActive = true;
         _currentStepIndex = 0;
-        _overlay.Initialize();
+        _overlay.Initialize(_config.HandOffset);
         GameEvents.OnPiecePlaced += HandlePiecePlaced;
         LoadStep(_currentStepIndex);
     }
@@ -70,12 +70,16 @@ public class TutorialManager
         _overlay.Show();
         _overlay.SetInstruction(_currentStep.InstructionText);
 
-        // Highlight target cells on board + piece in tray
+        // Highlight target cells on board
         HighlightTargetCells();
 
+        // Show hand at piece in tray
         var pieceRect = _pieceTray.GetFirstOccupiedPieceRect();
         if (pieceRect != null)
+        {
             _overlay.HighlightRect(pieceRect);
+            _overlay.ShowHandAtPosition(pieceRect);
+        }
     }
 
     private void SetupBoard()
@@ -204,6 +208,12 @@ public class TutorialManager
         Canvas.ForceUpdateCanvases();
         HighlightTargetCells();
         _overlay.SetInstruction("Place it here!");
+
+        // Move hand to target board area
+        var target = _currentStep.TargetBoardPosition;
+        var targetCell = _boardView.GetCellView(target.x, target.y);
+        if (targetCell != null)
+            _overlay.MoveHandToPosition(targetCell.RectTransform);
     }
 
     private void StartNormalGame()
