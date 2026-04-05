@@ -99,7 +99,7 @@ public class MultiplayerManager
     {
         bool isPlayer = _turnManager.IsPlayerTurn;
         int currentScore = isPlayer ? _hud.PlayerScore : _hud.OpponentScore;
-        int penalty = Mathf.RoundToInt(_turnManager.GetPenaltyAmount(currentScore));
+        int penalty = _turnManager.GetPenaltyAmount(currentScore);
 
         if (penalty > 0)
             _hud.ApplyPenalty(isPlayer, penalty);

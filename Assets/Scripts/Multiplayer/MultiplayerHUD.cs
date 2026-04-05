@@ -118,21 +118,51 @@ public class MultiplayerHUD : MonoBehaviour
 
     public void ApplyPenalty(bool isPlayer, int penalty)
     {
+        var scoreText = isPlayer ? _playerScoreText : _opponentScoreText;
+
         if (isPlayer)
-        {
             _playerScore = Mathf.Max(0, _playerScore - penalty);
-            _playerScoreText.color = Color.red;
-            DOVirtual.DelayedCall(PenaltyFlashDelay, () => _playerScoreText.color = Color.white)
-                .SetLink(_playerScoreText.gameObject);
-        }
         else
-        {
             _opponentScore = Mathf.Max(0, _opponentScore - penalty);
-            _opponentScoreText.color = Color.red;
-            DOVirtual.DelayedCall(PenaltyFlashDelay, () => _opponentScoreText.color = Color.white)
-                .SetLink(_opponentScoreText.gameObject);
-        }
+
         UpdateScores();
+
+        // Red flash
+        scoreText.color = Color.red;
+        DOVirtual.DelayedCall(PenaltyFlashDelay, () => scoreText.color = Color.white)
+            .SetLink(scoreText.gameObject);
+
+        // Shake
+        scoreText.transform.DOKill();
+        scoreText.transform.DOShakePosition(0.4f, 8f, 15, 90f, false, true, ShakeRandomnessMode.Harmonic)
+            .SetLink(scoreText.gameObject);
+
+        // Show penalty amount
+        ShowPenaltyText(scoreText.transform, penalty);
+    }
+
+    private void ShowPenaltyText(Transform anchor, int amount)
+    {
+        var penaltyGo = new GameObject("PenaltyText", typeof(RectTransform), typeof(TextMeshProUGUI));
+        penaltyGo.transform.SetParent(anchor.parent, false);
+        penaltyGo.transform.position = anchor.position;
+
+        var text = penaltyGo.GetComponent<TextMeshProUGUI>();
+        text.text = $"-{amount}";
+        text.fontSize = 28;
+        text.fontStyle = FontStyles.Bold;
+        text.color = Color.red;
+        text.alignment = TextAlignmentOptions.Center;
+        text.raycastTarget = false;
+
+        var rect = penaltyGo.GetComponent<RectTransform>();
+
+        // Float up and fade
+        var seq = DOTween.Sequence();
+        seq.Append(rect.DOAnchorPosY(rect.anchoredPosition.y + 80f, 1f).SetEase(Ease.OutCubic));
+        seq.Join(text.DOFade(0f, 1f).SetEase(Ease.InCubic));
+        seq.OnComplete(() => Destroy(penaltyGo));
+        seq.SetLink(penaltyGo);
     }
 
     public int PlayerScore => _playerScore;

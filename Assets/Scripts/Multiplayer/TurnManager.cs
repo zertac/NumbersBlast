@@ -109,8 +109,9 @@ public class TurnManager
         EndCurrentTurn();
     }
 
-    public float GetPenaltyAmount(int currentScore)
+    public int GetPenaltyAmount(int currentScore)
     {
-        return currentScore * _config.PenaltyPercent;
+        if (currentScore <= 0) return 0;
+        return Mathf.Max(1, Mathf.CeilToInt(currentScore * _config.PenaltyPercent));
     }
 }
