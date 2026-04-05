@@ -1,60 +1,65 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using NumbersBlast.Core;
+using NumbersBlast.StateMachine;
 
-public class PausePopup : BasePopup
+namespace NumbersBlast.UI
 {
-    [SerializeField] private Button _resumeButton;
-    [SerializeField] private Button _restartButton;
-    [SerializeField] private Button _mainMenuButton;
-
-    private GameStateManager _gameStateManager;
-    private bool _isMultiplayer;
-
-    protected override void Awake()
+    public class PausePopup : BasePopup
     {
-        base.Awake();
-        _resumeButton.onClick.AddListener(OnResume);
-        _restartButton.onClick.AddListener(OnRestart);
-        _mainMenuButton.onClick.AddListener(OnMainMenu);
-    }
+        [SerializeField] private Button _resumeButton;
+        [SerializeField] private Button _restartButton;
+        [SerializeField] private Button _mainMenuButton;
 
-    public void SetGameStateManager(GameStateManager gameStateManager)
-    {
-        _gameStateManager = gameStateManager;
-    }
+        private GameStateManager _gameStateManager;
+        private bool _isMultiplayer;
 
-    public void SetMultiplayerMode(bool isMultiplayer)
-    {
-        _isMultiplayer = isMultiplayer;
-    }
+        protected override void Awake()
+        {
+            base.Awake();
+            _resumeButton.onClick.AddListener(OnResume);
+            _restartButton.onClick.AddListener(OnRestart);
+            _mainMenuButton.onClick.AddListener(OnMainMenu);
+        }
 
-    private void OnResume()
-    {
-        Hide();
-        if (!_isMultiplayer)
-            _gameStateManager?.Resume();
-    }
+        public void SetGameStateManager(GameStateManager gameStateManager)
+        {
+            _gameStateManager = gameStateManager;
+        }
 
-    private void OnRestart()
-    {
-        if (!_isMultiplayer)
-            _gameStateManager?.Resume();
-        SceneManager.LoadScene(GameConstants.GameScene);
-    }
+        public void SetMultiplayerMode(bool isMultiplayer)
+        {
+            _isMultiplayer = isMultiplayer;
+        }
 
-    private void OnMainMenu()
-    {
-        if (!_isMultiplayer)
-            _gameStateManager?.Resume();
-        SceneManager.LoadScene(GameConstants.MainMenuScene);
-    }
+        private void OnResume()
+        {
+            Hide();
+            if (!_isMultiplayer)
+                _gameStateManager?.Resume();
+        }
 
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        _resumeButton.onClick.RemoveListener(OnResume);
-        _restartButton.onClick.RemoveListener(OnRestart);
-        _mainMenuButton.onClick.RemoveListener(OnMainMenu);
+        private void OnRestart()
+        {
+            if (!_isMultiplayer)
+                _gameStateManager?.Resume();
+            SceneManager.LoadScene(GameConstants.GameScene);
+        }
+
+        private void OnMainMenu()
+        {
+            if (!_isMultiplayer)
+                _gameStateManager?.Resume();
+            SceneManager.LoadScene(GameConstants.MainMenuScene);
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _resumeButton.onClick.RemoveListener(OnResume);
+            _restartButton.onClick.RemoveListener(OnRestart);
+            _mainMenuButton.onClick.RemoveListener(OnMainMenu);
+        }
     }
 }

@@ -1,4 +1,7 @@
-public static class GameModeHolder
+namespace NumbersBlast.Multiplayer
 {
-    public static GameMode CurrentMode = GameMode.SinglePlayer;
+    public static class GameModeHolder
+    {
+        public static GameMode CurrentMode = GameMode.SinglePlayer;
+    }
 }

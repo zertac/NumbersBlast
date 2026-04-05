@@ -1,24 +1,27 @@
 using UnityEngine.SceneManagement;
 
-public class SceneLoader
+namespace NumbersBlast.Core
 {
-    public void LoadScene(string sceneName)
+    public class SceneLoader
     {
-        SceneManager.LoadScene(sceneName);
-    }
+        public void LoadScene(string sceneName)
+        {
+            SceneManager.LoadScene(sceneName);
+        }
 
-    public void LoadGameplay()
-    {
-        LoadScene(GameConstants.GameScene);
-    }
+        public void LoadGameplay()
+        {
+            LoadScene(GameConstants.GameScene);
+        }
 
-    public void LoadMainMenu()
-    {
-        LoadScene(GameConstants.MainMenuScene);
-    }
+        public void LoadMainMenu()
+        {
+            LoadScene(GameConstants.MainMenuScene);
+        }
 
-    public void ReloadCurrentScene()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        public void ReloadCurrentScene()
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 }

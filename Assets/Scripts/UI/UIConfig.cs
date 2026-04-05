@@ -1,25 +1,28 @@
 using System;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "UIConfig", menuName = "NumbersBlast/UI Config")]
-public class UIConfig : ScriptableObject
+namespace NumbersBlast.UI
 {
-    public PopupEntry[] Popups;
-
-    public GameObject GetPopupPrefab<T>() where T : BasePopup
+    [CreateAssetMenu(fileName = "UIConfig", menuName = "NumbersBlast/UI Config")]
+    public class UIConfig : ScriptableObject
     {
-        var targetType = typeof(T);
-        for (int i = 0; i < Popups.Length; i++)
-        {
-            if (Popups[i].Prefab != null && Popups[i].Prefab.GetComponent<T>() != null)
-                return Popups[i].Prefab;
-        }
-        return null;
-    }
-}
+        public PopupEntry[] Popups;
 
-[Serializable]
-public struct PopupEntry
-{
-    public GameObject Prefab;
+        public GameObject GetPopupPrefab<T>() where T : BasePopup
+        {
+            var targetType = typeof(T);
+            for (int i = 0; i < Popups.Length; i++)
+            {
+                if (Popups[i].Prefab != null && Popups[i].Prefab.GetComponent<T>() != null)
+                    return Popups[i].Prefab;
+            }
+            return null;
+        }
+    }
+
+    [Serializable]
+    public struct PopupEntry
+    {
+        public GameObject Prefab;
+    }
 }

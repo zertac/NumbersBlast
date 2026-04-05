@@ -1,17 +1,23 @@
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using NumbersBlast.Audio;
+using NumbersBlast.Core;
+using NumbersBlast.Data;
 
-public class ProjectLifetimeScope : LifetimeScope
+namespace NumbersBlast.DI
 {
-    [SerializeField] private AudioConfig _audioConfig;
-
-    protected override void Configure(IContainerBuilder builder)
+    public class ProjectLifetimeScope : LifetimeScope
     {
-        if (_audioConfig != null)
-            builder.RegisterInstance(_audioConfig);
+        [SerializeField] private AudioConfig _audioConfig;
 
-        builder.Register<AudioManager>(Lifetime.Singleton);
-        builder.Register<SceneLoader>(Lifetime.Singleton);
+        protected override void Configure(IContainerBuilder builder)
+        {
+            if (_audioConfig != null)
+                builder.RegisterInstance(_audioConfig);
+
+            builder.Register<AudioManager>(Lifetime.Singleton);
+            builder.Register<SceneLoader>(Lifetime.Singleton);
+        }
     }
 }

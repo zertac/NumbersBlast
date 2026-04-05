@@ -1,87 +1,94 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using NumbersBlast.Audio;
+using NumbersBlast.Core;
+using NumbersBlast.Data;
+using NumbersBlast.Multiplayer;
 
-public class MainMenuUI : MonoBehaviour
+namespace NumbersBlast.UI
 {
-    [SerializeField] private Button _playButton;
-    [SerializeField] private Button _multiplayerButton;
-    [SerializeField] private Button _settingsButton;
-    [SerializeField] private Button _exitButton;
-    [SerializeField] private UIConfig _uiConfig;
-    [SerializeField] private AudioConfig _audioConfig;
-    [SerializeField] private Transform _popupContainer;
-
-    private UIManager _uiManager;
-    private AudioManager _audioManager;
-
-    private void Awake()
+    public class MainMenuUI : MonoBehaviour
     {
-        if (_audioConfig != null)
-            _audioManager = new AudioManager(_audioConfig);
+        [SerializeField] private Button _playButton;
+        [SerializeField] private Button _multiplayerButton;
+        [SerializeField] private Button _settingsButton;
+        [SerializeField] private Button _exitButton;
+        [SerializeField] private UIConfig _uiConfig;
+        [SerializeField] private AudioConfig _audioConfig;
+        [SerializeField] private Transform _popupContainer;
 
-        _uiManager = new UIManager(_uiConfig, _popupContainer);
+        private UIManager _uiManager;
+        private AudioManager _audioManager;
 
-        _playButton.onClick.AddListener(OnPlay);
+        private void Awake()
+        {
+            if (_audioConfig != null)
+                _audioManager = new AudioManager(_audioConfig);
 
-        if (_multiplayerButton != null)
-            _multiplayerButton.onClick.AddListener(OnMultiplayer);
+            _uiManager = new UIManager(_uiConfig, _popupContainer);
 
-        if (_settingsButton != null)
-            _settingsButton.onClick.AddListener(OnSettings);
+            _playButton.onClick.AddListener(OnPlay);
 
-        if (_exitButton != null)
-            _exitButton.onClick.AddListener(OnExit);
-    }
+            if (_multiplayerButton != null)
+                _multiplayerButton.onClick.AddListener(OnMultiplayer);
 
-    private void Start()
-    {
-        Application.runInBackground = false;
-        _audioManager?.StopMusic();
-        _audioManager?.PlayMenuMusic();
-    }
+            if (_settingsButton != null)
+                _settingsButton.onClick.AddListener(OnSettings);
 
-    private void OnDestroy()
-    {
-        _playButton.onClick.RemoveListener(OnPlay);
+            if (_exitButton != null)
+                _exitButton.onClick.AddListener(OnExit);
+        }
 
-        if (_multiplayerButton != null)
-            _multiplayerButton.onClick.RemoveListener(OnMultiplayer);
+        private void Start()
+        {
+            Application.runInBackground = false;
+            _audioManager?.StopMusic();
+            _audioManager?.PlayMenuMusic();
+        }
 
-        if (_settingsButton != null)
-            _settingsButton.onClick.RemoveListener(OnSettings);
+        private void OnDestroy()
+        {
+            _playButton.onClick.RemoveListener(OnPlay);
 
-        if (_exitButton != null)
-            _exitButton.onClick.RemoveListener(OnExit);
-    }
+            if (_multiplayerButton != null)
+                _multiplayerButton.onClick.RemoveListener(OnMultiplayer);
 
-    private void OnPlay()
-    {
-        _audioManager?.PlayButtonClick();
-        GameModeHolder.CurrentMode = GameMode.SinglePlayer;
-        SceneManager.LoadScene(GameConstants.GameScene);
-    }
+            if (_settingsButton != null)
+                _settingsButton.onClick.RemoveListener(OnSettings);
 
-    private void OnMultiplayer()
-    {
-        _audioManager?.PlayButtonClick();
-        GameModeHolder.CurrentMode = GameMode.Multiplayer;
-        SceneManager.LoadScene(GameConstants.GameScene);
-    }
+            if (_exitButton != null)
+                _exitButton.onClick.RemoveListener(OnExit);
+        }
 
-    private void OnSettings()
-    {
-        _audioManager?.PlayButtonClick();
-        _uiManager.ShowPopup<SettingsPopup>();
+        private void OnPlay()
+        {
+            _audioManager?.PlayButtonClick();
+            GameModeHolder.CurrentMode = GameMode.SinglePlayer;
+            SceneManager.LoadScene(GameConstants.GameScene);
+        }
 
-        var settingsPopup = _uiManager.GetPopup<SettingsPopup>();
-        if (settingsPopup != null)
-            settingsPopup.SetAudioManager(_audioManager);
-    }
+        private void OnMultiplayer()
+        {
+            _audioManager?.PlayButtonClick();
+            GameModeHolder.CurrentMode = GameMode.Multiplayer;
+            SceneManager.LoadScene(GameConstants.GameScene);
+        }
 
-    private void OnExit()
-    {
-        _audioManager?.PlayButtonClick();
-        Application.Quit();
+        private void OnSettings()
+        {
+            _audioManager?.PlayButtonClick();
+            _uiManager.ShowPopup<SettingsPopup>();
+
+            var settingsPopup = _uiManager.GetPopup<SettingsPopup>();
+            if (settingsPopup != null)
+                settingsPopup.SetAudioManager(_audioManager);
+        }
+
+        private void OnExit()
+        {
+            _audioManager?.PlayButtonClick();
+            Application.Quit();
+        }
     }
 }

@@ -1,155 +1,168 @@
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using NumbersBlast.Audio;
+using NumbersBlast.Board;
+using NumbersBlast.Data;
+using NumbersBlast.Feedback;
+using NumbersBlast.Gameplay;
+using NumbersBlast.Multiplayer;
+using NumbersBlast.Piece;
+using NumbersBlast.StateMachine;
+using NumbersBlast.Tutorial;
+using NumbersBlast.UI;
 
-public class GameplayInitializer : IStartable
+namespace NumbersBlast.Core
 {
-    // Core - constructor inject
-    private readonly BoardManager _boardManager;
-    private readonly BoardConfig _config;
-    private readonly BoardView _boardView;
-    private readonly PlacementHandler _placementHandler;
-    private readonly GameStateManager _gameStateManager;
-    private readonly UIManager _uiManager;
-    private readonly AudioManager _audioManager;
-    private readonly FeedbackManager _feedbackManager;
-
-    // UI - property inject
-    [Inject] private PieceTray _pieceTray;
-    [Inject] private ScoreUI _scoreUI;
-    [Inject] private GameplayHUD _gameplayHUD;
-
-    // Tutorial - property inject
-    [Inject] private TutorialManager _tutorialManager;
-
-    // Multiplayer - property inject
-    [Inject] private MultiplayerManager _multiplayerManager;
-    [Inject] private OpponentVisualPlayer _opponentVisualPlayer;
-    [Inject] private MultiplayerConfig _multiplayerConfig;
-    [Inject] private MultiplayerHUD _multiplayerHUD;
-
-    [Inject]
-    public GameplayInitializer(BoardManager boardManager, BoardConfig config, BoardView boardView,
-        PlacementHandler placementHandler, GameStateManager gameStateManager, UIManager uiManager,
-        AudioManager audioManager, FeedbackManager feedbackManager)
+    public class GameplayInitializer : IStartable
     {
-        _boardManager = boardManager;
-        _config = config;
-        _boardView = boardView;
-        _placementHandler = placementHandler;
-        _gameStateManager = gameStateManager;
-        _uiManager = uiManager;
-        _audioManager = audioManager;
-        _feedbackManager = feedbackManager;
-    }
+        // Core - constructor inject
+        private readonly BoardManager _boardManager;
+        private readonly BoardConfig _config;
+        private readonly BoardView _boardView;
+        private readonly PlacementHandler _placementHandler;
+        private readonly GameStateManager _gameStateManager;
+        private readonly UIManager _uiManager;
+        private readonly AudioManager _audioManager;
+        private readonly FeedbackManager _feedbackManager;
 
-    public void Start()
-    {
-        GameEvents.ClearAll();
-        DG.Tweening.DOTween.KillAll();
-        _boardManager.Initialize();
+        // UI - property inject
+        [Inject] private PieceTray _pieceTray;
+        [Inject] private ScoreUI _scoreUI;
+        [Inject] private GameplayHUD _gameplayHUD;
 
-        var canvas = _boardView.GetComponentInParent<Canvas>();
-        float cellSize = _boardManager.GetCellSize();
+        // Tutorial - property inject
+        [Inject] private TutorialManager _tutorialManager;
 
-        bool isMultiplayer = GameModeHolder.CurrentMode == GameMode.Multiplayer;
+        // Multiplayer - property inject
+        [Inject] private MultiplayerManager _multiplayerManager;
+        [Inject] private OpponentVisualPlayer _opponentVisualPlayer;
+        [Inject] private MultiplayerConfig _multiplayerConfig;
+        [Inject] private MultiplayerHUD _multiplayerHUD;
 
-        _pieceTray.Initialize(_config, cellSize, canvas, _boardView, _boardManager,
-            isMultiplayer ? null : _tutorialManager, _feedbackManager, _gameStateManager);
-
-        _feedbackManager.Initialize(_boardView.GetComponent<RectTransform>());
-        _gameplayHUD.Initialize(_uiManager, _gameStateManager);
-        _placementHandler.Enable();
-
-        GameEvents.OnGameOver += HandleGameOver;
-        GameEvents.OnPiecePickedUp += _ => _audioManager.PlayPiecePickup();
-        GameEvents.OnPiecePlaced += HandlePiecePlaced;
-        GameEvents.OnPieceReleased += _ => _audioManager.PlayPieceReturn();
-        GameEvents.OnScoreChanged += _ => _audioManager.PlayScoreUp();
-        GameEvents.OnTrayRefilled += () => _audioManager.PlayNewPiecesSpawn();
-        GameEvents.OnPopupOpened += HandlePopupOpened;
-        GameEvents.OnPopupClosed += () => _audioManager.PlayPopupClose();
-
-        _audioManager.StopMusic();
-        _audioManager.PlayGameplayMusic();
-        _audioManager.PlayGameStart();
-
-        Application.runInBackground = isMultiplayer;
-
-        if (isMultiplayer)
-            StartMultiplayer();
-        else
-            StartSinglePlayer();
-    }
-
-    private void StartSinglePlayer()
-    {
-        _scoreUI.Initialize();
-        _multiplayerHUD?.Hide();
-
-        if (_tutorialManager.ShouldRunTutorial())
+        [Inject]
+        public GameplayInitializer(BoardManager boardManager, BoardConfig config, BoardView boardView,
+            PlacementHandler placementHandler, GameStateManager gameStateManager, UIManager uiManager,
+            AudioManager audioManager, FeedbackManager feedbackManager)
         {
-            _gameStateManager.Initialize(GameState.Tutorial);
-            _tutorialManager.StartTutorial();
+            _boardManager = boardManager;
+            _config = config;
+            _boardView = boardView;
+            _placementHandler = placementHandler;
+            _gameStateManager = gameStateManager;
+            _uiManager = uiManager;
+            _audioManager = audioManager;
+            _feedbackManager = feedbackManager;
         }
-        else
+
+        public void Start()
         {
-            _gameStateManager.Initialize(GameState.Idle);
-            _pieceTray.SpawnPieces();
+            GameEvents.ClearAll();
+            DG.Tweening.DOTween.KillAll();
+            _boardManager.Initialize();
+
+            var canvas = _boardView.GetComponentInParent<Canvas>();
+            float cellSize = _boardManager.GetCellSize();
+
+            bool isMultiplayer = GameModeHolder.CurrentMode == GameMode.Multiplayer;
+
+            _pieceTray.Initialize(_config, cellSize, canvas, _boardView, _boardManager,
+                isMultiplayer ? null : _tutorialManager, _feedbackManager, _gameStateManager);
+
+            _feedbackManager.Initialize(_boardView.GetComponent<RectTransform>());
+            _gameplayHUD.Initialize(_uiManager, _gameStateManager);
+            _placementHandler.Enable();
+
+            GameEvents.OnGameOver += HandleGameOver;
+            GameEvents.OnPiecePickedUp += _ => _audioManager.PlayPiecePickup();
+            GameEvents.OnPiecePlaced += HandlePiecePlaced;
+            GameEvents.OnPieceReleased += _ => _audioManager.PlayPieceReturn();
+            GameEvents.OnScoreChanged += _ => _audioManager.PlayScoreUp();
+            GameEvents.OnTrayRefilled += () => _audioManager.PlayNewPiecesSpawn();
+            GameEvents.OnPopupOpened += HandlePopupOpened;
+            GameEvents.OnPopupClosed += () => _audioManager.PlayPopupClose();
+
+            _audioManager.StopMusic();
+            _audioManager.PlayGameplayMusic();
+            _audioManager.PlayGameStart();
+
+            Application.runInBackground = isMultiplayer;
+
+            if (isMultiplayer)
+                StartMultiplayer();
+            else
+                StartSinglePlayer();
         }
-    }
 
-    private void StartMultiplayer()
-    {
-        _scoreUI.gameObject.SetActive(false);
-        _gameStateManager.Initialize(GameState.Processing);
+        private void StartSinglePlayer()
+        {
+            _scoreUI.Initialize();
+            _multiplayerHUD?.Hide();
 
-        _opponentVisualPlayer.Initialize(_multiplayerConfig, _boardView, _pieceTray, _boardManager,
-            new OpponentAI(_multiplayerConfig), _config);
-
-        var searchPopup = _uiManager.ShowPopup<OpponentSearchPopup>();
-        searchPopup?.StartSearch(_multiplayerConfig,
-            onFound: () =>
+            if (_tutorialManager.ShouldRunTutorial())
             {
-                string opponentName = searchPopup.FoundOpponentName;
+                _gameStateManager.Initialize(GameState.Tutorial);
+                _tutorialManager.StartTutorial();
+            }
+            else
+            {
+                _gameStateManager.Initialize(GameState.Idle);
                 _pieceTray.SpawnPieces();
-                _multiplayerManager.StartMultiplayer(opponentName);
-            },
-            onCancel: () =>
-            {
-                UnityEngine.SceneManagement.SceneManager.LoadScene(GameConstants.MainMenuScene);
-            });
-    }
-
-    private void HandlePiecePlaced(PieceView piece, Vector2Int pos)
-    {
-        _audioManager.PlayPiecePlace();
-    }
-
-    private void HandlePopupOpened()
-    {
-        _audioManager.PlayPopupOpen();
-        var settingsPopup = _uiManager.GetPopup<SettingsPopup>();
-        if (settingsPopup != null)
-            settingsPopup.SetAudioManager(_audioManager);
-    }
-
-    private void HandleGameOver()
-    {
-        _audioManager.PlayGameOver();
-
-        if (GameModeHolder.CurrentMode == GameMode.Multiplayer)
-        {
-            _multiplayerManager.Stop();
-            var gameOverUI = _uiManager.ShowPopup<GameOverUI>();
-            if (gameOverUI != null)
-                gameOverUI.SetScore(_multiplayerHUD.PlayerScore);
+            }
         }
-        else
+
+        private void StartMultiplayer()
         {
-            var gameOverUI = _uiManager.ShowPopup<GameOverUI>();
-            if (gameOverUI != null)
-                gameOverUI.SetScore(_scoreUI.GetScore());
+            _scoreUI.gameObject.SetActive(false);
+            _gameStateManager.Initialize(GameState.Processing);
+
+            _opponentVisualPlayer.Initialize(_multiplayerConfig, _boardView, _pieceTray, _boardManager,
+                new OpponentAI(_multiplayerConfig), _config);
+
+            var searchPopup = _uiManager.ShowPopup<OpponentSearchPopup>();
+            searchPopup?.StartSearch(_multiplayerConfig,
+                onFound: () =>
+                {
+                    string opponentName = searchPopup.FoundOpponentName;
+                    _pieceTray.SpawnPieces();
+                    _multiplayerManager.StartMultiplayer(opponentName);
+                },
+                onCancel: () =>
+                {
+                    UnityEngine.SceneManagement.SceneManager.LoadScene(GameConstants.MainMenuScene);
+                });
+        }
+
+        private void HandlePiecePlaced(PieceView piece, Vector2Int pos)
+        {
+            _audioManager.PlayPiecePlace();
+        }
+
+        private void HandlePopupOpened()
+        {
+            _audioManager.PlayPopupOpen();
+            var settingsPopup = _uiManager.GetPopup<SettingsPopup>();
+            if (settingsPopup != null)
+                settingsPopup.SetAudioManager(_audioManager);
+        }
+
+        private void HandleGameOver()
+        {
+            _audioManager.PlayGameOver();
+
+            if (GameModeHolder.CurrentMode == GameMode.Multiplayer)
+            {
+                _multiplayerManager.Stop();
+                var gameOverUI = _uiManager.ShowPopup<GameOverUI>();
+                if (gameOverUI != null)
+                    gameOverUI.SetScore(_multiplayerHUD.PlayerScore);
+            }
+            else
+            {
+                var gameOverUI = _uiManager.ShowPopup<GameOverUI>();
+                if (gameOverUI != null)
+                    gameOverUI.SetScore(_scoreUI.GetScore());
+            }
         }
     }
 }

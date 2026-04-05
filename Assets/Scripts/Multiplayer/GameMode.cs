@@ -1,5 +1,8 @@
-public enum GameMode
+namespace NumbersBlast.Multiplayer
 {
-    SinglePlayer,
-    Multiplayer
+    public enum GameMode
+    {
+        SinglePlayer,
+        Multiplayer
+    }
 }

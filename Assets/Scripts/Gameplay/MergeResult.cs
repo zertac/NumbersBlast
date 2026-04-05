@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct MergeEvent
+namespace NumbersBlast.Gameplay
 {
-    public Vector2Int TargetPos;
-    public List<Vector2Int> AbsorbedPositions;
-    public bool IsChain;
+    public struct MergeEvent
+    {
+        public Vector2Int TargetPos;
+        public List<Vector2Int> AbsorbedPositions;
+        public bool IsChain;
+    }
 }

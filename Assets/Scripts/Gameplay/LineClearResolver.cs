@@ -1,88 +1,92 @@
 using System.Collections.Generic;
+using NumbersBlast.Board;
 
-public class LineClearResolver
+namespace NumbersBlast.Gameplay
 {
-    public LineClearResult Resolve(BoardModel model, BoardView boardView)
+    public class LineClearResolver
     {
-        var rowsToClear = new List<int>();
-        var columnsToClear = new List<int>();
-
-        for (int r = 0; r < model.Rows; r++)
+        public LineClearResult Resolve(BoardModel model, BoardView boardView)
         {
-            if (IsRowFull(model, r))
-                rowsToClear.Add(r);
-        }
+            var rowsToClear = new List<int>();
+            var columnsToClear = new List<int>();
 
-        for (int c = 0; c < model.Columns; c++)
-        {
-            if (IsColumnFull(model, c))
-                columnsToClear.Add(c);
-        }
-
-        var result = new LineClearResult
-        {
-            Score = 0,
-            ClearedPositions = new List<UnityEngine.Vector2Int>()
-        };
-
-        if (rowsToClear.Count == 0 && columnsToClear.Count == 0)
-            return result;
-
-        var clearedCells = new HashSet<long>();
-
-        for (int i = 0; i < rowsToClear.Count; i++)
-        {
-            int r = rowsToClear[i];
-            for (int c = 0; c < model.Columns; c++)
-            {
-                long key = (long)r * model.Columns + c;
-                if (clearedCells.Add(key))
-                {
-                    result.Score += model.GetCell(r, c).Value;
-                    result.ClearedPositions.Add(new UnityEngine.Vector2Int(r, c));
-                }
-            }
-        }
-
-        for (int i = 0; i < columnsToClear.Count; i++)
-        {
-            int c = columnsToClear[i];
             for (int r = 0; r < model.Rows; r++)
             {
-                long key = (long)r * model.Columns + c;
-                if (clearedCells.Add(key))
+                if (IsRowFull(model, r))
+                    rowsToClear.Add(r);
+            }
+
+            for (int c = 0; c < model.Columns; c++)
+            {
+                if (IsColumnFull(model, c))
+                    columnsToClear.Add(c);
+            }
+
+            var result = new LineClearResult
+            {
+                Score = 0,
+                ClearedPositions = new List<UnityEngine.Vector2Int>()
+            };
+
+            if (rowsToClear.Count == 0 && columnsToClear.Count == 0)
+                return result;
+
+            var clearedCells = new HashSet<long>();
+
+            for (int i = 0; i < rowsToClear.Count; i++)
+            {
+                int r = rowsToClear[i];
+                for (int c = 0; c < model.Columns; c++)
                 {
-                    result.Score += model.GetCell(r, c).Value;
-                    result.ClearedPositions.Add(new UnityEngine.Vector2Int(r, c));
+                    long key = (long)r * model.Columns + c;
+                    if (clearedCells.Add(key))
+                    {
+                        result.Score += model.GetCell(r, c).Value;
+                        result.ClearedPositions.Add(new UnityEngine.Vector2Int(r, c));
+                    }
                 }
             }
+
+            for (int i = 0; i < columnsToClear.Count; i++)
+            {
+                int c = columnsToClear[i];
+                for (int r = 0; r < model.Rows; r++)
+                {
+                    long key = (long)r * model.Columns + c;
+                    if (clearedCells.Add(key))
+                    {
+                        result.Score += model.GetCell(r, c).Value;
+                        result.ClearedPositions.Add(new UnityEngine.Vector2Int(r, c));
+                    }
+                }
+            }
+
+            foreach (long key in clearedCells)
+            {
+                int r = (int)(key / model.Columns);
+                int c = (int)(key % model.Columns);
+                model.GetCell(r, c).Clear();
+            }
+
+            return result;
         }
 
-        foreach (long key in clearedCells)
+        private bool IsRowFull(BoardModel model, int row)
         {
-            int r = (int)(key / model.Columns);
-            int c = (int)(key % model.Columns);
-            model.GetCell(r, c).Clear();
+            for (int c = 0; c < model.Columns; c++)
+            {
+                if (model.IsCellEmpty(row, c)) return false;
+            }
+            return true;
         }
 
-        return result;
-    }
-
-    private bool IsRowFull(BoardModel model, int row)
-    {
-        for (int c = 0; c < model.Columns; c++)
+        private bool IsColumnFull(BoardModel model, int column)
         {
-            if (model.IsCellEmpty(row, c)) return false;
+            for (int r = 0; r < model.Rows; r++)
+            {
+                if (model.IsCellEmpty(r, column)) return false;
+            }
+            return true;
         }
-        return true;
-    }
-
-    private bool IsColumnFull(BoardModel model, int column)
-    {
-        for (int r = 0; r < model.Rows; r++)
-        {
-            if (model.IsCellEmpty(r, column)) return false;
-        }
-        return true;
     }
 }

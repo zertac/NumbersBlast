@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct LineClearResult
+namespace NumbersBlast.Gameplay
 {
-    public int Score;
-    public List<Vector2Int> ClearedPositions;
+    public struct LineClearResult
+    {
+        public int Score;
+        public List<Vector2Int> ClearedPositions;
+    }
 }

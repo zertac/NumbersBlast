@@ -2,55 +2,60 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using NumbersBlast.Audio;
+using NumbersBlast.Feedback;
 
-[RequireComponent(typeof(Image))]
-public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
+namespace NumbersBlast.UI
 {
-    [SerializeField] private Button _button;
-
-    private Vector3 _originalScale;
-    private Tween _scaleTween;
-
-    private const float PressScale = 0.92f;
-    private const float PressDuration = 0.08f;
-    private const float ReleaseDuration = 0.15f;
-
-    private void Awake()
+    [RequireComponent(typeof(Image))]
+    public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
     {
-        _originalScale = transform.localScale;
-        if (_button == null) _button = GetComponent<Button>();
-    }
+        [SerializeField] private Button _button;
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        if (!_button.interactable) return;
+        private Vector3 _originalScale;
+        private Tween _scaleTween;
 
-        _scaleTween?.Kill();
-        _scaleTween = transform.DOScale(_originalScale * PressScale, PressDuration)
-            .SetEase(Ease.OutQuad)
-            .SetUpdate(true)
-            .SetLink(gameObject);
-    }
+        private const float PressScale = 0.92f;
+        private const float PressDuration = 0.08f;
+        private const float ReleaseDuration = 0.15f;
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        _scaleTween?.Kill();
-        _scaleTween = transform.DOScale(_originalScale, ReleaseDuration)
-            .SetEase(Ease.OutBack)
-            .SetUpdate(true)
-            .SetLink(gameObject);
-    }
+        private void Awake()
+        {
+            _originalScale = transform.localScale;
+            if (_button == null) _button = GetComponent<Button>();
+        }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (!_button.interactable) return;
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (!_button.interactable) return;
 
-        AudioManager.Instance?.PlayButtonClick();
-        HapticManager.Light();
-    }
+            _scaleTween?.Kill();
+            _scaleTween = transform.DOScale(_originalScale * PressScale, PressDuration)
+                .SetEase(Ease.OutQuad)
+                .SetUpdate(true)
+                .SetLink(gameObject);
+        }
 
-    private void OnDestroy()
-    {
-        _scaleTween?.Kill();
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            _scaleTween?.Kill();
+            _scaleTween = transform.DOScale(_originalScale, ReleaseDuration)
+                .SetEase(Ease.OutBack)
+                .SetUpdate(true)
+                .SetLink(gameObject);
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (!_button.interactable) return;
+
+            AudioManager.Instance?.PlayButtonClick();
+            HapticManager.Light();
+        }
+
+        private void OnDestroy()
+        {
+            _scaleTween?.Kill();
+        }
     }
 }

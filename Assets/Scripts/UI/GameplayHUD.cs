@@ -1,45 +1,50 @@
 using UnityEngine;
 using UnityEngine.UI;
+using NumbersBlast.Multiplayer;
+using NumbersBlast.StateMachine;
 
-public class GameplayHUD : MonoBehaviour
+namespace NumbersBlast.UI
 {
-    [SerializeField] private Button _pauseButton;
-    [SerializeField] private Button _settingsButton;
-
-    private UIManager _uiManager;
-    private GameStateManager _gameStateManager;
-
-    public void Initialize(UIManager uiManager, GameStateManager gameStateManager)
+    public class GameplayHUD : MonoBehaviour
     {
-        _uiManager = uiManager;
-        _gameStateManager = gameStateManager;
+        [SerializeField] private Button _pauseButton;
+        [SerializeField] private Button _settingsButton;
 
-        _pauseButton.onClick.AddListener(OnPause);
-        _settingsButton.onClick.AddListener(OnSettings);
-    }
+        private UIManager _uiManager;
+        private GameStateManager _gameStateManager;
 
-    private void OnDestroy()
-    {
-        _pauseButton.onClick.RemoveListener(OnPause);
-        _settingsButton.onClick.RemoveListener(OnSettings);
-    }
+        public void Initialize(UIManager uiManager, GameStateManager gameStateManager)
+        {
+            _uiManager = uiManager;
+            _gameStateManager = gameStateManager;
 
-    private void OnPause()
-    {
-        bool isMultiplayer = GameModeHolder.CurrentMode == GameMode.Multiplayer;
+            _pauseButton.onClick.AddListener(OnPause);
+            _settingsButton.onClick.AddListener(OnSettings);
+        }
 
-        // Multiplayer: just show popup, game continues in background
-        // Single player: pause game state
-        if (!isMultiplayer)
-            _gameStateManager.Pause();
+        private void OnDestroy()
+        {
+            _pauseButton.onClick.RemoveListener(OnPause);
+            _settingsButton.onClick.RemoveListener(OnSettings);
+        }
 
-        var pausePopup = _uiManager.ShowPopup<PausePopup>();
-        pausePopup?.SetGameStateManager(_gameStateManager);
-        pausePopup?.SetMultiplayerMode(isMultiplayer);
-    }
+        private void OnPause()
+        {
+            bool isMultiplayer = GameModeHolder.CurrentMode == GameMode.Multiplayer;
 
-    private void OnSettings()
-    {
-        _uiManager.ShowPopup<SettingsPopup>();
+            // Multiplayer: just show popup, game continues in background
+            // Single player: pause game state
+            if (!isMultiplayer)
+                _gameStateManager.Pause();
+
+            var pausePopup = _uiManager.ShowPopup<PausePopup>();
+            pausePopup?.SetGameStateManager(_gameStateManager);
+            pausePopup?.SetMultiplayerMode(isMultiplayer);
+        }
+
+        private void OnSettings()
+        {
+            _uiManager.ShowPopup<SettingsPopup>();
+        }
     }
 }

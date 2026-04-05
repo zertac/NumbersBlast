@@ -1,17 +1,20 @@
 using VContainer.Unity;
 
-public class MultiplayerTickRunner : ITickable
+namespace NumbersBlast.Multiplayer
 {
-    private readonly MultiplayerManager _multiplayerManager;
-
-    public MultiplayerTickRunner(MultiplayerManager multiplayerManager)
+    public class MultiplayerTickRunner : ITickable
     {
-        _multiplayerManager = multiplayerManager;
-    }
+        private readonly MultiplayerManager _multiplayerManager;
 
-    public void Tick()
-    {
-        if (!_multiplayerManager.IsActive) return;
-        _multiplayerManager.Tick(UnityEngine.Time.deltaTime);
+        public MultiplayerTickRunner(MultiplayerManager multiplayerManager)
+        {
+            _multiplayerManager = multiplayerManager;
+        }
+
+        public void Tick()
+        {
+            if (!_multiplayerManager.IsActive) return;
+            _multiplayerManager.Tick(UnityEngine.Time.deltaTime);
+        }
     }
 }

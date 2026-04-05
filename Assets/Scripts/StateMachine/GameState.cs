@@ -1,9 +1,12 @@
-public enum GameState
+namespace NumbersBlast.StateMachine
 {
-    Idle,
-    Dragging,
-    Processing,
-    Tutorial,
-    Paused,
-    GameOver
+    public enum GameState
+    {
+        Idle,
+        Dragging,
+        Processing,
+        Tutorial,
+        Paused,
+        GameOver
+    }
 }

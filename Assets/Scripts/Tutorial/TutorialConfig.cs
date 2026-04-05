@@ -1,10 +1,13 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "TutorialConfig", menuName = "NumbersBlast/Tutorial Config")]
-public class TutorialConfig : ScriptableObject
+namespace NumbersBlast.Tutorial
 {
-    public TutorialStepData[] Steps;
+    [CreateAssetMenu(fileName = "TutorialConfig", menuName = "NumbersBlast/Tutorial Config")]
+    public class TutorialConfig : ScriptableObject
+    {
+        public TutorialStepData[] Steps;
 
-    [Header("Hand Icon")]
-    public Vector2 HandOffset = new(30f, -30f);
+        [Header("Hand Icon")]
+        public Vector2 HandOffset = new(30f, -30f);
+    }
 }

@@ -1,31 +1,35 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using NumbersBlast.Core;
 
-public class GameOverUI : BasePopup
+namespace NumbersBlast.UI
 {
-    [SerializeField] private TextMeshProUGUI _finalScoreText;
-    [SerializeField] private Button _restartButton;
-
-    protected override void Awake()
+    public class GameOverUI : BasePopup
     {
-        base.Awake();
-        _restartButton.onClick.AddListener(HandleRestart);
-    }
+        [SerializeField] private TextMeshProUGUI _finalScoreText;
+        [SerializeField] private Button _restartButton;
 
-    public void SetScore(int score)
-    {
-        _finalScoreText.text = score.ToString();
-    }
+        protected override void Awake()
+        {
+            base.Awake();
+            _restartButton.onClick.AddListener(HandleRestart);
+        }
 
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        _restartButton.onClick.RemoveListener(HandleRestart);
-    }
+        public void SetScore(int score)
+        {
+            _finalScoreText.text = score.ToString();
+        }
 
-    private void HandleRestart()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(GameConstants.GameScene);
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _restartButton.onClick.RemoveListener(HandleRestart);
+        }
+
+        private void HandleRestart()
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(GameConstants.GameScene);
+        }
     }
 }

@@ -1,86 +1,90 @@
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using NumbersBlast.Core;
 
-[RequireComponent(typeof(CanvasGroup))]
-public abstract class BasePopup : MonoBehaviour
+namespace NumbersBlast.UI
 {
-    [SerializeField] private Image _dimBackground;
-    [SerializeField] private RectTransform _content;
-
-    private CanvasGroup _canvasGroup;
-    private Tween _showTween;
-    private Tween _hideTween;
-
-    private const float ShowDuration = 0.3f;
-    private const float HideDuration = 0.2f;
-    private const float ContentHiddenScale = 0.7f;
-    private float _dimTargetAlpha;
-
-    protected virtual void Awake()
+    [RequireComponent(typeof(CanvasGroup))]
+    public abstract class BasePopup : MonoBehaviour
     {
-        if (_canvasGroup == null) _canvasGroup = GetComponent<CanvasGroup>();
-        if (_dimBackground != null)
-            _dimTargetAlpha = _dimBackground.color.a;
-        gameObject.SetActive(false);
-    }
+        [SerializeField] private Image _dimBackground;
+        [SerializeField] private RectTransform _content;
 
-    public virtual void Show()
-    {
-        _hideTween?.Kill();
-        gameObject.SetActive(true);
+        private CanvasGroup _canvasGroup;
+        private Tween _showTween;
+        private Tween _hideTween;
 
-        _canvasGroup.alpha = 0f;
-        _canvasGroup.interactable = false;
+        private const float ShowDuration = 0.3f;
+        private const float HideDuration = 0.2f;
+        private const float ContentHiddenScale = 0.7f;
+        private float _dimTargetAlpha;
 
-        if (_content != null)
-            _content.localScale = Vector3.one * ContentHiddenScale;
-
-        if (_dimBackground != null)
+        protected virtual void Awake()
         {
-            var dimColor = _dimBackground.color;
-            dimColor.a = 0f;
-            _dimBackground.color = dimColor;
-            _dimBackground.DOFade(_dimTargetAlpha, ShowDuration);
+            if (_canvasGroup == null) _canvasGroup = GetComponent<CanvasGroup>();
+            if (_dimBackground != null)
+                _dimTargetAlpha = _dimBackground.color.a;
+            gameObject.SetActive(false);
         }
 
-        var sequence = DOTween.Sequence();
-        sequence.Append(_canvasGroup.DOFade(1f, ShowDuration).SetEase(Ease.OutCubic));
-
-        if (_content != null)
-            sequence.Join(_content.DOScale(Vector3.one, ShowDuration).SetEase(Ease.OutBack));
-
-        sequence.OnComplete(() => _canvasGroup.interactable = true);
-        _showTween = sequence;
-
-        OnShow();
-    }
-
-    public virtual void Hide()
-    {
-        _showTween?.Kill();
-        _canvasGroup.interactable = false;
-
-        var sequence = DOTween.Sequence();
-        sequence.Append(_canvasGroup.DOFade(0f, HideDuration).SetEase(Ease.InCubic));
-
-        if (_content != null)
-            sequence.Join(_content.DOScale(Vector3.one * ContentHiddenScale, HideDuration).SetEase(Ease.InBack));
-
-        sequence.OnComplete(() =>
+        public virtual void Show()
         {
-            gameObject.SetActive(false);
-            OnHide();
-        });
-        _hideTween = sequence;
-    }
+            _hideTween?.Kill();
+            gameObject.SetActive(true);
 
-    protected virtual void OnShow() { GameEvents.PopupOpened(); }
-    protected virtual void OnHide() { GameEvents.PopupClosed(); }
+            _canvasGroup.alpha = 0f;
+            _canvasGroup.interactable = false;
 
-    protected virtual void OnDestroy()
-    {
-        _showTween?.Kill();
-        _hideTween?.Kill();
+            if (_content != null)
+                _content.localScale = Vector3.one * ContentHiddenScale;
+
+            if (_dimBackground != null)
+            {
+                var dimColor = _dimBackground.color;
+                dimColor.a = 0f;
+                _dimBackground.color = dimColor;
+                _dimBackground.DOFade(_dimTargetAlpha, ShowDuration);
+            }
+
+            var sequence = DOTween.Sequence();
+            sequence.Append(_canvasGroup.DOFade(1f, ShowDuration).SetEase(Ease.OutCubic));
+
+            if (_content != null)
+                sequence.Join(_content.DOScale(Vector3.one, ShowDuration).SetEase(Ease.OutBack));
+
+            sequence.OnComplete(() => _canvasGroup.interactable = true);
+            _showTween = sequence;
+
+            OnShow();
+        }
+
+        public virtual void Hide()
+        {
+            _showTween?.Kill();
+            _canvasGroup.interactable = false;
+
+            var sequence = DOTween.Sequence();
+            sequence.Append(_canvasGroup.DOFade(0f, HideDuration).SetEase(Ease.InCubic));
+
+            if (_content != null)
+                sequence.Join(_content.DOScale(Vector3.one * ContentHiddenScale, HideDuration).SetEase(Ease.InBack));
+
+            sequence.OnComplete(() =>
+            {
+                gameObject.SetActive(false);
+                OnHide();
+            });
+            _hideTween = sequence;
+        }
+
+        protected virtual void OnShow() { GameEvents.PopupOpened(); }
+        protected virtual void OnHide() { GameEvents.PopupClosed(); }
+
+        protected virtual void OnDestroy()
+        {
+            _showTween?.Kill();
+            _hideTween?.Kill();
+        }
     }
 }

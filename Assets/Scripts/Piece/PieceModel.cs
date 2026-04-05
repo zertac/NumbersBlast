@@ -1,34 +1,37 @@
 using UnityEngine;
 
-public class PieceModel
+namespace NumbersBlast.Piece
 {
-    public PieceShapeData Shape { get; private set; }
-    public Vector2Int[] Positions { get; private set; }
-    public int[] Values { get; private set; }
-
-    public PieceModel(PieceShapeData shape, int minValue, int maxValue)
+    public class PieceModel
     {
-        Shape = shape;
-        Positions = shape.GetNormalizedPositions();
-        Values = new int[Positions.Length];
+        public PieceShapeData Shape { get; private set; }
+        public Vector2Int[] Positions { get; private set; }
+        public int[] Values { get; private set; }
 
-        for (int i = 0; i < Values.Length; i++)
+        public PieceModel(PieceShapeData shape, int minValue, int maxValue)
         {
-            Values[i] = Random.Range(minValue, maxValue + 1);
+            Shape = shape;
+            Positions = shape.GetNormalizedPositions();
+            Values = new int[Positions.Length];
+
+            for (int i = 0; i < Values.Length; i++)
+            {
+                Values[i] = Random.Range(minValue, maxValue + 1);
+            }
         }
-    }
 
-    public PieceModel(Vector2Int[] positions, int[] fixedValues)
-    {
-        Shape = null;
-        Positions = positions;
-        Values = fixedValues;
-    }
+        public PieceModel(Vector2Int[] positions, int[] fixedValues)
+        {
+            Shape = null;
+            Positions = positions;
+            Values = fixedValues;
+        }
 
-    public int GetValueAt(int index)
-    {
-        return Values[index];
-    }
+        public int GetValueAt(int index)
+        {
+            return Values[index];
+        }
 
-    public int CellCount => Positions.Length;
+        public int CellCount => Positions.Length;
+    }
 }

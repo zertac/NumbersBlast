@@ -1,41 +1,45 @@
 using UnityEngine;
+using NumbersBlast.Piece;
 
-[CreateAssetMenu(fileName = "BoardConfig", menuName = "NumbersBlast/Board Config")]
-public class BoardConfig : ScriptableObject
+namespace NumbersBlast.Data
 {
-    [Header("Board")]
-    public int Rows = 8;
-    public int Columns = 8;
-    public float CellSpacing = 4f;
-
-    [Header("Piece Spawning")]
-    public PieceSpawnConfig PieceSpawnConfig;
-
-    [Header("Block Values")]
-    public int MinBlockValue = 1;
-    public int MaxBlockValue = 4;
-
-    [Header("Theme")]
-    public ThemeData Theme;
-
-    public bool ValidatePieceShape(PieceShapeData shape)
+    [CreateAssetMenu(fileName = "BoardConfig", menuName = "NumbersBlast/Board Config")]
+    public class BoardConfig : ScriptableObject
     {
-        var size = shape.GetNormalizedSize();
-        return size.x <= Rows && size.y <= Columns;
-    }
+        [Header("Board")]
+        public int Rows = 8;
+        public int Columns = 8;
+        public float CellSpacing = 4f;
 
-    public void OnValidate()
-    {
-        if (PieceSpawnConfig == null || PieceSpawnConfig.Shapes == null) return;
+        [Header("Piece Spawning")]
+        public PieceSpawnConfig PieceSpawnConfig;
 
-        for (int i = 0; i < PieceSpawnConfig.Shapes.Length; i++)
+        [Header("Block Values")]
+        public int MinBlockValue = 1;
+        public int MaxBlockValue = 4;
+
+        [Header("Theme")]
+        public ThemeData Theme;
+
+        public bool ValidatePieceShape(PieceShapeData shape)
         {
-            var shape = PieceSpawnConfig.Shapes[i];
-            if (shape == null) continue;
+            var size = shape.GetNormalizedSize();
+            return size.x <= Rows && size.y <= Columns;
+        }
 
-            if (!ValidatePieceShape(shape))
+        public void OnValidate()
+        {
+            if (PieceSpawnConfig == null || PieceSpawnConfig.Shapes == null) return;
+
+            for (int i = 0; i < PieceSpawnConfig.Shapes.Length; i++)
             {
-                Debug.LogWarning($"[BoardConfig] Piece shape '{shape.name}' is too large for {Rows}x{Columns} board.");
+                var shape = PieceSpawnConfig.Shapes[i];
+                if (shape == null) continue;
+
+                if (!ValidatePieceShape(shape))
+                {
+                    Debug.LogWarning($"[BoardConfig] Piece shape '{shape.name}' is too large for {Rows}x{Columns} board.");
+                }
             }
         }
     }
