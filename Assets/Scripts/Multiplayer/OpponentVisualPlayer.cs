@@ -358,14 +358,7 @@ namespace NumbersBlast.Multiplayer
 
         private bool CanFitAt(PieceModel piece, Vector2Int pos)
         {
-            var model = _boardManager.Model;
-            for (int i = 0; i < piece.CellCount; i++)
-            {
-                int r = pos.x + piece.Positions[i].x;
-                int c = pos.y + piece.Positions[i].y;
-                if (!model.IsInBounds(r, c) || !model.IsCellEmpty(r, c)) return false;
-            }
-            return true;
+            return _boardManager.Model.CanFitPiece(piece.Positions, pos.x, pos.y);
         }
 
         private void OnDestroy()

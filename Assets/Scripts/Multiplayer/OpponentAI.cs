@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using NumbersBlast.Board;
+using NumbersBlast.Core;
 using NumbersBlast.Data;
 using NumbersBlast.Piece;
 
@@ -11,11 +12,6 @@ namespace NumbersBlast.Multiplayer
         private readonly MultiplayerConfig _config;
         private readonly List<OpponentMove> _allMoves = new(64);
         private readonly HashSet<Vector2Int> _occupiedAfterPlace = new(64);
-
-        private static readonly Vector2Int[] MergeDirections =
-        {
-            new(-1, 0), new(1, 0), new(0, -1), new(0, 1)
-        };
 
         public OpponentAI(MultiplayerConfig config)
         {
@@ -120,10 +116,10 @@ namespace NumbersBlast.Multiplayer
                 int c = startCol + piece.Positions[i].y;
                 int value = piece.GetValueAt(i);
 
-                for (int d = 0; d < MergeDirections.Length; d++)
+                for (int d = 0; d < GameConstants.MergeDirections.Length; d++)
                 {
-                    int nr = r + MergeDirections[d].x;
-                    int nc = c + MergeDirections[d].y;
+                    int nr = r + GameConstants.MergeDirections[d].x;
+                    int nc = c + GameConstants.MergeDirections[d].y;
 
                     var neighbor = board.GetCell(nr, nc);
                     if (neighbor != null && !neighbor.IsEmpty && neighbor.Value == value)
@@ -187,15 +183,7 @@ namespace NumbersBlast.Multiplayer
 
         private bool CanFit(BoardModel board, PieceModel piece, int startRow, int startCol)
         {
-            for (int i = 0; i < piece.CellCount; i++)
-            {
-                int r = startRow + piece.Positions[i].x;
-                int c = startCol + piece.Positions[i].y;
-
-                if (!board.IsInBounds(r, c)) return false;
-                if (!board.IsCellEmpty(r, c)) return false;
-            }
-            return true;
+            return board.CanFitPiece(piece.Positions, startRow, startCol);
         }
     }
 }

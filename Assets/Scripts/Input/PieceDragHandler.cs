@@ -28,11 +28,6 @@ namespace NumbersBlast.Input
         private Vector2 _dragOffset;
         private bool _isDragging;
 
-        private static readonly Vector2Int[] MergeDirections =
-        {
-            new(-1, 0), new(1, 0), new(0, -1), new(0, 1)
-        };
-
         private const float DragScale = 1f;
         private const float PickupDuration = 0.15f;
         private const float ReturnDuration = 0.2f;
@@ -224,10 +219,10 @@ namespace NumbersBlast.Input
                 int cellCol = boardPos.y + pieceModel.Positions[i].y;
                 int value = pieceModel.GetValueAt(i);
 
-                for (int d = 0; d < MergeDirections.Length; d++)
+                for (int d = 0; d < GameConstants.MergeDirections.Length; d++)
                 {
-                    int nRow = cellRow + MergeDirections[d].x;
-                    int nCol = cellCol + MergeDirections[d].y;
+                    int nRow = cellRow + GameConstants.MergeDirections[d].x;
+                    int nCol = cellCol + GameConstants.MergeDirections[d].y;
 
                     if (_placedSet.Contains(new Vector2Int(nRow, nCol))) continue;
 
@@ -375,19 +370,7 @@ namespace NumbersBlast.Input
 
         private bool CanPlace(Vector2Int boardPos)
         {
-            var positions = _pieceView.Model.Positions;
-            var model = _boardManager.Model;
-
-            for (int i = 0; i < positions.Length; i++)
-            {
-                int row = boardPos.x + positions[i].x;
-                int col = boardPos.y + positions[i].y;
-
-                if (!model.IsInBounds(row, col)) return false;
-                if (!model.IsCellEmpty(row, col)) return false;
-            }
-
-            return true;
+            return _boardManager.Model.CanFitPiece(_pieceView.Model.Positions, boardPos.x, boardPos.y);
         }
 
         private void ReturnToTray()

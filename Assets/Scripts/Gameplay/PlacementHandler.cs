@@ -171,7 +171,7 @@ namespace NumbersBlast.Gameplay
                 {
                     for (int c = 0; c < model.Columns; c++)
                     {
-                        if (CanFitAt(model, positions, r, c))
+                        if (model.CanFitPiece(positions, r, c))
                             return true;
                     }
                 }
@@ -180,17 +180,5 @@ namespace NumbersBlast.Gameplay
             return false;
         }
 
-        private bool CanFitAt(BoardModel model, Vector2Int[] positions, int startRow, int startCol)
-        {
-            for (int i = 0; i < positions.Length; i++)
-            {
-                int row = startRow + positions[i].x;
-                int col = startCol + positions[i].y;
-
-                if (!model.IsInBounds(row, col)) return false;
-                if (!model.IsCellEmpty(row, col)) return false;
-            }
-            return true;
-        }
     }
 }

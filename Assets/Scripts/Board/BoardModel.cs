@@ -37,5 +37,17 @@ namespace NumbersBlast.Board
             if (!IsInBounds(row, column)) return false;
             return Cells[row, column].IsEmpty;
         }
+
+        public bool CanFitPiece(UnityEngine.Vector2Int[] positions, int startRow, int startCol)
+        {
+            for (int i = 0; i < positions.Length; i++)
+            {
+                int row = startRow + positions[i].x;
+                int col = startCol + positions[i].y;
+                if (!IsInBounds(row, col)) return false;
+                if (!IsCellEmpty(row, col)) return false;
+            }
+            return true;
+        }
     }
 }

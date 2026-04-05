@@ -1,17 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using NumbersBlast.Board;
+using NumbersBlast.Core;
 using NumbersBlast.Piece;
 
 namespace NumbersBlast.Gameplay
 {
     public class MergeResolver
     {
-        private static readonly Vector2Int[] Directions =
-        {
-            new(-1, 0), new(1, 0), new(0, -1), new(0, 1)
-        };
-
         private readonly HashSet<Vector2Int> _placedPositions = new();
         private readonly List<Vector2Int> _neighborMatches = new(4);
 
@@ -86,10 +82,10 @@ namespace NumbersBlast.Gameplay
             _neighborMatches.Clear();
             var matches = _neighborMatches;
 
-            for (int i = 0; i < Directions.Length; i++)
+            for (int i = 0; i < GameConstants.MergeDirections.Length; i++)
             {
-                int row = pos.x + Directions[i].x;
-                int col = pos.y + Directions[i].y;
+                int row = pos.x + GameConstants.MergeDirections[i].x;
+                int col = pos.y + GameConstants.MergeDirections[i].y;
 
                 if (excludePlaced && _placedPositions.Contains(new Vector2Int(row, col)))
                     continue;

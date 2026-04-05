@@ -55,22 +55,7 @@ namespace NumbersBlast.Piece
 
                 var shape = spawnConfig.Shapes[Random.Range(0, spawnConfig.Shapes.Length)];
                 var model = new PieceModel(shape, _config.MinBlockValue, _config.MaxBlockValue);
-
-                var pieceGo = Instantiate(_piecePrefab, _pieceSlots[i]);
-                var pieceView = pieceGo.GetComponent<PieceView>();
-                pieceView.Initialize(model, _config, _cellSize);
-
-                // TODO: PieceDragHandler should be pre-attached on the piece prefab instead of added as fallback.
-                var dragHandler = pieceGo.GetComponent<PieceDragHandler>();
-                if (dragHandler == null)
-                    dragHandler = pieceGo.AddComponent<PieceDragHandler>();
-                dragHandler.Initialize(pieceView, _canvas, _boardView, _boardManager, _config, _tutorialManager, _feedbackManager, _gameStateManager);
-
-                var slotRect = _slotRects[i];
-                float scale = CalculateFitScale(model.Shape, slotRect);
-                pieceView.SetScale(scale);
-
-                _pieceViews[i] = pieceView;
+                _pieceViews[i] = SpawnSinglePiece(model, i);
             }
         }
 
@@ -88,11 +73,19 @@ namespace NumbersBlast.Piece
             return true;
         }
 
-        private float CalculateFitScale(PieceShapeData shape, RectTransform slotRect)
+        private float CalculateFitScale(PieceModel model, RectTransform slotRect)
         {
-            var size = shape.GetNormalizedSize();
-            float pieceWidth = size.y * _cellSize;
-            float pieceHeight = size.x * _cellSize;
+            int maxRow = 0, maxCol = 0;
+            for (int i = 0; i < model.Positions.Length; i++)
+            {
+                if (model.Positions[i].x + 1 > maxRow) maxRow = model.Positions[i].x + 1;
+                if (model.Positions[i].y + 1 > maxCol) maxCol = model.Positions[i].y + 1;
+            }
+
+            float pieceWidth = maxCol * _cellSize;
+            float pieceHeight = maxRow * _cellSize;
+
+            if (pieceWidth <= 0 || pieceHeight <= 0) return GameConstants.MaxPieceTrayScale;
 
             float scaleX = slotRect.sizeDelta.x / pieceWidth;
             float scaleY = slotRect.sizeDelta.y / pieceHeight;
@@ -103,8 +96,12 @@ namespace NumbersBlast.Piece
         public void SpawnTutorialPiece(PieceModel model)
         {
             ClearAll();
+            _pieceViews[0] = SpawnSinglePiece(model, 0);
+        }
 
-            var pieceGo = Instantiate(_piecePrefab, _pieceSlots[0]);
+        private PieceView SpawnSinglePiece(PieceModel model, int slotIndex)
+        {
+            var pieceGo = Instantiate(_piecePrefab, _pieceSlots[slotIndex]);
             var pieceView = pieceGo.GetComponent<PieceView>();
             pieceView.Initialize(model, _config, _cellSize);
 
@@ -114,20 +111,11 @@ namespace NumbersBlast.Piece
                 dragHandler = pieceGo.AddComponent<PieceDragHandler>();
             dragHandler.Initialize(pieceView, _canvas, _boardView, _boardManager, _config, _tutorialManager, _feedbackManager, _gameStateManager);
 
-            var slotRect = _slotRects[0];
-            float pieceWidth = 1;
-            float pieceHeight = 1;
-            for (int i = 0; i < model.Positions.Length; i++)
-            {
-                if (model.Positions[i].y + 1 > pieceWidth) pieceWidth = model.Positions[i].y + 1;
-                if (model.Positions[i].x + 1 > pieceHeight) pieceHeight = model.Positions[i].x + 1;
-            }
+            var slotRect = _slotRects[slotIndex];
+            float scale = CalculateFitScale(model, slotRect);
+            pieceView.SetScale(scale);
 
-            float scaleX = slotRect.sizeDelta.x / (pieceWidth * _cellSize);
-            float scaleY = slotRect.sizeDelta.y / (pieceHeight * _cellSize);
-            pieceView.SetScale(Mathf.Min(scaleX, scaleY, GameConstants.MaxPieceTrayScale));
-
-            _pieceViews[0] = pieceView;
+            return pieceView;
         }
 
         public void ClearAll()
