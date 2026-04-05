@@ -15,12 +15,13 @@ public class GameplayInitializer : IStartable
     private readonly FeedbackManager _feedbackManager;
     private readonly GameStateManager _gameStateManager;
     private readonly AudioManager _audioManager;
+    private readonly GameplayHUD _gameplayHUD;
 
     [Inject]
     public GameplayInitializer(BoardManager boardManager, PieceTray pieceTray, BoardConfig config,
         BoardView boardView, PlacementHandler placementHandler, ScoreUI scoreUI, UIManager uiManager,
         TutorialManager tutorialManager, FeedbackManager feedbackManager, GameStateManager gameStateManager,
-        AudioManager audioManager)
+        AudioManager audioManager, GameplayHUD gameplayHUD)
     {
         _boardManager = boardManager;
         _pieceTray = pieceTray;
@@ -33,6 +34,7 @@ public class GameplayInitializer : IStartable
         _feedbackManager = feedbackManager;
         _gameStateManager = gameStateManager;
         _audioManager = audioManager;
+        _gameplayHUD = gameplayHUD;
     }
 
     public void Start()
@@ -46,6 +48,7 @@ public class GameplayInitializer : IStartable
         _pieceTray.Initialize(_config, cellSize, canvas, _boardView, _boardManager, _tutorialManager, _feedbackManager, _gameStateManager);
         _feedbackManager.Initialize(_boardView.GetComponent<RectTransform>());
         _scoreUI.Initialize();
+        _gameplayHUD.Initialize(_uiManager, _gameStateManager);
         _placementHandler.Enable();
 
         GameEvents.OnGameOver += HandleGameOver;

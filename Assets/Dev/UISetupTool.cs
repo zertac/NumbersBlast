@@ -21,9 +21,11 @@ public static class UISetupTool
             AssetDatabase.CreateFolder("Assets/Prefabs", "UI");
         }
 
+        CreateUIButtonPrefab();
         CreateGameOverPrefab();
         CreateTutorialFeedbackPrefab();
         CreateSettingsPrefab();
+        CreatePausePrefab();
         CreateUIConfig();
         SetupPopupContainer();
 
@@ -141,24 +143,45 @@ public static class UISetupTool
 
     private static GameObject CreateToggleButton(Transform parent, string name, string text, float minX, float minY, float maxX, float maxY)
     {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
-        go.transform.SetParent(parent, false);
+        var go = InstantiateButtonPrefab(parent, name, text);
         SetAnchors(go, minX, minY, maxX, maxY);
         go.GetComponent<Image>().color = new Color(0.25f, 0.25f, 0.4f);
-
-        var textGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
-        textGo.transform.SetParent(go.transform, false);
-        var textRect = textGo.GetComponent<RectTransform>();
-        textRect.anchorMin = Vector2.zero;
-        textRect.anchorMax = Vector2.one;
-        textRect.sizeDelta = Vector2.zero;
-        var tmp = textGo.GetComponent<TextMeshProUGUI>();
-        tmp.text = text;
-        tmp.fontSize = 28;
-        tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = Color.white;
-
+        go.GetComponentInChildren<TextMeshProUGUI>().fontSize = 28;
         return go;
+    }
+
+    private static void CreatePausePrefab()
+    {
+        var path = PrefabPath + "/PausePopup.prefab";
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null) return;
+
+        var root = CreatePopupRoot("PausePopup");
+        var content = CreatePopupContent(root.transform);
+        content.GetComponent<RectTransform>().sizeDelta = new Vector2(500, 450);
+
+        var title = CreateText(content.transform, "Title", "PAUSED", 56, FontStyles.Bold);
+        SetAnchors(title, 0, 0.8f, 1, 1);
+
+        var resumeBtn = CreateButton(content.transform, "ResumeButton", "RESUME", 0.15f, 0.52f, 0.85f, 0.72f);
+        resumeBtn.GetComponent<Image>().color = new Color(0.3f, 0.75f, 0.4f);
+
+        var restartBtn = CreateButton(content.transform, "RestartButton", "RESTART", 0.15f, 0.28f, 0.85f, 0.48f);
+        restartBtn.GetComponent<Image>().color = new Color(0.4f, 0.5f, 0.8f);
+
+        var menuBtn = CreateButton(content.transform, "MainMenuButton", "MAIN MENU", 0.15f, 0.04f, 0.85f, 0.24f);
+        menuBtn.GetComponent<Image>().color = new Color(0.7f, 0.35f, 0.35f);
+
+        var pausePopup = root.AddComponent<PausePopup>();
+        var so = new SerializedObject(pausePopup);
+        so.FindProperty("_dimBackground").objectReferenceValue = root.transform.Find("DimBackground").GetComponent<Image>();
+        so.FindProperty("_content").objectReferenceValue = content.GetComponent<RectTransform>();
+        so.FindProperty("_resumeButton").objectReferenceValue = resumeBtn.GetComponent<Button>();
+        so.FindProperty("_restartButton").objectReferenceValue = restartBtn.GetComponent<Button>();
+        so.FindProperty("_mainMenuButton").objectReferenceValue = menuBtn.GetComponent<Button>();
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        PrefabUtility.SaveAsPrefabAsset(root, path);
+        Object.DestroyImmediate(root);
     }
 
     private static void CreateUIConfig()
@@ -171,15 +194,46 @@ public static class UISetupTool
         var gameOverPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath + "/GameOverPopup.prefab");
         var tutorialPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath + "/TutorialFeedbackPopup.prefab");
         var settingsPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath + "/SettingsPopup.prefab");
+        var pausePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath + "/PausePopup.prefab");
 
         config.Popups = new PopupEntry[]
         {
             new() { Type = PopupType.GameOver, Prefab = gameOverPrefab },
             new() { Type = PopupType.TutorialFeedback, Prefab = tutorialPrefab },
-            new() { Type = PopupType.Settings, Prefab = settingsPrefab }
+            new() { Type = PopupType.Settings, Prefab = settingsPrefab },
+            new() { Type = PopupType.Pause, Prefab = pausePrefab }
         };
 
         AssetDatabase.CreateAsset(config, path);
+    }
+
+    private static void CreateUIButtonPrefab()
+    {
+        var path = PrefabPath + "/UIButton.prefab";
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null) return;
+
+        var go = new GameObject("UIButton", typeof(RectTransform), typeof(Image), typeof(Button), typeof(UIButton));
+        go.GetComponent<Image>().color = new Color(0.3f, 0.7f, 0.4f);
+
+        var uiBtn = new SerializedObject(go.GetComponent<UIButton>());
+        uiBtn.FindProperty("_button").objectReferenceValue = go.GetComponent<Button>();
+        uiBtn.ApplyModifiedPropertiesWithoutUndo();
+
+        var textGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+        textGo.transform.SetParent(go.transform, false);
+        var textRect = textGo.GetComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.sizeDelta = Vector2.zero;
+        var tmp = textGo.GetComponent<TextMeshProUGUI>();
+        tmp.text = "BUTTON";
+        tmp.fontSize = 32;
+        tmp.fontStyle = FontStyles.Bold;
+        tmp.alignment = TextAlignmentOptions.Center;
+        tmp.color = Color.white;
+
+        PrefabUtility.SaveAsPrefabAsset(go, path);
+        Object.DestroyImmediate(go);
     }
 
     // === Helpers ===
@@ -229,24 +283,18 @@ public static class UISetupTool
 
     private static GameObject CreateButton(Transform parent, string name, string text, float minX, float minY, float maxX, float maxY)
     {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
-        go.transform.SetParent(parent, false);
+        var go = InstantiateButtonPrefab(parent, name, text);
         SetAnchors(go, minX, minY, maxX, maxY);
-        go.GetComponent<Image>().color = new Color(0.3f, 0.7f, 0.4f);
+        return go;
+    }
 
-        var textGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
-        textGo.transform.SetParent(go.transform, false);
-        var textRect = textGo.GetComponent<RectTransform>();
-        textRect.anchorMin = Vector2.zero;
-        textRect.anchorMax = Vector2.one;
-        textRect.sizeDelta = Vector2.zero;
-        var tmp = textGo.GetComponent<TextMeshProUGUI>();
-        tmp.text = text;
-        tmp.fontSize = 32;
-        tmp.fontStyle = FontStyles.Bold;
-        tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = Color.white;
-
+    private static GameObject InstantiateButtonPrefab(Transform parent, string name, string text)
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath + "/UIButton.prefab");
+        var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        go.transform.SetParent(parent, false);
+        go.name = name;
+        go.GetComponentInChildren<TextMeshProUGUI>().text = text;
         return go;
     }
 

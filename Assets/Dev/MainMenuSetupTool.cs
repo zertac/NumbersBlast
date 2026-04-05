@@ -10,6 +10,8 @@ public static class MainMenuSetupTool
     [MenuItem("NumbersBlast/Setup Main Menu Scene")]
     private static void SetupMainMenu()
     {
+        // Ensure UIButton prefab exists
+        UISetupTool.RunSetup();
         // Create new scene
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -111,25 +113,13 @@ public static class MainMenuSetupTool
 
     private static GameObject CreateButton(Transform parent, string name, string text, Color color, float height)
     {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/UIButton.prefab");
+        var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
         go.transform.SetParent(parent, false);
-        var rect = go.GetComponent<RectTransform>();
-        rect.sizeDelta = new Vector2(0, height);
+        go.name = name;
+        go.GetComponent<RectTransform>().sizeDelta = new Vector2(0, height);
         go.GetComponent<Image>().color = color;
-
-        var textGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
-        textGo.transform.SetParent(go.transform, false);
-        var textRect = textGo.GetComponent<RectTransform>();
-        textRect.anchorMin = Vector2.zero;
-        textRect.anchorMax = Vector2.one;
-        textRect.sizeDelta = Vector2.zero;
-        var tmp = textGo.GetComponent<TextMeshProUGUI>();
-        tmp.text = text;
-        tmp.fontSize = 36;
-        tmp.fontStyle = FontStyles.Bold;
-        tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = Color.white;
-
+        go.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = text;
         return go;
     }
 }

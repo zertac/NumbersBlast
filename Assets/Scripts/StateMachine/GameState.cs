@@ -4,5 +4,6 @@ public enum GameState
     Dragging,
     Processing,
     Tutorial,
+    Paused,
     GameOver
 }

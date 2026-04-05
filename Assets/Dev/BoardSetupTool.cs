@@ -27,10 +27,11 @@ public static class BoardSetupTool
         var boardView = SetupBoardView(canvas.transform);
         var pieceTray = SetupPieceTray(canvas.transform);
         var scoreUI = SetupScoreUI(canvas.transform);
+        var gameplayHUD = SetupGameplayHUD(canvas.transform);
         var feedbackConfig = CreateOrLoadFeedbackConfig();
         var tutorialOverlay = SetupTutorialOverlay(canvas.transform);
         UISetupTool.RunSetup();
-        SetupGameplayScope(config, boardView, pieceTray, scoreUI, feedbackConfig, tutorialOverlay);
+        SetupGameplayScope(config, boardView, pieceTray, scoreUI, gameplayHUD, feedbackConfig, tutorialOverlay);
 
         AssetDatabase.SaveAssets();
         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
@@ -496,7 +497,63 @@ public static class BoardSetupTool
         return config;
     }
 
-    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, FeedbackConfig feedbackConfig, TutorialOverlay tutorialOverlay)
+    private static GameplayHUD SetupGameplayHUD(Transform canvasTransform)
+    {
+        var existing = canvasTransform.Find("GameplayHUD");
+        if (existing != null)
+        {
+            var existingHUD = existing.GetComponent<GameplayHUD>();
+            if (existingHUD != null) return existingHUD;
+            Object.DestroyImmediate(existing.gameObject);
+        }
+
+        var hudGo = new GameObject("GameplayHUD", typeof(RectTransform));
+        hudGo.transform.SetParent(canvasTransform, false);
+        var hudRect = hudGo.GetComponent<RectTransform>();
+        hudRect.anchorMin = Vector2.zero;
+        hudRect.anchorMax = Vector2.one;
+        hudRect.sizeDelta = Vector2.zero;
+
+        // Pause button - top left (from UIButton prefab)
+        var btnPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/UIButton.prefab");
+
+        var pauseBtn = (GameObject)PrefabUtility.InstantiatePrefab(btnPrefab);
+        pauseBtn.transform.SetParent(hudGo.transform, false);
+        pauseBtn.name = "PauseButton";
+        var pauseRect = pauseBtn.GetComponent<RectTransform>();
+        pauseRect.anchorMin = new Vector2(0, 1);
+        pauseRect.anchorMax = new Vector2(0, 1);
+        pauseRect.pivot = new Vector2(0, 1);
+        pauseRect.anchoredPosition = new Vector2(20, -20);
+        pauseRect.sizeDelta = new Vector2(80, 80);
+        pauseBtn.GetComponent<Image>().color = new Color(0.3f, 0.3f, 0.5f, 0.8f);
+        pauseBtn.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "II";
+        pauseBtn.GetComponentInChildren<TMPro.TextMeshProUGUI>().fontSize = 32;
+
+        // Settings button - top right (from UIButton prefab)
+        var settingsBtn = (GameObject)PrefabUtility.InstantiatePrefab(btnPrefab);
+        settingsBtn.transform.SetParent(hudGo.transform, false);
+        settingsBtn.name = "SettingsButton";
+        var settingsRect = settingsBtn.GetComponent<RectTransform>();
+        settingsRect.anchorMin = new Vector2(1, 1);
+        settingsRect.anchorMax = new Vector2(1, 1);
+        settingsRect.pivot = new Vector2(1, 1);
+        settingsRect.anchoredPosition = new Vector2(-20, -20);
+        settingsRect.sizeDelta = new Vector2(80, 80);
+        settingsBtn.GetComponent<Image>().color = new Color(0.3f, 0.3f, 0.5f, 0.8f);
+        settingsBtn.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "*";
+        settingsBtn.GetComponentInChildren<TMPro.TextMeshProUGUI>().fontSize = 36;
+
+        var hud = hudGo.AddComponent<GameplayHUD>();
+        var so = new SerializedObject(hud);
+        so.FindProperty("_pauseButton").objectReferenceValue = pauseBtn.GetComponent<Button>();
+        so.FindProperty("_settingsButton").objectReferenceValue = settingsBtn.GetComponent<Button>();
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        return hud;
+    }
+
+    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, GameplayHUD gameplayHUD, FeedbackConfig feedbackConfig, TutorialOverlay tutorialOverlay)
     {
         var tutorialConfig = AssetDatabase.LoadAssetAtPath<TutorialConfig>("Assets/ScriptableObjects/Tutorial/TutorialConfig.asset");
         var uiConfig = AssetDatabase.LoadAssetAtPath<UIConfig>("Assets/ScriptableObjects/UIConfig.asset");
@@ -511,6 +568,7 @@ public static class BoardSetupTool
             so.FindProperty("_boardView").objectReferenceValue = boardView;
             so.FindProperty("_pieceTray").objectReferenceValue = pieceTray;
             so.FindProperty("_scoreUI").objectReferenceValue = scoreUI;
+            so.FindProperty("_gameplayHUD").objectReferenceValue = gameplayHUD;
             so.FindProperty("_feedbackConfig").objectReferenceValue = feedbackConfig;
             so.FindProperty("_tutorialOverlay").objectReferenceValue = tutorialOverlay;
             if (uiConfig != null)

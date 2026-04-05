@@ -8,6 +8,7 @@ public class GameplayLifetimeScope : LifetimeScope
     [SerializeField] private BoardView _boardView;
     [SerializeField] private PieceTray _pieceTray;
     [SerializeField] private ScoreUI _scoreUI;
+    [SerializeField] private GameplayHUD _gameplayHUD;
     [SerializeField] private TutorialOverlay _tutorialOverlay;
     [SerializeField] private TutorialConfig _tutorialConfig;
     [SerializeField] private FeedbackConfig _feedbackConfig;
@@ -21,6 +22,7 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterInstance(_boardView);
         builder.RegisterInstance(_pieceTray);
         builder.RegisterInstance(_scoreUI);
+        builder.RegisterInstance(_gameplayHUD);
         builder.RegisterInstance(_tutorialOverlay);
         builder.RegisterInstance(_tutorialConfig);
         builder.RegisterInstance(_feedbackConfig);
