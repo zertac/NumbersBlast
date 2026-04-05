@@ -13,8 +13,11 @@ public class GameplayLifetimeScope : LifetimeScope
     [SerializeField] private TutorialConfig _tutorialConfig;
     [SerializeField] private FeedbackConfig _feedbackConfig;
     [SerializeField] private UIConfig _uiConfig;
-    [SerializeField] private Transform _popupContainer;
     [SerializeField] private AudioConfig _audioConfig;
+    [SerializeField] private Transform _popupContainer;
+    [SerializeField] private MultiplayerConfig _multiplayerConfig;
+    [SerializeField] private MultiplayerHUD _multiplayerHUD;
+    [SerializeField] private OpponentVisualPlayer _opponentVisualPlayer;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -30,11 +33,11 @@ public class GameplayLifetimeScope : LifetimeScope
         if (_audioConfig != null)
             builder.RegisterInstance(_audioConfig);
 
-        builder.Register<AudioManager>(Lifetime.Singleton);
         builder.Register<UIManager>(Lifetime.Singleton)
             .WithParameter("popupContainer", _popupContainer)
             .WithParameter("config", _uiConfig);
 
+        builder.Register<AudioManager>(Lifetime.Singleton);
         builder.Register<FeedbackManager>(Lifetime.Singleton);
         builder.Register<GameStateManager>(Lifetime.Singleton);
         builder.Register<BoardManager>(Lifetime.Singleton);
@@ -42,6 +45,17 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.Register<LineClearResolver>(Lifetime.Singleton);
         builder.Register<PlacementHandler>(Lifetime.Singleton);
         builder.Register<TutorialManager>(Lifetime.Singleton);
+
+        // Multiplayer
+        builder.RegisterInstance(_multiplayerConfig);
+        builder.RegisterInstance(_multiplayerHUD);
+        builder.RegisterInstance(_opponentVisualPlayer);
+
+        builder.Register<OpponentAI>(Lifetime.Singleton);
+        builder.Register<TurnManager>(Lifetime.Singleton);
+        builder.Register<MultiplayerManager>(Lifetime.Singleton);
+
+        builder.RegisterEntryPoint<MultiplayerTickRunner>();
 
         builder.RegisterEntryPoint<GameplayInitializer>();
     }

@@ -12,6 +12,8 @@ public class PlacementHandler
     private readonly GameStateManager _gameStateManager;
     private readonly AudioManager _audioManager;
 
+    public event System.Action OnPlacementComplete;
+
     public PlacementHandler(BoardManager boardManager, MergeResolver mergeResolver, LineClearResolver lineClearResolver, PieceTray pieceTray, BoardView boardView, FeedbackManager feedbackManager, GameStateManager gameStateManager, AudioManager audioManager)
     {
         _boardManager = boardManager;
@@ -40,6 +42,7 @@ public class PlacementHandler
         var pieceModel = pieceView.Model;
 
         PlaceCells(model, pieceModel, boardPos);
+        DG.Tweening.DOTween.Kill(pieceView.transform);
         Object.Destroy(pieceView.gameObject);
         _pieceTray.RemovePiece(pieceView);
         _boardView.RefreshAll();
@@ -93,7 +96,10 @@ public class PlacementHandler
                 _boardView.RefreshAll();
                 CheckGameOver();
                 if (_gameStateManager.CurrentState != GameState.GameOver)
+                {
                     _gameStateManager.TransitionTo(GameState.Idle);
+                    OnPlacementComplete?.Invoke();
+                }
             });
         }
         else
@@ -101,7 +107,10 @@ public class PlacementHandler
             _boardView.RefreshAll();
             CheckGameOver();
             if (_gameStateManager.CurrentState != GameState.GameOver)
+            {
                 _gameStateManager.TransitionTo(GameState.Idle);
+                OnPlacementComplete?.Invoke();
+            }
         }
     }
 

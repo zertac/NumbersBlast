@@ -30,8 +30,11 @@ public static class BoardSetupTool
         var gameplayHUD = SetupGameplayHUD(canvas.transform);
         var feedbackConfig = CreateOrLoadFeedbackConfig();
         var tutorialOverlay = SetupTutorialOverlay(canvas.transform);
+        var multiplayerHUD = SetupMultiplayerHUD(canvas.transform);
+        var opponentVisualPlayer = SetupOpponentVisualPlayer();
         UISetupTool.RunSetup();
-        SetupGameplayScope(config, boardView, pieceTray, scoreUI, gameplayHUD, feedbackConfig, tutorialOverlay);
+        MultiplayerSetupTool.RunSetup();
+        SetupGameplayScope(config, boardView, pieceTray, scoreUI, gameplayHUD, feedbackConfig, tutorialOverlay, multiplayerHUD, opponentVisualPlayer);
 
         AssetDatabase.SaveAssets();
         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
@@ -553,7 +556,113 @@ public static class BoardSetupTool
         return hud;
     }
 
-    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, GameplayHUD gameplayHUD, FeedbackConfig feedbackConfig, TutorialOverlay tutorialOverlay)
+    private static MultiplayerHUD SetupMultiplayerHUD(Transform canvasTransform)
+    {
+        var existing = canvasTransform.Find("MultiplayerHUD");
+        if (existing != null)
+        {
+            var e = existing.GetComponent<MultiplayerHUD>();
+            if (e != null) return e;
+            Object.DestroyImmediate(existing.gameObject);
+        }
+
+        var go = new GameObject("MultiplayerHUD", typeof(RectTransform));
+        go.transform.SetParent(canvasTransform, false);
+        var rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.sizeDelta = Vector2.zero;
+
+        var panel = new GameObject("MultiplayerPanel", typeof(RectTransform));
+        panel.transform.SetParent(go.transform, false);
+        var panelRect = panel.GetComponent<RectTransform>();
+        panelRect.anchorMin = new Vector2(0, 1);
+        panelRect.anchorMax = new Vector2(1, 1);
+        panelRect.pivot = new Vector2(0.5f, 1);
+        panelRect.anchoredPosition = new Vector2(0, -110);
+        panelRect.sizeDelta = new Vector2(0, 120);
+
+        // Player name + score (left)
+        var playerName = CreateTMP(panel.transform, "PlayerName", "YOU", 20, TMPro.TextAlignmentOptions.Left);
+        SetAnchor(playerName, 0.05f, 0.55f, 0.45f, 0.95f);
+        var playerScore = CreateTMP(panel.transform, "PlayerScore", "0", 36, TMPro.TextAlignmentOptions.Left);
+        SetAnchor(playerScore, 0.05f, 0.05f, 0.45f, 0.55f);
+        playerScore.GetComponent<TMPro.TextMeshProUGUI>().fontStyle = TMPro.FontStyles.Bold;
+
+        // Opponent name + score (right)
+        var oppName = CreateTMP(panel.transform, "OpponentName", "OPP", 20, TMPro.TextAlignmentOptions.Right);
+        SetAnchor(oppName, 0.55f, 0.55f, 0.95f, 0.95f);
+        var oppScore = CreateTMP(panel.transform, "OpponentScore", "0", 36, TMPro.TextAlignmentOptions.Right);
+        SetAnchor(oppScore, 0.55f, 0.05f, 0.95f, 0.55f);
+        oppScore.GetComponent<TMPro.TextMeshProUGUI>().fontStyle = TMPro.FontStyles.Bold;
+
+        // Turn indicator (center)
+        var turnText = CreateTMP(panel.transform, "TurnIndicator", "YOUR TURN", 22, TMPro.TextAlignmentOptions.Center);
+        SetAnchor(turnText, 0.3f, 0.55f, 0.7f, 0.95f);
+        turnText.GetComponent<TMPro.TextMeshProUGUI>().fontStyle = TMPro.FontStyles.Bold;
+
+        // Timer bar
+        var timerBg = new GameObject("TimerBg", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+        timerBg.transform.SetParent(panel.transform, false);
+        SetAnchor(timerBg, 0.3f, 0.1f, 0.7f, 0.4f);
+        timerBg.GetComponent<UnityEngine.UI.Image>().color = new Color(0.2f, 0.2f, 0.2f);
+
+        var timerFill = new GameObject("TimerFill", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+        timerFill.transform.SetParent(timerBg.transform, false);
+        var fillRect = timerFill.GetComponent<RectTransform>();
+        fillRect.anchorMin = Vector2.zero;
+        fillRect.anchorMax = Vector2.one;
+        fillRect.offsetMin = Vector2.zero;
+        fillRect.offsetMax = Vector2.zero;
+        var fillImage = timerFill.GetComponent<UnityEngine.UI.Image>();
+        fillImage.color = Color.green;
+
+        var hud = go.AddComponent<MultiplayerHUD>();
+        var so = new SerializedObject(hud);
+        so.FindProperty("_multiplayerPanel").objectReferenceValue = panel;
+        so.FindProperty("_playerScoreText").objectReferenceValue = playerScore.GetComponent<TMPro.TextMeshProUGUI>();
+        so.FindProperty("_opponentScoreText").objectReferenceValue = oppScore.GetComponent<TMPro.TextMeshProUGUI>();
+        so.FindProperty("_playerNameText").objectReferenceValue = playerName.GetComponent<TMPro.TextMeshProUGUI>();
+        so.FindProperty("_opponentNameText").objectReferenceValue = oppName.GetComponent<TMPro.TextMeshProUGUI>();
+        so.FindProperty("_turnIndicatorText").objectReferenceValue = turnText.GetComponent<TMPro.TextMeshProUGUI>();
+        so.FindProperty("_timerBar").objectReferenceValue = fillImage;
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        panel.SetActive(false);
+        return hud;
+    }
+
+    private static OpponentVisualPlayer SetupOpponentVisualPlayer()
+    {
+        var existing = Object.FindAnyObjectByType<OpponentVisualPlayer>();
+        if (existing != null) return existing;
+
+        var go = new GameObject("OpponentVisualPlayer");
+        return go.AddComponent<OpponentVisualPlayer>();
+    }
+
+    private static GameObject CreateTMP(Transform parent, string name, string text, int fontSize, TMPro.TextAlignmentOptions alignment)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(TMPro.TextMeshProUGUI));
+        go.transform.SetParent(parent, false);
+        var tmp = go.GetComponent<TMPro.TextMeshProUGUI>();
+        tmp.text = text;
+        tmp.fontSize = fontSize;
+        tmp.alignment = alignment;
+        tmp.color = Color.white;
+        return go;
+    }
+
+    private static void SetAnchor(GameObject go, float minX, float minY, float maxX, float maxY)
+    {
+        var rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(minX, minY);
+        rect.anchorMax = new Vector2(maxX, maxY);
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+    }
+
+    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, GameplayHUD gameplayHUD, FeedbackConfig feedbackConfig, TutorialOverlay tutorialOverlay, MultiplayerHUD multiplayerHUD, OpponentVisualPlayer opponentVisualPlayer)
     {
         var tutorialConfig = AssetDatabase.LoadAssetAtPath<TutorialConfig>("Assets/ScriptableObjects/Tutorial/TutorialConfig.asset");
         var uiConfig = AssetDatabase.LoadAssetAtPath<UIConfig>("Assets/ScriptableObjects/UIConfig.asset");
@@ -579,6 +688,15 @@ public static class BoardSetupTool
                 so.FindProperty("_tutorialConfig").objectReferenceValue = tutorialConfig;
             if (audioConfig != null)
                 so.FindProperty("_audioConfig").objectReferenceValue = audioConfig;
+
+            var mpConfig = AssetDatabase.LoadAssetAtPath<MultiplayerConfig>("Assets/ScriptableObjects/MultiplayerConfig.asset");
+            if (mpConfig != null)
+                so.FindProperty("_multiplayerConfig").objectReferenceValue = mpConfig;
+            if (multiplayerHUD != null)
+                so.FindProperty("_multiplayerHUD").objectReferenceValue = multiplayerHUD;
+            if (opponentVisualPlayer != null)
+                so.FindProperty("_opponentVisualPlayer").objectReferenceValue = opponentVisualPlayer;
+
             so.ApplyModifiedPropertiesWithoutUndo();
         };
 

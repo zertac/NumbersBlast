@@ -17,9 +17,12 @@ public class GameStateManager
 
     public bool CanTransitionTo(GameState newState)
     {
+        if (_currentState == newState) return true;
+
         return (_currentState, newState) switch
         {
             (GameState.Idle, GameState.Dragging) => true,
+            (GameState.Idle, GameState.Processing) => true,
             (GameState.Idle, GameState.Paused) => true,
             (GameState.Idle, GameState.GameOver) => true,
             (GameState.Dragging, GameState.Idle) => true,

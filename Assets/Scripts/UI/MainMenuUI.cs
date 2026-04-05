@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class MainMenuUI : MonoBehaviour
 {
     [SerializeField] private Button _playButton;
+    [SerializeField] private Button _multiplayerButton;
     [SerializeField] private Button _settingsButton;
     [SerializeField] private Button _exitButton;
     [SerializeField] private UIConfig _uiConfig;
@@ -23,6 +24,9 @@ public class MainMenuUI : MonoBehaviour
 
         _playButton.onClick.AddListener(OnPlay);
 
+        if (_multiplayerButton != null)
+            _multiplayerButton.onClick.AddListener(OnMultiplayer);
+
         if (_settingsButton != null)
             _settingsButton.onClick.AddListener(OnSettings);
 
@@ -40,6 +44,9 @@ public class MainMenuUI : MonoBehaviour
     {
         _playButton.onClick.RemoveListener(OnPlay);
 
+        if (_multiplayerButton != null)
+            _multiplayerButton.onClick.RemoveListener(OnMultiplayer);
+
         if (_settingsButton != null)
             _settingsButton.onClick.RemoveListener(OnSettings);
 
@@ -50,6 +57,14 @@ public class MainMenuUI : MonoBehaviour
     private void OnPlay()
     {
         _audioManager?.PlayButtonClick();
+        GameModeHolder.CurrentMode = GameMode.SinglePlayer;
+        SceneManager.LoadScene("GameScene");
+    }
+
+    private void OnMultiplayer()
+    {
+        _audioManager?.PlayButtonClick();
+        GameModeHolder.CurrentMode = GameMode.Multiplayer;
         SceneManager.LoadScene("GameScene");
     }
 

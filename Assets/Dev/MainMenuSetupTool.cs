@@ -81,6 +81,7 @@ public static class MainMenuSetupTool
         layout.childControlHeight = false;
 
         var playBtn = CreateButton(buttonsGo.transform, "PlayButton", "PLAY", new Color(0.3f, 0.75f, 0.4f), 80);
+        var multiBtn = CreateButton(buttonsGo.transform, "MultiplayerButton", "MULTIPLAYER", new Color(0.8f, 0.5f, 0.2f), 80);
         var settingsBtn = CreateButton(buttonsGo.transform, "SettingsButton", "SETTINGS", new Color(0.4f, 0.5f, 0.8f), 70);
         var exitBtn = CreateButton(buttonsGo.transform, "ExitButton", "EXIT", new Color(0.7f, 0.35f, 0.35f), 70);
 
@@ -99,6 +100,7 @@ public static class MainMenuSetupTool
         var menuUI = canvasGo.AddComponent<MainMenuUI>();
         var so = new SerializedObject(menuUI);
         so.FindProperty("_playButton").objectReferenceValue = playBtn.GetComponent<Button>();
+        so.FindProperty("_multiplayerButton").objectReferenceValue = multiBtn.GetComponent<Button>();
         so.FindProperty("_settingsButton").objectReferenceValue = settingsBtn.GetComponent<Button>();
         so.FindProperty("_exitButton").objectReferenceValue = exitBtn.GetComponent<Button>();
         so.FindProperty("_uiConfig").objectReferenceValue = uiConfig;
