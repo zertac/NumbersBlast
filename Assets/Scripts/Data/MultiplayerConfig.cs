@@ -19,6 +19,11 @@ namespace NumbersBlast.Data
         [Range(0f, 1f)] public float HesitationChance = 0.5f;
         [Range(0f, 1f)] public float CancelChance = 0.3f;
 
+        [Header("Opponent AI Weights")]
+        public float MergeWeight = 10f;
+        public float LineClearWeight = 50f;
+        public float CenterBonus = 5f;
+
         [Header("Opponent Timing")]
         public float MinThinkTime = 1.5f;
         public float MaxThinkTime = 4f;

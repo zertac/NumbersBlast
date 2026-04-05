@@ -65,27 +65,7 @@ namespace NumbersBlast.Gameplay
             _feedbackManager.PlayPlaceEffect(placedCells);
 
             // Merge feedback
-            for (int i = 0; i < mergeResult.Count; i++)
-            {
-                var merge = mergeResult[i];
-                var targetView = _boardView.GetCellView(merge.TargetPos.x, merge.TargetPos.y);
-                var absorbedViews = new CellView[merge.AbsorbedPositions.Count];
-                for (int j = 0; j < merge.AbsorbedPositions.Count; j++)
-                {
-                    absorbedViews[j] = _boardView.GetCellView(merge.AbsorbedPositions[j].x, merge.AbsorbedPositions[j].y);
-                }
-
-                if (merge.IsChain)
-                {
-                    _feedbackManager.PlayChainMergeSmash(targetView);
-                    _audioManager.PlayChainMerge();
-                }
-                else
-                {
-                    _feedbackManager.PlayMergeSmash(targetView, absorbedViews);
-                    _audioManager.PlayMerge();
-                }
-            }
+            PlayMergeFeedback(mergeResult);
 
             // Line clear
             var clearResult = _lineClearResolver.Resolve(model);
@@ -122,6 +102,31 @@ namespace NumbersBlast.Gameplay
                 {
                     _gameStateManager.TransitionTo(GameState.Idle);
                     OnPlacementComplete?.Invoke();
+                }
+            }
+        }
+
+        private void PlayMergeFeedback(List<MergeEvent> mergeResult)
+        {
+            for (int i = 0; i < mergeResult.Count; i++)
+            {
+                var merge = mergeResult[i];
+                var targetView = _boardView.GetCellView(merge.TargetPos.x, merge.TargetPos.y);
+                var absorbedViews = new CellView[merge.AbsorbedPositions.Count];
+                for (int j = 0; j < merge.AbsorbedPositions.Count; j++)
+                {
+                    absorbedViews[j] = _boardView.GetCellView(merge.AbsorbedPositions[j].x, merge.AbsorbedPositions[j].y);
+                }
+
+                if (merge.IsChain)
+                {
+                    _feedbackManager.PlayChainMergeSmash(targetView);
+                    _audioManager.PlayChainMerge();
+                }
+                else
+                {
+                    _feedbackManager.PlayMergeSmash(targetView, absorbedViews);
+                    _audioManager.PlayMerge();
                 }
             }
         }

@@ -13,6 +13,12 @@ namespace NumbersBlast.Tutorial
         [SerializeField] private Button _continueButton;
         [SerializeField] private RectTransform _checkIcon;
 
+        private const float CheckScaleDuration = 0.4f;
+        private const float CheckScaleDelay = 0.2f;
+        private const float CheckPunchStrength = 0.15f;
+        private const float CheckPunchDuration = 0.25f;
+        private const int CheckPunchVibrato = 2;
+
         private System.Action _onContinue;
 
         protected override void Awake()
@@ -36,13 +42,13 @@ namespace NumbersBlast.Tutorial
 
             _checkIcon.DOKill();
             _checkIcon.localScale = Vector3.zero;
-            _checkIcon.DOScale(Vector3.one, 0.4f)
+            _checkIcon.DOScale(Vector3.one, CheckScaleDuration)
                 .SetEase(DG.Tweening.Ease.OutBack)
-                .SetDelay(0.2f)
+                .SetDelay(CheckScaleDelay)
                 .SetLink(_checkIcon.gameObject)
                 .OnComplete(() =>
                 {
-                    _checkIcon.DOPunchScale(Vector3.one * 0.15f, 0.25f, 2)
+                    _checkIcon.DOPunchScale(Vector3.one * CheckPunchStrength, CheckPunchDuration, CheckPunchVibrato)
                         .SetLink(_checkIcon.gameObject);
                 });
         }

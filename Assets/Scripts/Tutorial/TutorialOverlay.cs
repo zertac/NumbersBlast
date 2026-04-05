@@ -18,6 +18,12 @@ namespace NumbersBlast.Tutorial
         private Tween _cutoutTween;
         private Vector2 _handOffset;
 
+        private const float BreathScale = 1.1f;
+        private const float BreathDuration = 0.5f;
+        private const float HideHandDuration = 0.2f;
+        private const float CutoutAnimDuration = 0.3f;
+        private const float HandMoveDuration = 0.4f;
+
         private static readonly int CutoutCenterProp = Shader.PropertyToID("_CutoutCenter");
         private static readonly int CutoutSizeProp = Shader.PropertyToID("_CutoutSize");
 
@@ -121,14 +127,14 @@ namespace NumbersBlast.Tutorial
 
             // Gentle breathing animation
             var seq = DOTween.Sequence();
-            seq.Append(_handIcon.DOScale(Vector3.one * 1.1f, 0.5f).SetEase(Ease.InOutSine));
-            seq.Append(_handIcon.DOScale(Vector3.one, 0.5f).SetEase(Ease.InOutSine));
+            seq.Append(_handIcon.DOScale(Vector3.one * BreathScale, BreathDuration).SetEase(Ease.InOutSine));
+            seq.Append(_handIcon.DOScale(Vector3.one, BreathDuration).SetEase(Ease.InOutSine));
             seq.SetLoops(-1, LoopType.Restart);
             seq.SetLink(_handIcon.gameObject);
             _handTween = seq;
         }
 
-        public void MoveHandToPosition(RectTransform target, float duration = 0.4f)
+        public void MoveHandToPosition(RectTransform target, float duration = HandMoveDuration)
         {
             if (_handIcon == null || target == null) return;
 
@@ -143,8 +149,8 @@ namespace NumbersBlast.Tutorial
                 {
                     // Breathing at destination
                     var seq = DOTween.Sequence();
-                    seq.Append(_handIcon.DOScale(Vector3.one * 1.1f, 0.5f).SetEase(Ease.InOutSine));
-                    seq.Append(_handIcon.DOScale(Vector3.one, 0.5f).SetEase(Ease.InOutSine));
+                    seq.Append(_handIcon.DOScale(Vector3.one * BreathScale, BreathDuration).SetEase(Ease.InOutSine));
+                    seq.Append(_handIcon.DOScale(Vector3.one, BreathDuration).SetEase(Ease.InOutSine));
                     seq.SetLoops(-1, LoopType.Restart);
                     seq.SetLink(_handIcon.gameObject);
                     _handTween = seq;
@@ -156,7 +162,7 @@ namespace NumbersBlast.Tutorial
             KillHandTween();
             if (_handIcon != null)
             {
-                _handIcon.DOScale(Vector3.zero, 0.2f)
+                _handIcon.DOScale(Vector3.zero, HideHandDuration)
                     .SetEase(Ease.InBack)
                     .SetLink(_handIcon.gameObject)
                     .OnComplete(() => _handIcon.gameObject.SetActive(false));
@@ -184,7 +190,7 @@ namespace NumbersBlast.Tutorial
                     Vector2.Lerp(currentCenter, targetCenter, t),
                     Vector2.Lerp(currentSize, targetSize, t)
                 );
-            }, 1f, 0.3f).SetEase(Ease.OutCubic);
+            }, 1f, CutoutAnimDuration).SetEase(Ease.OutCubic);
         }
 
         private void KillHandTween()

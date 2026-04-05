@@ -27,6 +27,15 @@ namespace NumbersBlast.Multiplayer
         private const float PunchDuration = 0.3f;
         private const int PunchVibrato = 2;
         private const float PenaltyFlashDelay = 0.5f;
+        private const float TimerPulseScale = 1.05f;
+        private const float TimerPulseResetDuration = 0.15f;
+        private const float ShakeDuration = 0.4f;
+        private const float ShakeStrength = 8f;
+        private const int ShakeVibrato = 15;
+        private const float ShakeRandomness = 90f;
+        private const int PenaltyFontSize = 28;
+        private const float PenaltyFloatDistance = 80f;
+        private const float PenaltyAnimDuration = 1f;
 
         private static readonly Color PlayerTurnColor = new Color(0.3f, 0.85f, 0.4f);
         private static readonly Color OpponentTurnColor = new Color(0.9f, 0.5f, 0.3f);
@@ -85,7 +94,7 @@ namespace NumbersBlast.Multiplayer
                 {
                     _isPulsing = true;
                     _timerParent.DOKill();
-                    _timerParent.DOScale(Vector3.one * 1.05f, 0.3f)
+                    _timerParent.DOScale(Vector3.one * TimerPulseScale, PunchDuration)
                         .SetEase(Ease.InOutSine)
                         .SetLoops(-1, LoopType.Yoyo)
                         .SetLink(_timerParent.gameObject);
@@ -95,7 +104,7 @@ namespace NumbersBlast.Multiplayer
             {
                 _isPulsing = false;
                 _timerParent.DOKill();
-                _timerParent.DOScale(Vector3.one, 0.15f)
+                _timerParent.DOScale(Vector3.one, TimerPulseResetDuration)
                     .SetLink(_timerParent.gameObject);
             }
         }
@@ -136,7 +145,7 @@ namespace NumbersBlast.Multiplayer
 
             // Shake
             scoreText.transform.DOKill();
-            scoreText.transform.DOShakePosition(0.4f, 8f, 15, 90f, false, true, ShakeRandomnessMode.Harmonic)
+            scoreText.transform.DOShakePosition(ShakeDuration, ShakeStrength, ShakeVibrato, ShakeRandomness, false, true, ShakeRandomnessMode.Harmonic)
                 .SetLink(scoreText.gameObject);
 
             // Show penalty amount
@@ -152,7 +161,7 @@ namespace NumbersBlast.Multiplayer
 
             var text = penaltyGo.GetComponent<TextMeshProUGUI>();
             text.text = $"-{amount}";
-            text.fontSize = 28;
+            text.fontSize = PenaltyFontSize;
             text.fontStyle = FontStyles.Bold;
             text.color = Color.red;
             text.alignment = TextAlignmentOptions.Center;
@@ -162,8 +171,8 @@ namespace NumbersBlast.Multiplayer
 
             // Float up and fade
             var seq = DOTween.Sequence();
-            seq.Append(rect.DOAnchorPosY(rect.anchoredPosition.y + 80f, 1f).SetEase(Ease.OutCubic));
-            seq.Join(text.DOFade(0f, 1f).SetEase(Ease.InCubic));
+            seq.Append(rect.DOAnchorPosY(rect.anchoredPosition.y + PenaltyFloatDistance, PenaltyAnimDuration).SetEase(Ease.OutCubic));
+            seq.Join(text.DOFade(0f, PenaltyAnimDuration).SetEase(Ease.InCubic));
             seq.OnComplete(() => Destroy(penaltyGo));
             seq.SetLink(penaltyGo);
         }

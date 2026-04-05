@@ -127,7 +127,7 @@ namespace NumbersBlast.Multiplayer
                 }
             }
 
-            score += mergeCount * 10f;
+            score += mergeCount * _config.MergeWeight;
 
             // Score for line clear potential
             _occupiedAfterPlace.Clear();
@@ -155,7 +155,7 @@ namespace NumbersBlast.Multiplayer
                         break;
                     }
                 }
-                if (full) score += 50f;
+                if (full) score += _config.LineClearWeight;
             }
 
             for (int c = 0; c < board.Columns; c++)
@@ -169,14 +169,14 @@ namespace NumbersBlast.Multiplayer
                         break;
                     }
                 }
-                if (full) score += 50f;
+                if (full) score += _config.LineClearWeight;
             }
 
             // Small bonus for center placement
             float centerR = board.Rows * 0.5f;
             float centerC = board.Columns * 0.5f;
             float distToCenter = Mathf.Abs(startRow - centerR) + Mathf.Abs(startCol - centerC);
-            score += Mathf.Max(0, 5f - distToCenter);
+            score += Mathf.Max(0, _config.CenterBonus - distToCenter);
 
             return score;
         }

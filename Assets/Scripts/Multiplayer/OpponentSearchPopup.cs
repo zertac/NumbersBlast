@@ -23,6 +23,16 @@ namespace NumbersBlast.Multiplayer
         private CancellationTokenSource _cts;
         private Tween _iconTween;
 
+        private const int SearchTickDelayMs = 400;
+        private const int FallbackNameMin = 1000;
+        private const int FallbackNameMax = 9999;
+        private const int FoundDelayMs = 1500;
+        private const float SearchIconSwingDistance = 30f;
+        private const float SearchIconSwingDuration = 0.6f;
+        private const float SearchIconReturnDuration = 0.4f;
+        private const float SearchIconPulseScale = 1.1f;
+        private const float SearchIconPulseDuration = 0.3f;
+
         public string FoundOpponentName => _foundName;
 
         protected override void Awake()
@@ -70,13 +80,13 @@ namespace NumbersBlast.Multiplayer
                         .SetLink(_opponentNameText.gameObject);
                 }
 
-                await UniTask.Delay(400, cancellationToken: token);
-                elapsed += 0.4f;
+                await UniTask.Delay(SearchTickDelayMs, cancellationToken: token);
+                elapsed += SearchTickDelayMs / 1000f;
             }
 
             _foundName = _config.FakeNames != null && _config.FakeNames.Length > 0
                 ? _config.FakeNames[UnityEngine.Random.Range(0, _config.FakeNames.Length)]
-                : $"Player_{UnityEngine.Random.Range(1000, 9999)}";
+                : $"Player_{UnityEngine.Random.Range(FallbackNameMin, FallbackNameMax)}";
 
             _opponentNameText.text = _foundName;
             _statusText.text = "Opponent found!";
@@ -93,7 +103,7 @@ namespace NumbersBlast.Multiplayer
                     .SetLink(_searchIcon.gameObject);
             }
 
-            await UniTask.Delay(1500, cancellationToken: token);
+            await UniTask.Delay(FoundDelayMs, cancellationToken: token);
 
             Hide();
             _onFound?.Invoke();
@@ -112,10 +122,10 @@ namespace NumbersBlast.Multiplayer
             if (_searchIcon == null) return;
 
             var seq = DOTween.Sequence();
-            seq.Append(_searchIcon.DOAnchorPosX(_searchIcon.anchoredPosition.x + 30f, 0.6f).SetEase(Ease.InOutSine));
-            seq.Append(_searchIcon.DOAnchorPosX(_searchIcon.anchoredPosition.x - 30f, 0.6f).SetEase(Ease.InOutSine));
-            seq.Append(_searchIcon.DOAnchorPosX(_searchIcon.anchoredPosition.x, 0.4f).SetEase(Ease.InOutSine));
-            seq.Join(_searchIcon.DOScale(Vector3.one * 1.1f, 0.3f).SetEase(Ease.InOutSine).SetLoops(2, LoopType.Yoyo));
+            seq.Append(_searchIcon.DOAnchorPosX(_searchIcon.anchoredPosition.x + SearchIconSwingDistance, SearchIconSwingDuration).SetEase(Ease.InOutSine));
+            seq.Append(_searchIcon.DOAnchorPosX(_searchIcon.anchoredPosition.x - SearchIconSwingDistance, SearchIconSwingDuration).SetEase(Ease.InOutSine));
+            seq.Append(_searchIcon.DOAnchorPosX(_searchIcon.anchoredPosition.x, SearchIconReturnDuration).SetEase(Ease.InOutSine));
+            seq.Join(_searchIcon.DOScale(Vector3.one * SearchIconPulseScale, SearchIconPulseDuration).SetEase(Ease.InOutSine).SetLoops(2, LoopType.Yoyo));
             seq.SetLoops(-1, LoopType.Restart);
             seq.SetLink(_searchIcon.gameObject);
             _iconTween = seq;

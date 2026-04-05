@@ -70,11 +70,8 @@ namespace NumbersBlast.UI
         private void OnSettings()
         {
             _audioManager?.PlayButtonClick();
-            _uiManager.ShowPopup<SettingsPopup>();
-
-            var settingsPopup = _uiManager.GetPopup<SettingsPopup>();
-            if (settingsPopup != null)
-                settingsPopup.SetAudioManager(_audioManager);
+            var popup = _uiManager.ShowPopup<SettingsPopup>();
+            popup?.SetAudioManager(_audioManager);
         }
 
         private void OnExit()

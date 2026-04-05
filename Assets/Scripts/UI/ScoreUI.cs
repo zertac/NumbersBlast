@@ -9,6 +9,11 @@ namespace NumbersBlast.UI
     {
         [SerializeField] private TextMeshProUGUI _scoreText;
 
+        private const float PunchStrength = 0.3f;
+        private const float PunchDuration = 0.3f;
+        private const int PunchVibrato = 2;
+        private const float PunchElasticity = 0.5f;
+
         private int _currentScore;
         private RectTransform _rectTransform;
 
@@ -30,7 +35,7 @@ namespace NumbersBlast.UI
             _currentScore += points;
             UpdateDisplay();
             _rectTransform.DOKill();
-            _rectTransform.DOPunchScale(Vector3.one * 0.3f, 0.3f, 2, 0.5f)
+            _rectTransform.DOPunchScale(Vector3.one * PunchStrength, PunchDuration, PunchVibrato, PunchElasticity)
                 .SetLink(gameObject);
         }
 
