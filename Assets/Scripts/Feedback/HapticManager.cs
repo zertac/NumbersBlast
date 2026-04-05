@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 public static class HapticManager
 {
     private static bool _enabled = true;
-    private const string HapticEnabledKey = "HapticEnabled";
 
     public static bool Enabled
     {
@@ -14,14 +13,14 @@ public static class HapticManager
         set
         {
             _enabled = value;
-            PlayerPrefs.SetInt(HapticEnabledKey, value ? 1 : 0);
+            PlayerPrefs.SetInt(GameConstants.HapticEnabledKey, value ? 1 : 0);
             PlayerPrefs.Save();
         }
     }
 
     static HapticManager()
     {
-        _enabled = PlayerPrefs.GetInt(HapticEnabledKey, 1) == 1;
+        _enabled = PlayerPrefs.GetInt(GameConstants.HapticEnabledKey, 1) == 1;
     }
 
     public static void Light()

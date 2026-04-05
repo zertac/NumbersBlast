@@ -26,6 +26,6 @@ public class GameOverUI : BasePopup
 
     private void HandleRestart()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+        UnityEngine.SceneManagement.SceneManager.LoadScene(GameConstants.GameScene);
     }
 }

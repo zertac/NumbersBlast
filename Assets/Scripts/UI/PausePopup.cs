@@ -32,13 +32,13 @@ public class PausePopup : BasePopup
     private void OnRestart()
     {
         _gameStateManager?.Resume();
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene(GameConstants.GameScene);
     }
 
     private void OnMainMenu()
     {
         _gameStateManager?.Resume();
-        SceneManager.LoadScene("MainMenuScene");
+        SceneManager.LoadScene(GameConstants.MainMenuScene);
     }
 
     protected override void OnDestroy()

@@ -58,14 +58,14 @@ public class MainMenuUI : MonoBehaviour
     {
         _audioManager?.PlayButtonClick();
         GameModeHolder.CurrentMode = GameMode.SinglePlayer;
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene(GameConstants.GameScene);
     }
 
     private void OnMultiplayer()
     {
         _audioManager?.PlayButtonClick();
         GameModeHolder.CurrentMode = GameMode.Multiplayer;
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene(GameConstants.GameScene);
     }
 
     private void OnSettings()

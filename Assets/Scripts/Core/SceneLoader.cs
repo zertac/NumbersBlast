@@ -9,12 +9,12 @@ public class SceneLoader
 
     public void LoadGameplay()
     {
-        LoadScene("GameScene");
+        LoadScene(GameConstants.GameScene);
     }
 
     public void LoadMainMenu()
     {
-        LoadScene("MainMenuScene");
+        LoadScene(GameConstants.MainMenuScene);
     }
 
     public void ReloadCurrentScene()

@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class TutorialManager
 {
-    private const string TutorialCompleteKey = "TutorialComplete";
 
     private readonly TutorialConfig _config;
     private readonly BoardManager _boardManager;
@@ -34,7 +33,7 @@ public class TutorialManager
     public bool ShouldRunTutorial()
     {
         return _config != null && _config.Steps != null && _config.Steps.Length > 0
-            && PlayerPrefs.GetInt(TutorialCompleteKey, 0) == 0;
+            && PlayerPrefs.GetInt(GameConstants.TutorialCompleteKey, 0) == 0;
     }
 
     public void StartTutorial()
@@ -52,7 +51,7 @@ public class TutorialManager
         GameEvents.OnPiecePlaced -= HandlePiecePlaced;
         _overlay.Hide();
         ClearBoardHighlight();
-        PlayerPrefs.SetInt(TutorialCompleteKey, 1);
+        PlayerPrefs.SetInt(GameConstants.TutorialCompleteKey, 1);
         PlayerPrefs.Save();
     }
 

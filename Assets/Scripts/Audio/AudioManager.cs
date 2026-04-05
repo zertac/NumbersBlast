@@ -12,8 +12,6 @@ public class AudioManager
     private bool _musicEnabled = true;
     private bool _sfxEnabled = true;
 
-    private const string MusicEnabledKey = "MusicEnabled";
-    private const string SFXEnabledKey = "SFXEnabled";
 
     public bool MusicEnabled => _musicEnabled;
     public bool SFXEnabled => _sfxEnabled;
@@ -22,8 +20,8 @@ public class AudioManager
     {
         _config = config;
 
-        _musicEnabled = PlayerPrefs.GetInt(MusicEnabledKey, 1) == 1;
-        _sfxEnabled = PlayerPrefs.GetInt(SFXEnabledKey, 1) == 1;
+        _musicEnabled = PlayerPrefs.GetInt(GameConstants.MusicEnabledKey, 1) == 1;
+        _sfxEnabled = PlayerPrefs.GetInt(GameConstants.SFXEnabledKey, 1) == 1;
 
         if (_audioGo == null)
         {
@@ -140,14 +138,14 @@ public class AudioManager
         _musicEnabled = !_musicEnabled;
         if (_musicSource != null)
             _musicSource.volume = _musicEnabled ? _config.MusicVolume : 0f;
-        PlayerPrefs.SetInt(MusicEnabledKey, _musicEnabled ? 1 : 0);
+        PlayerPrefs.SetInt(GameConstants.MusicEnabledKey, _musicEnabled ? 1 : 0);
         PlayerPrefs.Save();
     }
 
     public void ToggleSFX()
     {
         _sfxEnabled = !_sfxEnabled;
-        PlayerPrefs.SetInt(SFXEnabledKey, _sfxEnabled ? 1 : 0);
+        PlayerPrefs.SetInt(GameConstants.SFXEnabledKey, _sfxEnabled ? 1 : 0);
         PlayerPrefs.Save();
     }
 }

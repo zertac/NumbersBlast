@@ -31,6 +31,10 @@ public class ThemeData : ScriptableObject
     public Color ButtonColor = new(0.3f, 0.7f, 0.4f);
     public Color ButtonTextColor = Color.white;
 
+    [Header("Multiplayer")]
+    public Color PlayerTurnColor = new(0.3f, 0.85f, 0.4f);
+    public Color OpponentTurnColor = new(0.9f, 0.5f, 0.3f);
+
     public BlockVisual GetBlockVisual(int value)
     {
         for (int i = 0; i < BlockVisuals.Length; i++)

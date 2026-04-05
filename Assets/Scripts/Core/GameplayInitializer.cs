@@ -121,7 +121,7 @@ public class GameplayInitializer : IStartable
             },
             onCancel: () =>
             {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenuScene");
+                UnityEngine.SceneManagement.SceneManager.LoadScene(GameConstants.MainMenuScene);
             });
     }
 

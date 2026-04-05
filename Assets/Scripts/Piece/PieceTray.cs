@@ -77,7 +77,7 @@ public class PieceTray : MonoBehaviour
         float scaleX = slotRect.sizeDelta.x / pieceWidth;
         float scaleY = slotRect.sizeDelta.y / pieceHeight;
 
-        return Mathf.Min(scaleX, scaleY, 0.6f);
+        return Mathf.Min(scaleX, scaleY, GameConstants.MaxPieceTrayScale);
     }
 
     public void SpawnTutorialPiece(PieceModel model)
@@ -102,7 +102,7 @@ public class PieceTray : MonoBehaviour
 
         float scaleX = slotRect.sizeDelta.x / (pieceWidth * _cellSize);
         float scaleY = slotRect.sizeDelta.y / (pieceHeight * _cellSize);
-        pieceView.SetScale(Mathf.Min(scaleX, scaleY, 0.6f));
+        pieceView.SetScale(Mathf.Min(scaleX, scaleY, GameConstants.MaxPieceTrayScale));
 
         _pieceViews[0] = pieceView;
     }
