@@ -30,9 +30,10 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
 
     private TutorialManager _tutorialManager;
     private FeedbackManager _feedbackManager;
+    private GameStateManager _gameStateManager;
     private CellView[] _currentMergeHoverCells;
 
-    public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null)
+    public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null, GameStateManager gameStateManager = null)
     {
         _pieceView = pieceView;
         _canvas = canvas;
@@ -42,6 +43,7 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         _config = config;
         _tutorialManager = tutorialManager;
         _feedbackManager = feedbackManager;
+        _gameStateManager = gameStateManager;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -53,7 +55,14 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (_gameStateManager != null && !_gameStateManager.IsInputAllowed)
+        {
+            eventData.pointerDrag = null;
+            return;
+        }
+
         _isDragging = true;
+        _gameStateManager?.TransitionTo(GameState.Dragging);
 
         _pieceView.transform.SetParent(_canvasRect, true);
         _pieceView.transform.SetAsLastSibling();
@@ -92,25 +101,27 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         var boardPos = GetBoardPosition();
         var forcedPos = _tutorialManager?.ForcedPlacement;
 
-        Debug.Log($"[Drag] boardPos={boardPos} forcedPos={forcedPos} tutorialMgr={(_tutorialManager != null ? "yes" : "null")}");
-
         if (forcedPos.HasValue)
         {
             if (boardPos.HasValue && boardPos.Value == forcedPos.Value && CanPlace(boardPos.Value))
             {
+                _gameStateManager?.TransitionTo(GameState.Processing);
                 GameEvents.PiecePlaced(_pieceView, boardPos.Value);
             }
             else
             {
+                _gameStateManager?.TransitionTo(_tutorialManager != null && _tutorialManager.IsActive ? GameState.Tutorial : GameState.Idle);
                 ReturnToTray();
             }
         }
         else if (boardPos.HasValue && CanPlace(boardPos.Value))
         {
+            _gameStateManager?.TransitionTo(GameState.Processing);
             GameEvents.PiecePlaced(_pieceView, boardPos.Value);
         }
         else
         {
+            _gameStateManager?.TransitionTo(GameState.Idle);
             ReturnToTray();
             GameEvents.PieceReleased(_pieceView);
         }
@@ -206,7 +217,6 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
                 var neighbor = model.GetCell(nRow, nCol);
                 if (neighbor != null && !neighbor.IsEmpty && neighbor.Value == value)
                 {
-                    Debug.Log($"[MergeHighlight] Piece({cellRow},{cellCol})={value} matched neighbor({nRow},{nCol})={neighbor.Value}");
                     var cellView = _boardView.GetCellView(nRow, nCol);
                     if (cellView != null)
                     {

@@ -13,8 +13,9 @@ public class PieceTray : MonoBehaviour
     private float _cellSize;
     private TutorialManager _tutorialManager;
     private FeedbackManager _feedbackManager;
+    private GameStateManager _gameStateManager;
 
-    public void Initialize(BoardConfig config, float cellSize, Canvas canvas, BoardView boardView, BoardManager boardManager, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null)
+    public void Initialize(BoardConfig config, float cellSize, Canvas canvas, BoardView boardView, BoardManager boardManager, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null, GameStateManager gameStateManager = null)
     {
         _config = config;
         _cellSize = cellSize;
@@ -23,6 +24,7 @@ public class PieceTray : MonoBehaviour
         _boardManager = boardManager;
         _tutorialManager = tutorialManager;
         _feedbackManager = feedbackManager;
+        _gameStateManager = gameStateManager;
         _pieceViews = new PieceView[_pieceSlots.Length];
     }
 
@@ -42,7 +44,7 @@ public class PieceTray : MonoBehaviour
             pieceView.Initialize(model, _config, _cellSize);
 
             var dragHandler = pieceGo.AddComponent<PieceDragHandler>();
-            dragHandler.Initialize(pieceView, _canvas, _boardView, _boardManager, _config, _tutorialManager, _feedbackManager);
+            dragHandler.Initialize(pieceView, _canvas, _boardView, _boardManager, _config, _tutorialManager, _feedbackManager, _gameStateManager);
 
             var slotRect = _pieceSlots[i].GetComponent<RectTransform>();
             float scale = CalculateFitScale(model.Shape, slotRect);

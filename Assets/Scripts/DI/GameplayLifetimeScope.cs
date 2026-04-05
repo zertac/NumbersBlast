@@ -29,6 +29,7 @@ public class GameplayLifetimeScope : LifetimeScope
 
         builder.RegisterInstance(_feedbackManager);
 
+        builder.Register<GameStateManager>(Lifetime.Singleton);
         builder.Register<BoardManager>(Lifetime.Singleton);
         builder.Register<MergeResolver>(Lifetime.Singleton);
         builder.Register<LineClearResolver>(Lifetime.Singleton);

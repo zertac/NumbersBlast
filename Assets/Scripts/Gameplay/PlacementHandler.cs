@@ -9,8 +9,9 @@ public class PlacementHandler
     private readonly PieceTray _pieceTray;
     private readonly BoardView _boardView;
     private readonly FeedbackManager _feedbackManager;
+    private readonly GameStateManager _gameStateManager;
 
-    public PlacementHandler(BoardManager boardManager, MergeResolver mergeResolver, LineClearResolver lineClearResolver, PieceTray pieceTray, BoardView boardView, FeedbackManager feedbackManager)
+    public PlacementHandler(BoardManager boardManager, MergeResolver mergeResolver, LineClearResolver lineClearResolver, PieceTray pieceTray, BoardView boardView, FeedbackManager feedbackManager, GameStateManager gameStateManager)
     {
         _boardManager = boardManager;
         _mergeResolver = mergeResolver;
@@ -18,6 +19,7 @@ public class PlacementHandler
         _pieceTray = pieceTray;
         _boardView = boardView;
         _feedbackManager = feedbackManager;
+        _gameStateManager = gameStateManager;
     }
 
     public void Enable()
@@ -81,12 +83,16 @@ public class PlacementHandler
             {
                 _boardView.RefreshAll();
                 CheckGameOver();
+                if (_gameStateManager.CurrentState != GameState.GameOver)
+                    _gameStateManager.TransitionTo(GameState.Idle);
             });
         }
         else
         {
             _boardView.RefreshAll();
             CheckGameOver();
+            if (_gameStateManager.CurrentState != GameState.GameOver)
+                _gameStateManager.TransitionTo(GameState.Idle);
         }
     }
 
@@ -116,6 +122,7 @@ public class PlacementHandler
     {
         if (!HasValidMoveForTray())
         {
+            _gameStateManager.TransitionTo(GameState.GameOver);
             _feedbackManager.PlayGameOverEffect(() => GameEvents.GameOver());
         }
     }

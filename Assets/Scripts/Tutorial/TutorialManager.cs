@@ -129,7 +129,6 @@ public class TutorialManager
             if (c > maxCol) maxCol = c;
 
             var cellView = _boardView.GetCellView(r, c);
-            Debug.Log($"[Tutorial] Highlight cell ({r},{c}) cellView={cellView != null}");
             cellView?.SetHighlight(HighlightType.TutorialTarget);
         }
 

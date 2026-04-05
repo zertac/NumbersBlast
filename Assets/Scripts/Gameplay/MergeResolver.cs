@@ -51,13 +51,11 @@ public class MergeResolver
                     for (int j = 0; j < mergedNeighbors.Count; j++)
                     {
                         var neighbor = model.GetCell(mergedNeighbors[j].x, mergedNeighbors[j].y);
-                        Debug.Log($"[Merge] Cell ({cell.x},{cell.y}) val={cellData.Value} absorbs ({mergedNeighbors[j].x},{mergedNeighbors[j].y}) val={neighbor.Value} | isFirstPass={isFirstPass}");
                         sum += neighbor.Value;
                         neighbor.Clear();
                         absorbedPositions.Add(mergedNeighbors[j]);
                     }
 
-                    Debug.Log($"[Merge] Cell ({cell.x},{cell.y}) new value={sum}");
                     cellData.SetValue(sum);
                     merged = true;
                     nextCheck.Add(cell);
