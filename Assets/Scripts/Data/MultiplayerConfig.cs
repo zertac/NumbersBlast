@@ -26,4 +26,9 @@ public class MultiplayerConfig : ScriptableObject
     public float MinHesitationTime = 0.8f;
     public float MaxHesitationTime = 2f;
     public float MoveSpeed = 0.4f;
+
+    [Header("Opponent Wander")]
+    [Range(0f, 1f)] public float InvalidMoveChance = 0.3f;
+    public float MinWanderPause = 0.3f;
+    public float MaxWanderPause = 1.0f;
 }

@@ -17,6 +17,17 @@ public class OpponentVisualPlayer : MonoBehaviour
     private Vector3 _selectedPieceOriginalScale;
     private PieceView _selectedPiece;
 
+    private const float PieceSelectScale = 1.15f;
+    private const float PieceSelectDuration = 0.2f;
+    private const float PieceDeselectDuration = 0.15f;
+    private const float PieceScaleResetDuration = 0.1f;
+    private const float PostDeselectPause = 0.3f;
+    private const float PostSelectPause = 0.3f;
+    private const float DecoyHoldDuration = 0.5f;
+    private const float GhostAlpha = 0.6f;
+    private const float PostPlaceWait = 1.5f;
+    private const int GhostTextFontSize = 24;
+
     public void Initialize(MultiplayerConfig config, BoardView boardView, PieceTray pieceTray,
         BoardManager boardManager, OpponentAI ai, BoardConfig boardConfig)
     {
@@ -97,7 +108,7 @@ public class OpponentVisualPlayer : MonoBehaviour
         for (int w = 0; w < wanderCount; w++)
         {
             // Sometimes pick a random spot (could be invalid) for realism
-            bool tryInvalid = UnityEngine.Random.value < 0.3f;
+            bool tryInvalid = UnityEngine.Random.value < _config.InvalidMoveChance;
             Vector2Int wanderPos;
 
             if (tryInvalid)
@@ -117,7 +128,7 @@ public class OpponentVisualPlayer : MonoBehaviour
             bool canPlace = CanFitAt(piece, wanderPos);
             yield return StartCoroutine(AnimateHoverPosition(wanderPos, canPlace));
 
-            float wanderPause = UnityEngine.Random.Range(0.3f, 1.0f);
+            float wanderPause = UnityEngine.Random.Range(_config.MinWanderPause, _config.MaxWanderPause);
             yield return new WaitForSeconds(wanderPause);
 
             ClearHighlights();
@@ -152,13 +163,13 @@ public class OpponentVisualPlayer : MonoBehaviour
         DestroyGhost();
 
         if (_selectedPiece != null && _selectedPiece.gameObject != null)
-            _selectedPiece.transform.DOScale(_selectedPieceOriginalScale, 0.1f);
+            _selectedPiece.transform.DOScale(_selectedPieceOriginalScale, PieceScaleResetDuration);
 
         if (selectedPiece != null && selectedPiece.gameObject != null)
             GameEvents.PiecePlaced(selectedPiece, finalMove.BoardPosition);
 
         // Wait for placement processing to complete
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(PostPlaceWait);
 
         _selectedPiece = null;
         _onMoveComplete?.Invoke();
@@ -171,21 +182,21 @@ public class OpponentVisualPlayer : MonoBehaviour
 
         var originalScale = decoyPiece.transform.localScale;
 
-        decoyPiece.transform.DOScale(originalScale * 1.15f, 0.2f).SetEase(Ease.OutBack);
-        yield return new WaitForSeconds(0.5f);
+        decoyPiece.transform.DOScale(originalScale * PieceSelectScale, PieceSelectDuration).SetEase(Ease.OutBack);
+        yield return new WaitForSeconds(DecoyHoldDuration);
 
         float hesitateTime = UnityEngine.Random.Range(_config.MinHesitationTime, _config.MaxHesitationTime);
         yield return new WaitForSeconds(hesitateTime);
 
-        decoyPiece.transform.DOScale(originalScale, 0.15f).SetEase(Ease.InQuad);
-        yield return new WaitForSeconds(0.3f);
+        decoyPiece.transform.DOScale(originalScale, PieceDeselectDuration).SetEase(Ease.InQuad);
+        yield return new WaitForSeconds(PostDeselectPause);
     }
 
     private IEnumerator AnimateSelectPiece(PieceView piece)
     {
         _selectedPieceOriginalScale = piece.transform.localScale;
-        piece.transform.DOScale(_selectedPieceOriginalScale * 1.15f, 0.2f).SetEase(Ease.OutBack);
-        yield return new WaitForSeconds(0.3f);
+        piece.transform.DOScale(_selectedPieceOriginalScale * PieceSelectScale, PieceSelectDuration).SetEase(Ease.OutBack);
+        yield return new WaitForSeconds(PostSelectPause);
 
         CreateGhost(piece);
     }
@@ -212,7 +223,7 @@ public class OpponentVisualPlayer : MonoBehaviour
         _ghostPiece.transform.SetParent(_boardView.transform.parent, false);
 
         var canvasGroup = _ghostPiece.GetComponent<CanvasGroup>();
-        canvasGroup.alpha = 0.6f;
+        canvasGroup.alpha = GhostAlpha;
 
         // Copy piece cells visually
         var model = piece.Model;
@@ -246,7 +257,7 @@ public class OpponentVisualPlayer : MonoBehaviour
             var text = textGo.GetComponent<TMPro.TextMeshProUGUI>();
             text.text = model.GetValueAt(i).ToString();
             text.alignment = TMPro.TextAlignmentOptions.Center;
-            text.fontSize = 24;
+            text.fontSize = GhostTextFontSize;
             text.color = Color.white;
         }
 

@@ -11,6 +11,17 @@ public class FeedbackManager
     private Tween _hoverBoardTween;
     private Tween _hoverPulseTween;
 
+    private const float PlaceShakeMultiplier = 0.5f;
+    private const float MergeShakeMultiplier = 0.6f;
+    private const float ChainShakeMultiplier = 0.8f;
+    private const float ChainShakeDurationMultiplier = 0.6f;
+    private const float GameOverMultiplier = 2f;
+    private const float ClearShrinkRatio = 0.7f;
+    private const float ShakeRandomnessDegrees = 90f;
+    private const int PickupVibrato = 1;
+    private const float PickupElasticity = 0.5f;
+    private const int PunchScaleVibrato = 2;
+
     public FeedbackManager(FeedbackConfig config)
     {
         _config = config;
@@ -34,7 +45,7 @@ public class FeedbackManager
             .SetEase(Ease.InOutSine)
             .OnComplete(() =>
             {
-                _hoverPulseTween = _shakeTarget.DOScale(Vector3.one * (_config.HoverBoardScale + 0.005f), 0.4f)
+                _hoverPulseTween = _shakeTarget.DOScale(Vector3.one * (_config.HoverBoardScale + _config.HoverPulseIncrement), _config.HoverPulseDuration)
                     .SetEase(Ease.InOutSine)
                     .SetLoops(-1, LoopType.Yoyo);
             });
@@ -43,7 +54,7 @@ public class FeedbackManager
         {
             var cell = mergeCells[i];
             cell.transform.DOKill();
-            cell.transform.DOScale(Vector3.one * 1.08f, 0.3f)
+            cell.transform.DOScale(Vector3.one * _config.HoverCellScale, _config.HoverCellPulseDuration)
                 .SetEase(Ease.InOutSine)
                 .SetLoops(-1, LoopType.Yoyo);
         }
@@ -56,7 +67,7 @@ public class FeedbackManager
 
         _hoverBoardTween?.Kill();
         _hoverPulseTween?.Kill();
-        _shakeTarget.DOScale(Vector3.one, 0.15f).SetEase(Ease.OutQuad);
+        _shakeTarget.DOScale(Vector3.one, _config.HoverResetDuration).SetEase(Ease.OutQuad);
 
         if (mergeCells != null)
         {
@@ -78,10 +89,10 @@ public class FeedbackManager
             cell.transform.localScale = Vector3.zero;
             cell.transform.DOScale(Vector3.one, _config.PlaceDuration)
                 .SetEase(Ease.OutBack)
-                .SetDelay(i * 0.03f);
+                .SetDelay(i * _config.PlaceDelayPerCell);
         }
 
-        ShakeScreen(_config.ShakeStrength * 0.5f, _config.ShakeDuration * 0.5f);
+        ShakeScreen(_config.ShakeStrength * PlaceShakeMultiplier, _config.ShakeDuration * PlaceShakeMultiplier);
         HapticManager.Light();
     }
 
@@ -93,8 +104,8 @@ public class FeedbackManager
 
         _hoverBoardTween?.Kill();
         _hoverPulseTween?.Kill();
-        _shakeTarget.DOScale(Vector3.one, 0.05f).SetEase(Ease.OutQuad);
-        ShakeScreen(_config.ShakeStrength * 0.6f, _config.ShakeDuration * 0.5f);
+        _shakeTarget.DOScale(Vector3.one, _config.MergeResetDuration).SetEase(Ease.OutQuad);
+        ShakeScreen(_config.ShakeStrength * MergeShakeMultiplier, _config.ShakeDuration * PlaceShakeMultiplier);
         HapticManager.Medium();
 
         for (int i = 0; i < absorbedCells.Length; i++)
@@ -104,35 +115,35 @@ public class FeedbackManager
             absorbed.transform.localScale = Vector3.one;
 
             var seq = DOTween.Sequence();
-            seq.Append(absorbed.transform.DOScale(Vector3.one * 1.3f, 0.06f).SetEase(Ease.OutQuad));
-            seq.Append(absorbed.transform.DOScale(Vector3.zero, 0.1f).SetEase(Ease.InBack));
+            seq.Append(absorbed.transform.DOScale(Vector3.one * _config.AbsorbedFlashScale, _config.AbsorbedFlashDuration).SetEase(Ease.OutQuad));
+            seq.Append(absorbed.transform.DOScale(Vector3.zero, _config.AbsorbedShrinkDuration).SetEase(Ease.InBack));
             seq.OnComplete(() => absorbed.transform.localScale = Vector3.one);
         }
 
-        DOVirtual.DelayedCall(0.18f, () =>
+        DOVirtual.DelayedCall(_config.ImpactDelay, () =>
         {
             targetCell.Refresh();
 
             var impactSeq = DOTween.Sequence();
-            impactSeq.Append(targetCell.transform.DOScale(new Vector3(1.5f, 1.5f, 1f), 0.08f).SetEase(Ease.OutQuad));
-            impactSeq.Append(targetCell.transform.DOScale(new Vector3(0.85f, 1.15f, 1f), 0.06f).SetEase(Ease.InQuad));
-            impactSeq.Append(targetCell.transform.DOScale(new Vector3(1.1f, 0.9f, 1f), 0.05f).SetEase(Ease.InOutQuad));
-            impactSeq.Append(targetCell.transform.DOScale(Vector3.one, 0.1f).SetEase(Ease.OutBack));
+            impactSeq.Append(targetCell.transform.DOScale(new Vector3(_config.ImpactScale, _config.ImpactScale, 1f), _config.ImpactDuration).SetEase(Ease.OutQuad));
+            impactSeq.Append(targetCell.transform.DOScale(new Vector3(_config.SquashScaleX, _config.SquashScaleY, 1f), _config.SquashDuration).SetEase(Ease.InQuad));
+            impactSeq.Append(targetCell.transform.DOScale(new Vector3(_config.StretchScaleX, _config.StretchScaleY, 1f), _config.StretchDuration).SetEase(Ease.InOutQuad));
+            impactSeq.Append(targetCell.transform.DOScale(Vector3.one, _config.SettleDuration).SetEase(Ease.OutBack));
         });
     }
 
     public void PlayChainMergeSmash(CellView targetCell)
     {
-        ShakeScreen(_config.ShakeStrength * 0.8f, _config.ShakeDuration * 0.6f);
+        ShakeScreen(_config.ShakeStrength * ChainShakeMultiplier, _config.ShakeDuration * ChainShakeDurationMultiplier);
         HapticManager.Medium();
 
         targetCell.Refresh();
 
         var impactSeq = DOTween.Sequence();
-        impactSeq.Append(targetCell.transform.DOScale(new Vector3(1.8f, 1.8f, 1f), 0.1f).SetEase(Ease.OutQuad));
-        impactSeq.Append(targetCell.transform.DOScale(new Vector3(0.7f, 1.3f, 1f), 0.07f).SetEase(Ease.InQuad));
-        impactSeq.Append(targetCell.transform.DOScale(new Vector3(1.15f, 0.85f, 1f), 0.05f).SetEase(Ease.InOutQuad));
-        impactSeq.Append(targetCell.transform.DOScale(Vector3.one, 0.12f).SetEase(Ease.OutBack));
+        impactSeq.Append(targetCell.transform.DOScale(new Vector3(_config.ChainImpactScale, _config.ChainImpactScale, 1f), _config.ChainImpactDuration).SetEase(Ease.OutQuad));
+        impactSeq.Append(targetCell.transform.DOScale(new Vector3(_config.ChainSquashScaleX, _config.ChainSquashScaleY, 1f), _config.ChainSquashDuration).SetEase(Ease.InQuad));
+        impactSeq.Append(targetCell.transform.DOScale(new Vector3(_config.ChainStretchScaleX, _config.ChainStretchScaleY, 1f), _config.ChainStretchDuration).SetEase(Ease.InOutQuad));
+        impactSeq.Append(targetCell.transform.DOScale(Vector3.one, _config.ChainSettleDuration).SetEase(Ease.OutBack));
     }
 
     // === LINE CLEAR ===
@@ -149,8 +160,8 @@ public class FeedbackManager
 
             var sequence = DOTween.Sequence();
             sequence.SetDelay(delay);
-            sequence.Append(cell.transform.DOScale(Vector3.one * 1.2f, _config.ClearDuration * 0.3f).SetEase(Ease.OutQuad));
-            sequence.Append(cell.transform.DOScale(Vector3.zero, _config.ClearDuration * 0.7f).SetEase(Ease.InBack));
+            sequence.Append(cell.transform.DOScale(Vector3.one * _config.ClearGrowScale, _config.ClearDuration * _config.ClearGrowRatio).SetEase(Ease.OutQuad));
+            sequence.Append(cell.transform.DOScale(Vector3.zero, _config.ClearDuration * ClearShrinkRatio).SetEase(Ease.InBack));
             sequence.OnComplete(() =>
             {
                 cell.transform.localScale = Vector3.one;
@@ -168,16 +179,16 @@ public class FeedbackManager
 
     public void PlayGameOverEffect(System.Action onComplete)
     {
-        ShakeScreen(_config.ShakeStrength * 2f, _config.ShakeDuration * 2f);
+        ShakeScreen(_config.ShakeStrength * GameOverMultiplier, _config.ShakeDuration * GameOverMultiplier);
         HapticManager.Heavy();
-        DOVirtual.DelayedCall(_config.ShakeDuration * 2f, () => onComplete?.Invoke());
+        DOVirtual.DelayedCall(_config.ShakeDuration * GameOverMultiplier, () => onComplete?.Invoke());
     }
 
     // === PIECE PICKUP ===
 
     public void PlayPiecePickupEffect(Transform pieceTransform)
     {
-        pieceTransform.DOPunchScale(Vector3.one * 0.1f, 0.15f, 1, 0.5f);
+        pieceTransform.DOPunchScale(Vector3.one * _config.PickupPunchScale, _config.PickupPunchDuration, PickupVibrato, PickupElasticity);
     }
 
     // === SCREEN SHAKE ===
@@ -188,7 +199,7 @@ public class FeedbackManager
 
         _shakeTarget.DOKill(true);
         _shakeTarget.anchoredPosition = _shakeOriginalPos;
-        _shakeTarget.DOShakeAnchorPos(duration, strength, _config.ShakeVibrato, 90f, false, true, ShakeRandomnessMode.Harmonic)
+        _shakeTarget.DOShakeAnchorPos(duration, strength, _config.ShakeVibrato, ShakeRandomnessDegrees, false, true, ShakeRandomnessMode.Harmonic)
             .OnComplete(() => _shakeTarget.anchoredPosition = _shakeOriginalPos);
     }
 }

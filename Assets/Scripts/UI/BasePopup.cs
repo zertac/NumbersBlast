@@ -14,6 +14,7 @@ public abstract class BasePopup : MonoBehaviour
 
     private const float ShowDuration = 0.3f;
     private const float HideDuration = 0.2f;
+    private const float ContentHiddenScale = 0.7f;
     private float _dimTargetAlpha;
 
     protected virtual void Awake()
@@ -33,7 +34,7 @@ public abstract class BasePopup : MonoBehaviour
         _canvasGroup.interactable = false;
 
         if (_content != null)
-            _content.localScale = Vector3.one * 0.7f;
+            _content.localScale = Vector3.one * ContentHiddenScale;
 
         if (_dimBackground != null)
         {
@@ -64,7 +65,7 @@ public abstract class BasePopup : MonoBehaviour
         sequence.Append(_canvasGroup.DOFade(0f, HideDuration).SetEase(Ease.InCubic));
 
         if (_content != null)
-            sequence.Join(_content.DOScale(Vector3.one * 0.7f, HideDuration).SetEase(Ease.InBack));
+            sequence.Join(_content.DOScale(Vector3.one * ContentHiddenScale, HideDuration).SetEase(Ease.InBack));
 
         sequence.OnComplete(() =>
         {
