@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc19d490915987740ab3cb140dc5f060, type: 3}
-  m_Name: Step3_ClearLine
+  m_Name: SO_Step3_ClearLine
   m_EditorClassIdentifier: Assembly-CSharp::TutorialStepData
   InstructionText: Complete the row to clear it!
   BoardRows: 8

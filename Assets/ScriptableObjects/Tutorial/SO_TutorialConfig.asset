@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8dd3debb26d8adc4f84e43dda989ec57, type: 3}
-  m_Name: TutorialConfig
+  m_Name: SO_TutorialConfig
   m_EditorClassIdentifier: Assembly-CSharp::TutorialConfig
   Steps:
   - {fileID: 11400000, guid: 864f5f1026ae8494493d52798fbe426c, type: 2}

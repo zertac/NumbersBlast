@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a353d859b8228ae48824f431bdbaf3ae, type: 3}
-  m_Name: FeedbackConfig
+  m_Name: SO_FeedbackConfig
   m_EditorClassIdentifier: Assembly-CSharp::FeedbackConfig
   ShakeStrength: 10
   ShakeDuration: 0.3

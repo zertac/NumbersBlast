@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a25e46fa10db08247b27ba51466f6768, type: 3}
-  m_Name: PieceSpawnConfig
+  m_Name: SO_PieceSpawnConfig
   m_EditorClassIdentifier: Assembly-CSharp::PieceSpawnConfig
   Shapes:
   - {fileID: 11400000, guid: a8cd22241981f244fa9b45ae90ab4e2a, type: 2}

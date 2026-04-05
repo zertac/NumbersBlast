@@ -591,7 +591,7 @@ GameObject:
   - component: {fileID: 3125505036847320485}
   - component: {fileID: 5194920500807911778}
   m_Layer: 0
-  m_Name: OpponentSearchPopup
+  m_Name: P_OpponentSearchPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
