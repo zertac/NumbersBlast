@@ -103,6 +103,13 @@ public class MultiplayerManager
 
         if (penalty > 0)
             _hud.ApplyPenalty(isPlayer, penalty);
+
+        // Cancel AI turn if it was their timeout
+        if (!isPlayer)
+        {
+            _visualPlayer.CancelTurn();
+            _isProcessingAITurn = false;
+        }
     }
 
     private void HandleScoreChanged(int points)

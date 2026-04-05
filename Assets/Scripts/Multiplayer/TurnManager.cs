@@ -45,6 +45,8 @@ public class TurnManager
         // Timer runs even during pause for realism
         if (_gameStateManager.CurrentState == GameState.GameOver) return;
 
+        if (_turnTimer <= 0) return;
+
         _turnTimer -= deltaTime;
         OnTimerTick?.Invoke(TurnTimeNormalized);
 
@@ -91,6 +93,7 @@ public class TurnManager
 
     private void HandleTimeout()
     {
+        _turnTimer = 0f;
         OnTurnTimeout?.Invoke();
         EndCurrentTurn();
     }
