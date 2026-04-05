@@ -39,6 +39,7 @@ namespace NumbersBlast.Core
         [Inject] private OpponentVisualPlayer _opponentVisualPlayer;
         [Inject] private MultiplayerConfig _multiplayerConfig;
         [Inject] private MultiplayerHUD _multiplayerHUD;
+        [Inject] private OpponentAI _opponentAI;
 
         [Inject]
         public GameplayInitializer(BoardManager boardManager, BoardConfig config, BoardView boardView,
@@ -117,7 +118,7 @@ namespace NumbersBlast.Core
             _gameStateManager.Initialize(GameState.Processing);
 
             _opponentVisualPlayer.Initialize(_multiplayerConfig, _boardView, _pieceTray, _boardManager,
-                new OpponentAI(_multiplayerConfig), _config);
+                _opponentAI, _config);
 
             var searchPopup = _uiManager.ShowPopup<OpponentSearchPopup>();
             searchPopup?.StartSearch(_multiplayerConfig,

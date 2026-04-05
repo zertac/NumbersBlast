@@ -1,5 +1,4 @@
 using UnityEngine;
-using VContainer;
 using NumbersBlast.Data;
 
 namespace NumbersBlast.Board
@@ -14,7 +13,6 @@ namespace NumbersBlast.Board
         public BoardModel Model => _model;
         public BoardConfig Config => _config;
 
-        [Inject]
         public BoardManager(BoardConfig config, BoardView view)
         {
             _config = config;

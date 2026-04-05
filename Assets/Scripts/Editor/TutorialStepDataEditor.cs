@@ -23,8 +23,26 @@ namespace NumbersBlast.Editor
         private static readonly Color TargetColor = new(0.3f, 0.9f, 0.3f, 0.5f);
         private static readonly Color PieceActiveColor = new(0.3f, 0.5f, 0.9f);
 
+        private static GUIStyle _cellLabelStyle;
+
         private int _boardBrushValue = 1;
         private int _pieceBrushValue = 1;
+
+        private static GUIStyle CellLabelStyle
+        {
+            get
+            {
+                if (_cellLabelStyle == null)
+                {
+                    _cellLabelStyle = new GUIStyle(EditorStyles.boldLabel)
+                    {
+                        alignment = TextAnchor.MiddleCenter,
+                        normal = { textColor = Color.white }
+                    };
+                }
+                return _cellLabelStyle;
+            }
+        }
 
         public override void OnInspectorGUI()
         {
@@ -125,12 +143,7 @@ namespace NumbersBlast.Editor
 
                     if (value > 0)
                     {
-                        var style = new GUIStyle(EditorStyles.boldLabel)
-                        {
-                            alignment = TextAnchor.MiddleCenter,
-                            normal = { textColor = Color.white }
-                        };
-                        EditorGUI.LabelField(cellRect, value.ToString(), style);
+                        EditorGUI.LabelField(cellRect, value.ToString(), CellLabelStyle);
                     }
 
                     HandleBoardCellClick(step, cellRect, r, c);
@@ -202,12 +215,7 @@ namespace NumbersBlast.Editor
 
                     if (active && value > 0)
                     {
-                        var style = new GUIStyle(EditorStyles.boldLabel)
-                        {
-                            alignment = TextAnchor.MiddleCenter,
-                            normal = { textColor = Color.white }
-                        };
-                        EditorGUI.LabelField(cellRect, value.ToString(), style);
+                        EditorGUI.LabelField(cellRect, value.ToString(), CellLabelStyle);
                     }
 
                     if (Event.current.type == EventType.MouseDown && cellRect.Contains(Event.current.mousePosition))

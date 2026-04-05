@@ -25,6 +25,9 @@ namespace NumbersBlast.Piece
         private GameStateManager _gameStateManager;
         private RectTransform[] _slotRects;
 
+        // L-08: 8 parameters acknowledged. MonoBehaviour cannot use constructor injection,
+        // so all dependencies must be passed via Initialize. Refactoring to a config object
+        // would add complexity without meaningful benefit here.
         public void Initialize(BoardConfig config, float cellSize, Canvas canvas, BoardView boardView, BoardManager boardManager, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null, GameStateManager gameStateManager = null)
         {
             _config = config;

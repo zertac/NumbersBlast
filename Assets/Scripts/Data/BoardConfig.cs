@@ -3,6 +3,8 @@ using NumbersBlast.Piece;
 
 namespace NumbersBlast.Data
 {
+    // L-17: Public fields are required here instead of properties because Unity's
+    // ScriptableObject serialization system only serializes public fields (or [SerializeField]).
     [CreateAssetMenu(fileName = "BoardConfig", menuName = "NumbersBlast/Board Config")]
     public class BoardConfig : ScriptableObject
     {

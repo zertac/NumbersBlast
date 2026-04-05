@@ -31,6 +31,8 @@ namespace NumbersBlast.StateMachine
                 (GameState.Idle, GameState.Tutorial) => true,
 
                 // From Dragging
+                // Note: Dragging->GameOver is intentionally absent. By design it goes
+                // through Dragging->Processing->GameOver so placement logic completes first.
                 (GameState.Dragging, GameState.Idle) => true,
                 (GameState.Dragging, GameState.Processing) => true,
                 (GameState.Dragging, GameState.Paused) => true,
@@ -80,6 +82,15 @@ namespace NumbersBlast.StateMachine
         public void Resume()
         {
             if (_currentState != GameState.Paused) return;
+
+            // Prevent restoring to GameOver - if game ended while paused, stay in GameOver
+            if (_stateBeforePause == GameState.GameOver)
+            {
+                var prev = _currentState;
+                _currentState = GameState.GameOver;
+                OnStateChanged?.Invoke(prev, _currentState);
+                return;
+            }
 
             var previous = _currentState;
             _currentState = _stateBeforePause;
