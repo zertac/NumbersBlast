@@ -1,10 +1,22 @@
 using System;
-using System.Collections;
+using System.Threading;
 using UnityEngine;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
 
 public class OpponentVisualPlayer : MonoBehaviour
 {
+    private const float PieceSelectScale = 1.15f;
+    private const float PieceSelectDuration = 0.2f;
+    private const float PieceDeselectDuration = 0.15f;
+    private const float PieceScaleResetDuration = 0.1f;
+    private const float DecoyHoldDuration = 0.5f;
+    private const float PostDeselectPause = 0.3f;
+    private const float PostSelectPause = 0.3f;
+    private const float PostPlaceWait = 1.5f;
+    private const float GhostAlpha = 0.6f;
+    private const int GhostTextFontSize = 24;
+
     private MultiplayerConfig _config;
     private BoardView _boardView;
     private PieceTray _pieceTray;
@@ -13,20 +25,9 @@ public class OpponentVisualPlayer : MonoBehaviour
     private BoardConfig _boardConfig;
 
     private GameObject _ghostPiece;
-    private Action _onMoveComplete;
     private Vector3 _selectedPieceOriginalScale;
     private PieceView _selectedPiece;
-
-    private const float PieceSelectScale = 1.15f;
-    private const float PieceSelectDuration = 0.2f;
-    private const float PieceDeselectDuration = 0.15f;
-    private const float PieceScaleResetDuration = 0.1f;
-    private const float PostDeselectPause = 0.3f;
-    private const float PostSelectPause = 0.3f;
-    private const float DecoyHoldDuration = 0.5f;
-    private const float GhostAlpha = 0.6f;
-    private const float PostPlaceWait = 1.5f;
-    private const int GhostTextFontSize = 24;
+    private CancellationTokenSource _cts;
 
     public void Initialize(MultiplayerConfig config, BoardView boardView, PieceTray pieceTray,
         BoardManager boardManager, OpponentAI ai, BoardConfig boardConfig)
@@ -39,19 +40,16 @@ public class OpponentVisualPlayer : MonoBehaviour
         _boardConfig = boardConfig;
     }
 
-    private bool _isCancelled;
-
     public void PerformTurn(Action onComplete)
     {
-        _isCancelled = false;
-        _onMoveComplete = onComplete;
-        StartCoroutine(PlayTurnSequence());
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+        PlayTurnAsync(onComplete, _cts.Token).Forget();
     }
 
     public void CancelTurn()
     {
-        _isCancelled = true;
-        StopAllCoroutines();
+        _cts?.Cancel();
         ClearHighlights();
         DestroyGhost();
         if (_selectedPiece != null)
@@ -61,53 +59,41 @@ public class OpponentVisualPlayer : MonoBehaviour
         }
     }
 
-    private IEnumerator PlayTurnSequence()
+    private async UniTaskVoid PlayTurnAsync(Action onComplete, CancellationToken token)
     {
         var trayPieces = _pieceTray.GetRemainingPieces();
-        if (trayPieces == null) { _onMoveComplete?.Invoke(); yield break; }
+        if (trayPieces == null) { onComplete?.Invoke(); return; }
 
         var finalMove = _ai.CalculateMove(_boardManager.Model, trayPieces);
+        if (!finalMove.IsValid) { onComplete?.Invoke(); return; }
 
-        if (!finalMove.IsValid)
-        {
-            _onMoveComplete?.Invoke();
-            yield break;
-        }
-
-        // Phase 1: Think before selecting
+        // Phase 1: Think
         float thinkTime = UnityEngine.Random.Range(_config.MinThinkTime, _config.MaxThinkTime);
-        yield return new WaitForSeconds(thinkTime);
+        await UniTask.Delay((int)(thinkTime * 1000), cancellationToken: token);
 
-        // Phase 2: Maybe try a wrong piece first (hesitation)
+        // Phase 2: Maybe try wrong piece (hesitation)
         bool willHesitate = UnityEngine.Random.value < _config.HesitationChance;
-
         if (willHesitate)
         {
             var decoyMove = _ai.CalculateDecoyMove(_boardManager.Model, trayPieces);
             if (decoyMove.IsValid && decoyMove.PieceIndex != finalMove.PieceIndex)
-            {
-                yield return StartCoroutine(AnimatePickAndCancel(trayPieces, decoyMove));
-            }
+                await AnimatePickAndCancelAsync(trayPieces, decoyMove, token);
         }
 
-        // Phase 3: Select the real piece
+        // Phase 3: Select real piece
         _selectedPiece = trayPieces[finalMove.PieceIndex];
         var selectedPiece = _selectedPiece;
-        if (selectedPiece == null)
-        {
-            _onMoveComplete?.Invoke();
-            yield break;
-        }
+        if (selectedPiece == null) { onComplete?.Invoke(); return; }
 
-        yield return StartCoroutine(AnimateSelectPiece(selectedPiece));
+        await AnimateSelectPieceAsync(selectedPiece, token);
 
-        // Phase 4: Wander around board (mix of valid and invalid spots)
-        int wanderCount = UnityEngine.Random.Range(1, 4);
+        // Phase 4: Wander
         var piece = selectedPiece.Model;
-
+        int wanderCount = UnityEngine.Random.Range(1, 4);
         for (int w = 0; w < wanderCount; w++)
         {
-            // Sometimes pick a random spot (could be invalid) for realism
+            if (token.IsCancellationRequested) return;
+
             bool tryInvalid = UnityEngine.Random.value < _config.InvalidMoveChance;
             Vector2Int wanderPos;
 
@@ -115,8 +101,7 @@ public class OpponentVisualPlayer : MonoBehaviour
             {
                 wanderPos = new Vector2Int(
                     UnityEngine.Random.Range(0, _boardManager.Model.Rows),
-                    UnityEngine.Random.Range(0, _boardManager.Model.Columns)
-                );
+                    UnityEngine.Random.Range(0, _boardManager.Model.Columns));
             }
             else
             {
@@ -126,38 +111,34 @@ public class OpponentVisualPlayer : MonoBehaviour
             }
 
             bool canPlace = CanFitAt(piece, wanderPos);
-            yield return StartCoroutine(AnimateHoverPosition(wanderPos, canPlace));
+            await AnimateHoverAsync(wanderPos, canPlace, token);
 
             float wanderPause = UnityEngine.Random.Range(_config.MinWanderPause, _config.MaxWanderPause);
-            yield return new WaitForSeconds(wanderPause);
-
+            await UniTask.Delay((int)(wanderPause * 1000), cancellationToken: token);
             ClearHighlights();
         }
 
-        // Phase 5: Maybe hover wrong position and cancel
+        // Phase 5: Maybe cancel
         bool willCancel = UnityEngine.Random.value < _config.CancelChance;
-
         if (willCancel)
         {
             var decoyMove = _ai.CalculateDecoyMove(_boardManager.Model, trayPieces);
             if (decoyMove.IsValid && decoyMove.BoardPosition != finalMove.BoardPosition)
             {
-                yield return StartCoroutine(AnimateHoverPosition(decoyMove.BoardPosition, true));
-
+                await AnimateHoverAsync(decoyMove.BoardPosition, true, token);
                 float hesitateTime = UnityEngine.Random.Range(_config.MinHesitationTime, _config.MaxHesitationTime);
-                yield return new WaitForSeconds(hesitateTime);
+                await UniTask.Delay((int)(hesitateTime * 1000), cancellationToken: token);
                 ClearHighlights();
             }
         }
 
-        // Phase 6: Move to final position
-        yield return StartCoroutine(AnimateHoverPosition(finalMove.BoardPosition, true));
-
+        // Phase 6: Final position
+        await AnimateHoverAsync(finalMove.BoardPosition, true, token);
         float hoverTime = UnityEngine.Random.Range(_config.MinHoverTime, _config.MaxHoverTime);
-        yield return new WaitForSeconds(hoverTime);
+        await UniTask.Delay((int)(hoverTime * 1000), cancellationToken: token);
 
         // Phase 7: Place
-        if (_isCancelled) yield break;
+        if (token.IsCancellationRequested) return;
 
         ClearHighlights();
         DestroyGhost();
@@ -165,60 +146,68 @@ public class OpponentVisualPlayer : MonoBehaviour
         if (_selectedPiece != null && _selectedPiece.gameObject != null)
         {
             _selectedPiece.transform.DOKill();
-            _selectedPiece.transform.DOScale(_selectedPieceOriginalScale, PieceScaleResetDuration).SetLink(_selectedPiece.gameObject);
+            _selectedPiece.transform.DOScale(_selectedPieceOriginalScale, PieceScaleResetDuration)
+                .SetLink(_selectedPiece.gameObject);
         }
 
         if (selectedPiece != null && selectedPiece.gameObject != null)
             GameEvents.PiecePlaced(selectedPiece, finalMove.BoardPosition);
 
-        // Wait for placement processing to complete
-        yield return new WaitForSeconds(PostPlaceWait);
+        await UniTask.Delay((int)(PostPlaceWait * 1000), cancellationToken: token);
 
         _selectedPiece = null;
-        _onMoveComplete?.Invoke();
+        onComplete?.Invoke();
     }
 
-    private IEnumerator AnimatePickAndCancel(PieceView[] trayPieces, OpponentMove decoyMove)
+    private async UniTask AnimatePickAndCancelAsync(PieceView[] trayPieces, OpponentMove decoyMove, CancellationToken token)
     {
         var decoyPiece = trayPieces[decoyMove.PieceIndex];
-        if (decoyPiece == null) yield break;
+        if (decoyPiece == null) return;
 
         var originalScale = decoyPiece.transform.localScale;
 
         decoyPiece.transform.DOKill();
-        decoyPiece.transform.DOScale(originalScale * PieceSelectScale, PieceSelectDuration).SetEase(Ease.OutBack).SetLink(decoyPiece.gameObject);
-        yield return new WaitForSeconds(DecoyHoldDuration);
+        decoyPiece.transform.DOScale(originalScale * PieceSelectScale, PieceSelectDuration)
+            .SetEase(Ease.OutBack).SetLink(decoyPiece.gameObject);
+
+        await UniTask.Delay((int)(DecoyHoldDuration * 1000), cancellationToken: token);
 
         float hesitateTime = UnityEngine.Random.Range(_config.MinHesitationTime, _config.MaxHesitationTime);
-        yield return new WaitForSeconds(hesitateTime);
+        await UniTask.Delay((int)(hesitateTime * 1000), cancellationToken: token);
 
         decoyPiece.transform.DOKill();
-        decoyPiece.transform.DOScale(originalScale, PieceDeselectDuration).SetEase(Ease.InQuad).SetLink(decoyPiece.gameObject);
-        yield return new WaitForSeconds(PostDeselectPause);
+        decoyPiece.transform.DOScale(originalScale, PieceDeselectDuration)
+            .SetEase(Ease.InQuad).SetLink(decoyPiece.gameObject);
+
+        await UniTask.Delay((int)(PostDeselectPause * 1000), cancellationToken: token);
     }
 
-    private IEnumerator AnimateSelectPiece(PieceView piece)
+    private async UniTask AnimateSelectPieceAsync(PieceView piece, CancellationToken token)
     {
         _selectedPieceOriginalScale = piece.transform.localScale;
-        piece.transform.DOKill();
-        piece.transform.DOScale(_selectedPieceOriginalScale * PieceSelectScale, PieceSelectDuration).SetEase(Ease.OutBack).SetLink(piece.gameObject);
-        yield return new WaitForSeconds(PostSelectPause);
 
+        piece.transform.DOKill();
+        piece.transform.DOScale(_selectedPieceOriginalScale * PieceSelectScale, PieceSelectDuration)
+            .SetEase(Ease.OutBack).SetLink(piece.gameObject);
+
+        await UniTask.Delay((int)(PostSelectPause * 1000), cancellationToken: token);
         CreateGhost(piece);
     }
 
-    private IEnumerator AnimateHoverPosition(Vector2Int boardPos, bool canPlace = true)
+    private async UniTask AnimateHoverAsync(Vector2Int boardPos, bool canPlace, CancellationToken token)
     {
-        if (_ghostPiece == null) yield break;
+        if (_ghostPiece == null) return;
 
         var cellView = _boardView.GetCellView(boardPos.x, boardPos.y);
-        if (cellView == null) yield break;
+        if (cellView == null) return;
 
         Vector3 targetPos = cellView.RectTransform.position;
-        _ghostPiece.transform.DOKill();
-        _ghostPiece.transform.DOMove(targetPos, _config.MoveSpeed).SetEase(Ease.InOutCubic).SetLink(_ghostPiece);
-        yield return new WaitForSeconds(_config.MoveSpeed);
 
+        _ghostPiece.transform.DOKill();
+        _ghostPiece.transform.DOMove(targetPos, _config.MoveSpeed)
+            .SetEase(Ease.InOutCubic).SetLink(_ghostPiece);
+
+        await UniTask.Delay((int)(_config.MoveSpeed * 1000), cancellationToken: token);
         HighlightBoardCells(boardPos, canPlace);
     }
 
@@ -232,7 +221,6 @@ public class OpponentVisualPlayer : MonoBehaviour
         var canvasGroup = _ghostPiece.GetComponent<CanvasGroup>();
         canvasGroup.alpha = GhostAlpha;
 
-        // Copy piece cells visually
         var model = piece.Model;
         var theme = _boardConfig.Theme;
         float cellSize = _boardView.CellSize;
@@ -246,8 +234,7 @@ public class OpponentVisualPlayer : MonoBehaviour
             rect.sizeDelta = new Vector2(cellSize, cellSize);
             rect.anchoredPosition = new Vector2(
                 model.Positions[i].y * cellSize,
-                -model.Positions[i].x * cellSize
-            );
+                -model.Positions[i].x * cellSize);
 
             var image = cellGo.GetComponent<UnityEngine.UI.Image>();
             var visual = theme.GetBlockVisual(model.GetValueAt(i));
@@ -324,6 +311,8 @@ public class OpponentVisualPlayer : MonoBehaviour
 
     private void OnDestroy()
     {
+        _cts?.Cancel();
+        _cts?.Dispose();
         DestroyGhost();
     }
 }

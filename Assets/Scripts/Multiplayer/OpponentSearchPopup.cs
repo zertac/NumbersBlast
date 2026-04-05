@@ -1,8 +1,9 @@
 using System;
-using System.Collections;
+using System.Threading;
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
 
 public class OpponentSearchPopup : BasePopup
 {
@@ -14,9 +15,8 @@ public class OpponentSearchPopup : BasePopup
     private MultiplayerConfig _config;
     private Action _onFound;
     private Action _onCancel;
-    private Coroutine _searchCoroutine;
     private string _foundName;
-    private bool _cancelled;
+    private CancellationTokenSource _cts;
     private Tween _iconTween;
 
     public string FoundOpponentName => _foundName;
@@ -32,45 +32,44 @@ public class OpponentSearchPopup : BasePopup
         _config = config;
         _onFound = onFound;
         _onCancel = onCancel;
-        _cancelled = false;
+
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
 
         _opponentNameText.text = "";
         _statusText.text = "Searching for opponent...";
         Show();
         StartSearchIconAnimation();
 
-        _searchCoroutine = StartCoroutine(SearchSequence());
+        SearchSequenceAsync(_cts.Token).Forget();
     }
 
-    private IEnumerator SearchSequence()
+    private async UniTaskVoid SearchSequenceAsync(CancellationToken token)
     {
         float searchDuration = UnityEngine.Random.Range(_config.MinSearchDuration, _config.MaxSearchDuration);
         float elapsed = 0f;
         int dotCount = 0;
 
-        // Cycle through random names
         while (elapsed < searchDuration)
         {
-            if (_cancelled) yield break;
+            if (token.IsCancellationRequested) return;
 
             dotCount = (dotCount + 1) % 4;
-            string dots = new string('.', dotCount);
-            _statusText.text = $"Searching{dots}";
+            _statusText.text = $"Searching{new string('.', dotCount)}";
 
             if (_config.FakeNames != null && _config.FakeNames.Length > 0)
             {
                 _opponentNameText.text = _config.FakeNames[UnityEngine.Random.Range(0, _config.FakeNames.Length)];
                 _opponentNameText.DOKill();
                 _opponentNameText.DOFade(0.3f, 0.1f)
-                    .SetLink(_opponentNameText.gameObject)
-                    .OnComplete(() => _opponentNameText.DOFade(1f, 0.1f).SetLink(_opponentNameText.gameObject));
+                    .OnComplete(() => _opponentNameText.DOFade(1f, 0.1f).SetLink(_opponentNameText.gameObject))
+                    .SetLink(_opponentNameText.gameObject);
             }
 
-            yield return new WaitForSeconds(0.4f);
+            await UniTask.Delay(400, cancellationToken: token);
             elapsed += 0.4f;
         }
 
-        // Found
         _foundName = _config.FakeNames != null && _config.FakeNames.Length > 0
             ? _config.FakeNames[UnityEngine.Random.Range(0, _config.FakeNames.Length)]
             : $"Player_{UnityEngine.Random.Range(1000, 9999)}";
@@ -82,6 +81,7 @@ public class OpponentSearchPopup : BasePopup
         _opponentNameText.transform.DOKill();
         _opponentNameText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 2)
             .SetLink(_opponentNameText.gameObject);
+
         if (_searchIcon != null)
         {
             _searchIcon.DOKill();
@@ -89,7 +89,7 @@ public class OpponentSearchPopup : BasePopup
                 .SetLink(_searchIcon.gameObject);
         }
 
-        yield return new WaitForSeconds(1.5f);
+        await UniTask.Delay(1500, cancellationToken: token);
 
         Hide();
         _onFound?.Invoke();
@@ -97,10 +97,8 @@ public class OpponentSearchPopup : BasePopup
 
     private void OnCancelClick()
     {
-        _cancelled = true;
+        _cts?.Cancel();
         StopSearchIconAnimation();
-        if (_searchCoroutine != null)
-            StopCoroutine(_searchCoroutine);
         Hide();
         _onCancel?.Invoke();
     }
@@ -123,14 +121,14 @@ public class OpponentSearchPopup : BasePopup
     {
         _iconTween?.Kill();
         if (_searchIcon != null)
-        {
             _searchIcon.localScale = Vector3.one;
-        }
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
+        _cts?.Cancel();
+        _cts?.Dispose();
         _iconTween?.Kill();
         _cancelButton.onClick.RemoveListener(OnCancelClick);
     }
