@@ -46,14 +46,18 @@ public class MultiplayerHUD : MonoBehaviour
     {
         _turnIndicatorText.text = "YOUR TURN";
         _turnIndicatorText.color = PlayerTurnColor;
-        _turnIndicatorText.transform.DOPunchScale(Vector3.one * TurnPunchScale, PunchDuration, PunchVibrato);
+        _turnIndicatorText.transform.DOKill();
+        _turnIndicatorText.transform.DOPunchScale(Vector3.one * TurnPunchScale, PunchDuration, PunchVibrato)
+            .SetLink(_turnIndicatorText.gameObject);
     }
 
     public void SetOpponentTurn()
     {
         _turnIndicatorText.text = "OPPONENT'S TURN";
         _turnIndicatorText.color = OpponentTurnColor;
-        _turnIndicatorText.transform.DOPunchScale(Vector3.one * TurnPunchScale, PunchDuration, PunchVibrato);
+        _turnIndicatorText.transform.DOKill();
+        _turnIndicatorText.transform.DOPunchScale(Vector3.one * TurnPunchScale, PunchDuration, PunchVibrato)
+            .SetLink(_turnIndicatorText.gameObject);
     }
 
     public void UpdateTimer(float normalized)
@@ -73,14 +77,18 @@ public class MultiplayerHUD : MonoBehaviour
     {
         _playerScore += points;
         UpdateScores();
-        _playerScoreText.transform.DOPunchScale(Vector3.one * ScorePunchScale, PunchDuration, PunchVibrato);
+        _playerScoreText.transform.DOKill();
+        _playerScoreText.transform.DOPunchScale(Vector3.one * ScorePunchScale, PunchDuration, PunchVibrato)
+            .SetLink(_playerScoreText.gameObject);
     }
 
     public void AddOpponentScore(int points)
     {
         _opponentScore += points;
         UpdateScores();
-        _opponentScoreText.transform.DOPunchScale(Vector3.one * ScorePunchScale, PunchDuration, PunchVibrato);
+        _opponentScoreText.transform.DOKill();
+        _opponentScoreText.transform.DOPunchScale(Vector3.one * ScorePunchScale, PunchDuration, PunchVibrato)
+            .SetLink(_opponentScoreText.gameObject);
     }
 
     public void ApplyPenalty(bool isPlayer, int penalty)
@@ -89,13 +97,15 @@ public class MultiplayerHUD : MonoBehaviour
         {
             _playerScore = Mathf.Max(0, _playerScore - penalty);
             _playerScoreText.color = Color.red;
-            DOVirtual.DelayedCall(PenaltyFlashDelay, () => _playerScoreText.color = Color.white);
+            DOVirtual.DelayedCall(PenaltyFlashDelay, () => _playerScoreText.color = Color.white)
+                .SetLink(_playerScoreText.gameObject);
         }
         else
         {
             _opponentScore = Mathf.Max(0, _opponentScore - penalty);
             _opponentScoreText.color = Color.red;
-            DOVirtual.DelayedCall(PenaltyFlashDelay, () => _opponentScoreText.color = Color.white);
+            DOVirtual.DelayedCall(PenaltyFlashDelay, () => _opponentScoreText.color = Color.white)
+                .SetLink(_opponentScoreText.gameObject);
         }
         UpdateScores();
     }

@@ -29,7 +29,8 @@ public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         _scaleTween?.Kill();
         _scaleTween = transform.DOScale(_originalScale * PressScale, PressDuration)
             .SetEase(Ease.OutQuad)
-            .SetUpdate(true);
+            .SetUpdate(true)
+            .SetLink(gameObject);
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -37,7 +38,8 @@ public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         _scaleTween?.Kill();
         _scaleTween = transform.DOScale(_originalScale, ReleaseDuration)
             .SetEase(Ease.OutBack)
-            .SetUpdate(true);
+            .SetUpdate(true)
+            .SetLink(gameObject);
     }
 
     public void OnPointerClick(PointerEventData eventData)

@@ -67,7 +67,8 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         _pieceView.transform.SetParent(_canvasRect, true);
         _pieceView.transform.SetAsLastSibling();
 
-        _pieceView.transform.DOScale(DragScale, PickupDuration).SetEase(Ease.OutBack);
+        _pieceView.transform.DOKill();
+        _pieceView.transform.DOScale(DragScale, PickupDuration).SetEase(Ease.OutBack).SetLink(_pieceView.gameObject);
 
         _dragOffset = new Vector2(0, DragOffsetY);
 
@@ -389,7 +390,9 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     private void ReturnToTray()
     {
         _pieceView.transform.SetParent(_originalParent, true);
-        _pieceView.RectTransform.DOAnchorPos(_originalPosition, ReturnDuration).SetEase(Ease.OutCubic);
-        _pieceView.transform.DOScale(_originalScale, ReturnDuration).SetEase(Ease.OutCubic);
+        _pieceView.RectTransform.DOKill();
+        _pieceView.transform.DOKill();
+        _pieceView.RectTransform.DOAnchorPos(_originalPosition, ReturnDuration).SetEase(Ease.OutCubic).SetLink(_pieceView.gameObject);
+        _pieceView.transform.DOScale(_originalScale, ReturnDuration).SetEase(Ease.OutCubic).SetLink(_pieceView.gameObject);
     }
 }

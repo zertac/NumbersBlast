@@ -26,7 +26,9 @@ public class ScoreUI : MonoBehaviour
     {
         _currentScore += points;
         UpdateDisplay();
-        _rectTransform.DOPunchScale(Vector3.one * 0.3f, 0.3f, 2, 0.5f);
+        _rectTransform.DOKill();
+        _rectTransform.DOPunchScale(Vector3.one * 0.3f, 0.3f, 2, 0.5f)
+            .SetLink(gameObject);
     }
 
     private void UpdateDisplay()

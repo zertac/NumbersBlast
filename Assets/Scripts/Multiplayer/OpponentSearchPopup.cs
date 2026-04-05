@@ -60,7 +60,10 @@ public class OpponentSearchPopup : BasePopup
             if (_config.FakeNames != null && _config.FakeNames.Length > 0)
             {
                 _opponentNameText.text = _config.FakeNames[UnityEngine.Random.Range(0, _config.FakeNames.Length)];
-                _opponentNameText.DOFade(0.3f, 0.1f).OnComplete(() => _opponentNameText.DOFade(1f, 0.1f));
+                _opponentNameText.DOKill();
+                _opponentNameText.DOFade(0.3f, 0.1f)
+                    .SetLink(_opponentNameText.gameObject)
+                    .OnComplete(() => _opponentNameText.DOFade(1f, 0.1f).SetLink(_opponentNameText.gameObject));
             }
 
             yield return new WaitForSeconds(0.4f);
@@ -76,9 +79,15 @@ public class OpponentSearchPopup : BasePopup
         _statusText.text = "Opponent found!";
         StopSearchIconAnimation();
 
-        _opponentNameText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 2);
+        _opponentNameText.transform.DOKill();
+        _opponentNameText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 2)
+            .SetLink(_opponentNameText.gameObject);
         if (_searchIcon != null)
-            _searchIcon.DOPunchScale(Vector3.one * 0.3f, 0.4f, 2);
+        {
+            _searchIcon.DOKill();
+            _searchIcon.DOPunchScale(Vector3.one * 0.3f, 0.4f, 2)
+                .SetLink(_searchIcon.gameObject);
+        }
 
         yield return new WaitForSeconds(1.5f);
 
@@ -106,6 +115,7 @@ public class OpponentSearchPopup : BasePopup
         seq.Append(_searchIcon.DOAnchorPosX(_searchIcon.anchoredPosition.x, 0.4f).SetEase(Ease.InOutSine));
         seq.Join(_searchIcon.DOScale(Vector3.one * 1.1f, 0.3f).SetEase(Ease.InOutSine).SetLoops(2, LoopType.Yoyo));
         seq.SetLoops(-1, LoopType.Restart);
+        seq.SetLink(_searchIcon.gameObject);
         _iconTween = seq;
     }
 

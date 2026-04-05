@@ -31,13 +31,16 @@ public class TutorialFeedbackPopup : BasePopup
     {
         if (_checkIcon == null) return;
 
+        _checkIcon.DOKill();
         _checkIcon.localScale = Vector3.zero;
         _checkIcon.DOScale(Vector3.one, 0.4f)
             .SetEase(DG.Tweening.Ease.OutBack)
             .SetDelay(0.2f)
+            .SetLink(_checkIcon.gameObject)
             .OnComplete(() =>
             {
-                _checkIcon.DOPunchScale(Vector3.one * 0.15f, 0.25f, 2);
+                _checkIcon.DOPunchScale(Vector3.one * 0.15f, 0.25f, 2)
+                    .SetLink(_checkIcon.gameObject);
             });
     }
 

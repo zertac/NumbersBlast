@@ -163,7 +163,10 @@ public class OpponentVisualPlayer : MonoBehaviour
         DestroyGhost();
 
         if (_selectedPiece != null && _selectedPiece.gameObject != null)
-            _selectedPiece.transform.DOScale(_selectedPieceOriginalScale, PieceScaleResetDuration);
+        {
+            _selectedPiece.transform.DOKill();
+            _selectedPiece.transform.DOScale(_selectedPieceOriginalScale, PieceScaleResetDuration).SetLink(_selectedPiece.gameObject);
+        }
 
         if (selectedPiece != null && selectedPiece.gameObject != null)
             GameEvents.PiecePlaced(selectedPiece, finalMove.BoardPosition);
@@ -182,20 +185,23 @@ public class OpponentVisualPlayer : MonoBehaviour
 
         var originalScale = decoyPiece.transform.localScale;
 
-        decoyPiece.transform.DOScale(originalScale * PieceSelectScale, PieceSelectDuration).SetEase(Ease.OutBack);
+        decoyPiece.transform.DOKill();
+        decoyPiece.transform.DOScale(originalScale * PieceSelectScale, PieceSelectDuration).SetEase(Ease.OutBack).SetLink(decoyPiece.gameObject);
         yield return new WaitForSeconds(DecoyHoldDuration);
 
         float hesitateTime = UnityEngine.Random.Range(_config.MinHesitationTime, _config.MaxHesitationTime);
         yield return new WaitForSeconds(hesitateTime);
 
-        decoyPiece.transform.DOScale(originalScale, PieceDeselectDuration).SetEase(Ease.InQuad);
+        decoyPiece.transform.DOKill();
+        decoyPiece.transform.DOScale(originalScale, PieceDeselectDuration).SetEase(Ease.InQuad).SetLink(decoyPiece.gameObject);
         yield return new WaitForSeconds(PostDeselectPause);
     }
 
     private IEnumerator AnimateSelectPiece(PieceView piece)
     {
         _selectedPieceOriginalScale = piece.transform.localScale;
-        piece.transform.DOScale(_selectedPieceOriginalScale * PieceSelectScale, PieceSelectDuration).SetEase(Ease.OutBack);
+        piece.transform.DOKill();
+        piece.transform.DOScale(_selectedPieceOriginalScale * PieceSelectScale, PieceSelectDuration).SetEase(Ease.OutBack).SetLink(piece.gameObject);
         yield return new WaitForSeconds(PostSelectPause);
 
         CreateGhost(piece);
@@ -209,7 +215,8 @@ public class OpponentVisualPlayer : MonoBehaviour
         if (cellView == null) yield break;
 
         Vector3 targetPos = cellView.RectTransform.position;
-        _ghostPiece.transform.DOMove(targetPos, _config.MoveSpeed).SetEase(Ease.InOutCubic);
+        _ghostPiece.transform.DOKill();
+        _ghostPiece.transform.DOMove(targetPos, _config.MoveSpeed).SetEase(Ease.InOutCubic).SetLink(_ghostPiece);
         yield return new WaitForSeconds(_config.MoveSpeed);
 
         HighlightBoardCells(boardPos, canPlace);
