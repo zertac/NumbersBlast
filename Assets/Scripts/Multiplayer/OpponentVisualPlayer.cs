@@ -94,25 +94,23 @@ public class OpponentVisualPlayer : MonoBehaviour
         // Phase 4: Wander
         var piece = selectedPiece.Model;
         int wanderCount = UnityEngine.Random.Range(1, 4);
+        var board = _boardManager.Model;
+
         for (int w = 0; w < wanderCount; w++)
         {
             if (token.IsCancellationRequested) return;
 
-            bool tryInvalid = UnityEngine.Random.value < _config.InvalidMoveChance;
-            Vector2Int wanderPos;
+            // Wander near final position (within 3 cells) for natural feel
+            int maxOffset = 3;
+            int offsetR = UnityEngine.Random.Range(-maxOffset, maxOffset + 1);
+            int offsetC = UnityEngine.Random.Range(-maxOffset, maxOffset + 1);
 
-            if (tryInvalid)
-            {
-                wanderPos = new Vector2Int(
-                    UnityEngine.Random.Range(0, _boardManager.Model.Rows),
-                    UnityEngine.Random.Range(0, _boardManager.Model.Columns));
-            }
-            else
-            {
-                var wanderMove = _ai.CalculateDecoyMove(_boardManager.Model, trayPieces);
-                if (!wanderMove.IsValid) continue;
-                wanderPos = wanderMove.BoardPosition;
-            }
+            var wanderPos = new Vector2Int(
+                Mathf.Clamp(finalMove.BoardPosition.x + offsetR, 0, board.Rows - 1),
+                Mathf.Clamp(finalMove.BoardPosition.y + offsetC, 0, board.Columns - 1));
+
+            // Skip if same as final
+            if (wanderPos == finalMove.BoardPosition) continue;
 
             bool canPlace = CanFitAt(piece, wanderPos);
             await AnimateHoverAsync(wanderPos, canPlace, token);
@@ -126,10 +124,17 @@ public class OpponentVisualPlayer : MonoBehaviour
         bool willCancel = UnityEngine.Random.value < _config.CancelChance;
         if (willCancel)
         {
-            var decoyMove = _ai.CalculateDecoyMove(_boardManager.Model, trayPieces);
-            if (decoyMove.IsValid && decoyMove.BoardPosition != finalMove.BoardPosition)
+            // Cancel position: nearby but different from final
+            int cancelOffR = UnityEngine.Random.Range(-2, 3);
+            int cancelOffC = UnityEngine.Random.Range(-2, 3);
+            var cancelPos = new Vector2Int(
+                Mathf.Clamp(finalMove.BoardPosition.x + cancelOffR, 0, board.Rows - 1),
+                Mathf.Clamp(finalMove.BoardPosition.y + cancelOffC, 0, board.Columns - 1));
+
+            if (cancelPos != finalMove.BoardPosition)
             {
-                await AnimateHoverAsync(decoyMove.BoardPosition, true, token);
+                bool canPlaceCancel = CanFitAt(piece, cancelPos);
+                await AnimateHoverAsync(cancelPos, canPlaceCancel, token);
                 float hesitateTime = UnityEngine.Random.Range(_config.MinHesitationTime, _config.MaxHesitationTime);
                 await UniTask.Delay((int)(hesitateTime * 1000), cancellationToken: token);
                 ClearHighlights();
