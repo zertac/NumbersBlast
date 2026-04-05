@@ -18,13 +18,4 @@ MonoBehaviour:
   PieceSpawnConfig: {fileID: 11400000, guid: 7eec6fd9222dbc44ebed122064c61843, type: 2}
   MinBlockValue: 1
   MaxBlockValue: 4
-  EmptyCellColor: {r: 0.9, g: 0.9, b: 0.9, a: 1}
-  BlockColors:
-  - Value: 1
-    Color: {r: 0.55, g: 0.83, b: 0.78, a: 1}
-  - Value: 2
-    Color: {r: 0.99, g: 0.75, b: 0.44, a: 1}
-  - Value: 3
-    Color: {r: 0.55, g: 0.63, b: 0.8, a: 1}
-  - Value: 4
-    Color: {r: 0.91, g: 0.54, b: 0.54, a: 1}
+  Theme: {fileID: 11400000, guid: 31bfeeb76aedf154aa9a5ee328966ab1, type: 2}

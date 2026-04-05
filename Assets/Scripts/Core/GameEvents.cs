@@ -16,4 +16,14 @@ public static class GameEvents
     public static void ScoreChanged(int score) => OnScoreChanged?.Invoke(score);
     public static void GameOver() => OnGameOver?.Invoke();
     public static void TrayRefilled() => OnTrayRefilled?.Invoke();
+
+    public static void ClearAll()
+    {
+        OnPiecePickedUp = null;
+        OnPieceReleased = null;
+        OnPiecePlaced = null;
+        OnScoreChanged = null;
+        OnGameOver = null;
+        OnTrayRefilled = null;
+    }
 }

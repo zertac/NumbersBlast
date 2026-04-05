@@ -9,7 +9,7 @@ public class TutorialManager
     private readonly BoardView _boardView;
     private readonly PieceTray _pieceTray;
     private readonly TutorialOverlay _overlay;
-    private readonly TutorialFeedbackPopup _feedbackPopup;
+    private readonly UIManager _uiManager;
     private readonly BoardConfig _boardConfig;
 
     private int _currentStepIndex;
@@ -20,14 +20,14 @@ public class TutorialManager
     public Vector2Int? ForcedPlacement => _isActive ? _currentStep?.TargetBoardPosition : null;
 
     public TutorialManager(TutorialConfig config, BoardManager boardManager, BoardView boardView,
-        PieceTray pieceTray, TutorialOverlay overlay, TutorialFeedbackPopup feedbackPopup, BoardConfig boardConfig)
+        PieceTray pieceTray, TutorialOverlay overlay, UIManager uiManager, BoardConfig boardConfig)
     {
         _config = config;
         _boardManager = boardManager;
         _boardView = boardView;
         _pieceTray = pieceTray;
         _overlay = overlay;
-        _feedbackPopup = feedbackPopup;
+        _uiManager = uiManager;
         _boardConfig = boardConfig;
     }
 
@@ -42,7 +42,6 @@ public class TutorialManager
         _isActive = true;
         _currentStepIndex = 0;
         _overlay.Initialize();
-        _feedbackPopup.Initialize();
         GameEvents.OnPiecePlaced += HandlePiecePlaced;
         LoadStep(_currentStepIndex);
     }
@@ -182,7 +181,9 @@ public class TutorialManager
 
         _overlay.Hide();
 
-        _feedbackPopup.Show(title, desc, () =>
+        _uiManager.ShowPopup(PopupType.TutorialFeedback);
+        var feedbackPopup = _uiManager.GetPopup<TutorialFeedbackPopup>(PopupType.TutorialFeedback);
+        feedbackPopup.ShowWithMessage(title, desc, () =>
         {
             _currentStepIndex++;
 

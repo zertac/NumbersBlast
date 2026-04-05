@@ -5,5 +5,6 @@ public class ProjectLifetimeScope : LifetimeScope
 {
     protected override void Configure(IContainerBuilder builder)
     {
+        builder.Register<SceneLoader>(Lifetime.Singleton);
     }
 }

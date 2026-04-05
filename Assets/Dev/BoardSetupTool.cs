@@ -27,11 +27,10 @@ public static class BoardSetupTool
         var boardView = SetupBoardView(canvas.transform);
         var pieceTray = SetupPieceTray(canvas.transform);
         var scoreUI = SetupScoreUI(canvas.transform);
-        var gameOverUI = SetupGameOverUI(canvas.transform);
         var feedbackManager = SetupFeedbackManager(canvas.transform);
         var tutorialOverlay = SetupTutorialOverlay(canvas.transform);
-        var tutorialPopup = SetupTutorialFeedbackPopup(canvas.transform);
-        SetupGameplayScope(config, boardView, pieceTray, scoreUI, gameOverUI, feedbackManager, tutorialOverlay, tutorialPopup);
+        UISetupTool.RunSetup();
+        SetupGameplayScope(config, boardView, pieceTray, scoreUI, feedbackManager, tutorialOverlay);
 
         AssetDatabase.SaveAssets();
         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
@@ -233,7 +232,7 @@ public static class BoardSetupTool
         {
             var eventSystemGo = new GameObject("EventSystem");
             eventSystemGo.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            eventSystemGo.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            eventSystemGo.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
         }
 
         return canvas;
@@ -406,112 +405,6 @@ public static class BoardSetupTool
         return scoreUI;
     }
 
-    private static GameOverUI SetupGameOverUI(Transform canvasTransform)
-    {
-        var existing = canvasTransform.Find("GameOverPanel");
-        if (existing != null)
-        {
-            var existingUI = existing.GetComponent<GameOverUI>();
-            if (existingUI != null) return existingUI;
-            Object.DestroyImmediate(existing.gameObject);
-        }
-
-        var rootGo = new GameObject("GameOverPanel", typeof(RectTransform));
-        rootGo.transform.SetParent(canvasTransform, false);
-
-        // Overlay panel (full screen, dark background)
-        var panelGo = new GameObject("Panel", typeof(RectTransform), typeof(Image), typeof(CanvasGroup));
-        panelGo.transform.SetParent(rootGo.transform, false);
-
-        var panelRect = panelGo.GetComponent<RectTransform>();
-        panelRect.anchorMin = Vector2.zero;
-        panelRect.anchorMax = Vector2.one;
-        panelRect.sizeDelta = Vector2.zero;
-
-        var panelImage = panelGo.GetComponent<Image>();
-        panelImage.color = new Color(0, 0, 0, 0.7f);
-
-        // Content container
-        var contentGo = new GameObject("Content", typeof(RectTransform));
-        contentGo.transform.SetParent(panelGo.transform, false);
-
-        var contentRect = contentGo.GetComponent<RectTransform>();
-        contentRect.anchorMin = new Vector2(0.5f, 0.5f);
-        contentRect.anchorMax = new Vector2(0.5f, 0.5f);
-        contentRect.sizeDelta = new Vector2(500, 400);
-
-        // Game Over title
-        var titleGo = new GameObject("Title", typeof(RectTransform), typeof(TextMeshProUGUI));
-        titleGo.transform.SetParent(contentGo.transform, false);
-
-        var titleRect = titleGo.GetComponent<RectTransform>();
-        titleRect.anchorMin = new Vector2(0, 0.7f);
-        titleRect.anchorMax = new Vector2(1, 1);
-        titleRect.offsetMin = Vector2.zero;
-        titleRect.offsetMax = Vector2.zero;
-
-        var titleText = titleGo.GetComponent<TextMeshProUGUI>();
-        titleText.text = "GAME OVER";
-        titleText.alignment = TextAlignmentOptions.Center;
-        titleText.fontSize = 56;
-        titleText.color = Color.white;
-        titleText.fontStyle = FontStyles.Bold;
-
-        // Score text
-        var scoreGo = new GameObject("FinalScore", typeof(RectTransform), typeof(TextMeshProUGUI));
-        scoreGo.transform.SetParent(contentGo.transform, false);
-
-        var scoreRect = scoreGo.GetComponent<RectTransform>();
-        scoreRect.anchorMin = new Vector2(0, 0.35f);
-        scoreRect.anchorMax = new Vector2(1, 0.7f);
-        scoreRect.offsetMin = Vector2.zero;
-        scoreRect.offsetMax = Vector2.zero;
-
-        var scoreText = scoreGo.GetComponent<TextMeshProUGUI>();
-        scoreText.text = "0";
-        scoreText.alignment = TextAlignmentOptions.Center;
-        scoreText.fontSize = 72;
-        scoreText.color = Color.white;
-        scoreText.fontStyle = FontStyles.Bold;
-
-        // Restart button
-        var buttonGo = new GameObject("RestartButton", typeof(RectTransform), typeof(Image), typeof(Button));
-        buttonGo.transform.SetParent(contentGo.transform, false);
-
-        var buttonRect = buttonGo.GetComponent<RectTransform>();
-        buttonRect.anchorMin = new Vector2(0.2f, 0.05f);
-        buttonRect.anchorMax = new Vector2(0.8f, 0.3f);
-        buttonRect.offsetMin = Vector2.zero;
-        buttonRect.offsetMax = Vector2.zero;
-
-        var buttonImage = buttonGo.GetComponent<Image>();
-        buttonImage.color = new Color(0.3f, 0.7f, 0.4f);
-
-        var buttonTextGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
-        buttonTextGo.transform.SetParent(buttonGo.transform, false);
-
-        var btnTextRect = buttonTextGo.GetComponent<RectTransform>();
-        btnTextRect.anchorMin = Vector2.zero;
-        btnTextRect.anchorMax = Vector2.one;
-        btnTextRect.sizeDelta = Vector2.zero;
-
-        var btnText = buttonTextGo.GetComponent<TextMeshProUGUI>();
-        btnText.text = "RESTART";
-        btnText.alignment = TextAlignmentOptions.Center;
-        btnText.fontSize = 36;
-        btnText.color = Color.white;
-        btnText.fontStyle = FontStyles.Bold;
-
-        var gameOverUI = rootGo.AddComponent<GameOverUI>();
-        var so = new SerializedObject(gameOverUI);
-        so.FindProperty("_panel").objectReferenceValue = panelGo;
-        so.FindProperty("_finalScoreText").objectReferenceValue = scoreText;
-        so.FindProperty("_restartButton").objectReferenceValue = buttonGo.GetComponent<Button>();
-        so.ApplyModifiedPropertiesWithoutUndo();
-
-        return gameOverUI;
-    }
-
     private static TutorialOverlay SetupTutorialOverlay(Transform canvasTransform)
     {
         var existing = canvasTransform.Find("TutorialOverlay");
@@ -592,94 +485,6 @@ public static class BoardSetupTool
         return overlay;
     }
 
-    private static TutorialFeedbackPopup SetupTutorialFeedbackPopup(Transform canvasTransform)
-    {
-        var existing = canvasTransform.Find("TutorialFeedbackPopup");
-        if (existing != null)
-        {
-            var existingPopup = existing.GetComponent<TutorialFeedbackPopup>();
-            if (existingPopup != null) return existingPopup;
-            Object.DestroyImmediate(existing.gameObject);
-        }
-
-        var rootGo = new GameObject("TutorialFeedbackPopup", typeof(RectTransform));
-        rootGo.transform.SetParent(canvasTransform, false);
-
-        var panelGo = new GameObject("Panel", typeof(RectTransform), typeof(Image), typeof(CanvasGroup));
-        panelGo.transform.SetParent(rootGo.transform, false);
-        var panelRect = panelGo.GetComponent<RectTransform>();
-        panelRect.anchorMin = Vector2.zero;
-        panelRect.anchorMax = Vector2.one;
-        panelRect.sizeDelta = Vector2.zero;
-        panelGo.GetComponent<Image>().color = new Color(0, 0, 0, 0.6f);
-
-        var contentGo = new GameObject("Content", typeof(RectTransform));
-        contentGo.transform.SetParent(panelGo.transform, false);
-        var contentRect = contentGo.GetComponent<RectTransform>();
-        contentRect.anchorMin = new Vector2(0.5f, 0.5f);
-        contentRect.anchorMax = new Vector2(0.5f, 0.5f);
-        contentRect.sizeDelta = new Vector2(500, 300);
-
-        var titleGo = new GameObject("Title", typeof(RectTransform), typeof(TextMeshProUGUI));
-        titleGo.transform.SetParent(contentGo.transform, false);
-        var titleRect = titleGo.GetComponent<RectTransform>();
-        titleRect.anchorMin = new Vector2(0, 0.6f);
-        titleRect.anchorMax = new Vector2(1, 1);
-        titleRect.offsetMin = Vector2.zero;
-        titleRect.offsetMax = Vector2.zero;
-        var titleText = titleGo.GetComponent<TextMeshProUGUI>();
-        titleText.fontSize = 48;
-        titleText.alignment = TextAlignmentOptions.Center;
-        titleText.color = Color.white;
-        titleText.fontStyle = FontStyles.Bold;
-
-        var descGo = new GameObject("Description", typeof(RectTransform), typeof(TextMeshProUGUI));
-        descGo.transform.SetParent(contentGo.transform, false);
-        var descRect = descGo.GetComponent<RectTransform>();
-        descRect.anchorMin = new Vector2(0, 0.3f);
-        descRect.anchorMax = new Vector2(1, 0.6f);
-        descRect.offsetMin = Vector2.zero;
-        descRect.offsetMax = Vector2.zero;
-        var descText = descGo.GetComponent<TextMeshProUGUI>();
-        descText.fontSize = 28;
-        descText.alignment = TextAlignmentOptions.Center;
-        descText.color = Color.white;
-
-        var buttonGo = new GameObject("ContinueButton", typeof(RectTransform), typeof(Image), typeof(Button));
-        buttonGo.transform.SetParent(contentGo.transform, false);
-        var buttonRect = buttonGo.GetComponent<RectTransform>();
-        buttonRect.anchorMin = new Vector2(0.2f, 0.05f);
-        buttonRect.anchorMax = new Vector2(0.8f, 0.25f);
-        buttonRect.offsetMin = Vector2.zero;
-        buttonRect.offsetMax = Vector2.zero;
-        buttonGo.GetComponent<Image>().color = new Color(0.3f, 0.7f, 0.4f);
-
-        var btnTextGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
-        btnTextGo.transform.SetParent(buttonGo.transform, false);
-        var btnTextRect = btnTextGo.GetComponent<RectTransform>();
-        btnTextRect.anchorMin = Vector2.zero;
-        btnTextRect.anchorMax = Vector2.one;
-        btnTextRect.sizeDelta = Vector2.zero;
-        var btnText = btnTextGo.GetComponent<TextMeshProUGUI>();
-        btnText.text = "CONTINUE";
-        btnText.fontSize = 30;
-        btnText.alignment = TextAlignmentOptions.Center;
-        btnText.color = Color.white;
-        btnText.fontStyle = FontStyles.Bold;
-
-        var popup = rootGo.AddComponent<TutorialFeedbackPopup>();
-        var so = new SerializedObject(popup);
-        so.FindProperty("_panel").objectReferenceValue = panelGo;
-        so.FindProperty("_titleText").objectReferenceValue = titleText;
-        so.FindProperty("_descriptionText").objectReferenceValue = descText;
-        so.FindProperty("_continueButton").objectReferenceValue = buttonGo.GetComponent<Button>();
-        so.ApplyModifiedPropertiesWithoutUndo();
-
-        panelGo.SetActive(false);
-
-        return popup;
-    }
-
     private static FeedbackManager SetupFeedbackManager(Transform canvasTransform)
     {
         var existing = Object.FindAnyObjectByType<FeedbackManager>();
@@ -690,37 +495,40 @@ public static class BoardSetupTool
         return go.AddComponent<FeedbackManager>();
     }
 
-    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, GameOverUI gameOverUI, FeedbackManager feedbackManager, TutorialOverlay tutorialOverlay, TutorialFeedbackPopup tutorialPopup)
+    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, FeedbackManager feedbackManager, TutorialOverlay tutorialOverlay)
     {
+        var tutorialConfig = AssetDatabase.LoadAssetAtPath<TutorialConfig>("Assets/ScriptableObjects/Tutorial/TutorialConfig.asset");
+        var uiConfig = AssetDatabase.LoadAssetAtPath<UIConfig>("Assets/ScriptableObjects/UIConfig.asset");
+        var canvas = Object.FindAnyObjectByType<Canvas>();
+        var popupContainer = canvas != null ? canvas.transform.Find("PopupContainer") : null;
         var existingScope = Object.FindAnyObjectByType<GameplayLifetimeScope>();
-        if (existingScope != null)
+
+        System.Action<SerializedObject> applyFields = (so) =>
         {
-            var so = new SerializedObject(existingScope);
             so.FindProperty("_boardConfig").objectReferenceValue = config;
             so.FindProperty("_boardView").objectReferenceValue = boardView;
             so.FindProperty("_pieceTray").objectReferenceValue = pieceTray;
             so.FindProperty("_scoreUI").objectReferenceValue = scoreUI;
-            so.FindProperty("_gameOverUI").objectReferenceValue = gameOverUI;
             so.FindProperty("_feedbackManager").objectReferenceValue = feedbackManager;
             so.FindProperty("_tutorialOverlay").objectReferenceValue = tutorialOverlay;
-            so.FindProperty("_tutorialPopup").objectReferenceValue = tutorialPopup;
+            if (uiConfig != null)
+                so.FindProperty("_uiConfig").objectReferenceValue = uiConfig;
+            if (popupContainer != null)
+                so.FindProperty("_popupContainer").objectReferenceValue = popupContainer;
+            if (tutorialConfig != null)
+                so.FindProperty("_tutorialConfig").objectReferenceValue = tutorialConfig;
             so.ApplyModifiedPropertiesWithoutUndo();
+        };
+
+        if (existingScope != null)
+        {
+            applyFields(new SerializedObject(existingScope));
             return;
         }
 
         var scopeGo = new GameObject("GameplayScope");
         var scope = scopeGo.AddComponent<GameplayLifetimeScope>();
-
-        var scopeSo = new SerializedObject(scope);
-        scopeSo.FindProperty("_boardConfig").objectReferenceValue = config;
-        scopeSo.FindProperty("_boardView").objectReferenceValue = boardView;
-        scopeSo.FindProperty("_pieceTray").objectReferenceValue = pieceTray;
-        scopeSo.FindProperty("_scoreUI").objectReferenceValue = scoreUI;
-        scopeSo.FindProperty("_gameOverUI").objectReferenceValue = gameOverUI;
-        scopeSo.FindProperty("_feedbackManager").objectReferenceValue = feedbackManager;
-        scopeSo.FindProperty("_tutorialOverlay").objectReferenceValue = tutorialOverlay;
-        scopeSo.FindProperty("_tutorialPopup").objectReferenceValue = tutorialPopup;
-        scopeSo.ApplyModifiedPropertiesWithoutUndo();
+        applyFields(new SerializedObject(scope));
     }
 
     private static GameObject CreateValueText(Transform parent)

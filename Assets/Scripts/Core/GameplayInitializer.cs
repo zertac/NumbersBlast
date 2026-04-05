@@ -10,14 +10,14 @@ public class GameplayInitializer : IStartable
     private readonly BoardView _boardView;
     private readonly PlacementHandler _placementHandler;
     private readonly ScoreUI _scoreUI;
-    private readonly GameOverUI _gameOverUI;
+    private readonly UIManager _uiManager;
     private readonly TutorialManager _tutorialManager;
     private readonly FeedbackManager _feedbackManager;
     private readonly GameStateManager _gameStateManager;
 
     [Inject]
     public GameplayInitializer(BoardManager boardManager, PieceTray pieceTray, BoardConfig config,
-        BoardView boardView, PlacementHandler placementHandler, ScoreUI scoreUI, GameOverUI gameOverUI,
+        BoardView boardView, PlacementHandler placementHandler, ScoreUI scoreUI, UIManager uiManager,
         TutorialManager tutorialManager, FeedbackManager feedbackManager, GameStateManager gameStateManager)
     {
         _boardManager = boardManager;
@@ -26,7 +26,7 @@ public class GameplayInitializer : IStartable
         _boardView = boardView;
         _placementHandler = placementHandler;
         _scoreUI = scoreUI;
-        _gameOverUI = gameOverUI;
+        _uiManager = uiManager;
         _tutorialManager = tutorialManager;
         _feedbackManager = feedbackManager;
         _gameStateManager = gameStateManager;
@@ -34,6 +34,7 @@ public class GameplayInitializer : IStartable
 
     public void Start()
     {
+        GameEvents.ClearAll();
         _boardManager.Initialize();
 
         var canvas = _boardView.GetComponentInParent<Canvas>();
@@ -42,8 +43,9 @@ public class GameplayInitializer : IStartable
         _pieceTray.Initialize(_config, cellSize, canvas, _boardView, _boardManager, _tutorialManager, _feedbackManager, _gameStateManager);
         _feedbackManager.Initialize(_boardView.GetComponent<RectTransform>());
         _scoreUI.Initialize();
-        _gameOverUI.Initialize();
         _placementHandler.Enable();
+
+        GameEvents.OnGameOver += HandleGameOver;
 
         if (_tutorialManager.ShouldRunTutorial())
         {
@@ -55,5 +57,13 @@ public class GameplayInitializer : IStartable
             _gameStateManager.Initialize(GameState.Idle);
             _pieceTray.SpawnPieces();
         }
+    }
+
+    private void HandleGameOver()
+    {
+        _uiManager.ShowPopup(PopupType.GameOver);
+        var gameOverUI = _uiManager.GetPopup<GameOverUI>(PopupType.GameOver);
+        if (gameOverUI != null)
+            gameOverUI.SetScore(_scoreUI.GetScore());
     }
 }
