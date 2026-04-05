@@ -492,6 +492,7 @@ MonoBehaviour:
   _opponentNameText: {fileID: 40984261}
   _turnIndicatorText: {fileID: 640307840}
   _timerBar: {fileID: 1699777340}
+  _timerParent: {fileID: 1898833922}
 --- !u!224 &236690720
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2422,7 +2423,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 6557508881112015193, guid: 43b4a1cc877856b47b927ac4876cb8b2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b3ac52ea02f838f48b69be3677a29668, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1

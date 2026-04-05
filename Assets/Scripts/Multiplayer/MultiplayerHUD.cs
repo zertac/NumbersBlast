@@ -12,9 +12,11 @@ public class MultiplayerHUD : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _opponentNameText;
     [SerializeField] private TextMeshProUGUI _turnIndicatorText;
     [SerializeField] private Image _timerBar;
+    [SerializeField] private RectTransform _timerParent;
 
     private int _playerScore;
     private int _opponentScore;
+    private bool _isPulsing;
 
     private const float TimerCriticalThreshold = 0.25f;
     private const float TimerWarningThreshold = 0.5f;
@@ -60,17 +62,40 @@ public class MultiplayerHUD : MonoBehaviour
             .SetLink(_turnIndicatorText.gameObject);
     }
 
+    private static readonly Color TimerFullColor = new(0.4f, 0.85f, 0.4f);
+    private static readonly Color TimerMidColor = new(0.95f, 0.85f, 0.3f);
+    private static readonly Color TimerLowColor = new(0.9f, 0.3f, 0.3f);
+
     public void UpdateTimer(float normalized)
     {
         float clamped = Mathf.Clamp01(normalized);
         _timerBar.fillAmount = clamped;
 
-        if (clamped < TimerCriticalThreshold)
-            _timerBar.color = Color.red;
-        else if (clamped < TimerWarningThreshold)
-            _timerBar.color = Color.yellow;
+        if (clamped > 0.5f)
+            _timerBar.color = Color.Lerp(TimerMidColor, TimerFullColor, (clamped - 0.5f) * 2f);
         else
-            _timerBar.color = Color.green;
+            _timerBar.color = Color.Lerp(TimerLowColor, TimerMidColor, clamped * 2f);
+
+        // Pulse when low
+        if (_timerParent != null && clamped < TimerWarningThreshold && clamped > 0f)
+        {
+            if (!_isPulsing)
+            {
+                _isPulsing = true;
+                _timerParent.DOKill();
+                _timerParent.DOScale(Vector3.one * 1.05f, 0.3f)
+                    .SetEase(Ease.InOutSine)
+                    .SetLoops(-1, LoopType.Yoyo)
+                    .SetLink(_timerParent.gameObject);
+            }
+        }
+        else if (_isPulsing)
+        {
+            _isPulsing = false;
+            _timerParent.DOKill();
+            _timerParent.DOScale(Vector3.one, 0.15f)
+                .SetLink(_timerParent.gameObject);
+        }
     }
 
     public void AddPlayerScore(int points)
