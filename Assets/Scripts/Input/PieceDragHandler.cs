@@ -32,7 +32,7 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     private TutorialManager _tutorialManager;
     private FeedbackManager _feedbackManager;
     private GameStateManager _gameStateManager;
-    private List<CellView> _currentMergeHoverCells;
+    private readonly List<CellView> _currentMergeHoverCells = new(16);
     private readonly List<CellView> _mergeCellCache = new(16);
 
     public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null, GameStateManager gameStateManager = null)
@@ -96,10 +96,10 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         if (!_isDragging) return;
         _isDragging = false;
 
-        if (_feedbackManager != null && _currentMergeHoverCells != null)
+        if (_feedbackManager != null && _currentMergeHoverCells.Count > 0)
         {
             _feedbackManager.StopMergeHover(_currentMergeHoverCells);
-            _currentMergeHoverCells = null;
+            _currentMergeHoverCells.Clear();
         }
 
         var boardPos = GetBoardPosition();
@@ -158,16 +158,17 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
 
             if (!sameCells)
             {
-                if (_currentMergeHoverCells != null)
+                if (_currentMergeHoverCells.Count > 0)
                 {
                     _feedbackManager.StopMergeHover(_currentMergeHoverCells);
-                    _currentMergeHoverCells = null;
                 }
+
+                _currentMergeHoverCells.Clear();
 
                 if (mergeCells != null && mergeCells.Count > 0)
                 {
-                    _feedbackManager.StartMergeHover(mergeCells);
-                    _currentMergeHoverCells = mergeCells;
+                    _currentMergeHoverCells.AddRange(mergeCells);
+                    _feedbackManager.StartMergeHover(_currentMergeHoverCells);
                 }
             }
         }
@@ -236,9 +237,8 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
 
     private bool AreSameCells(List<CellView> a, List<CellView> b)
     {
-        if (a == null && b == null) return true;
-        if (a == null || b == null) return false;
-        if (a.Count != b.Count) return false;
+        if (a.Count == 0 && (b == null || b.Count == 0)) return true;
+        if (b == null || a.Count != b.Count) return false;
         for (int i = 0; i < a.Count; i++)
         {
             if (a[i] != b[i]) return false;
