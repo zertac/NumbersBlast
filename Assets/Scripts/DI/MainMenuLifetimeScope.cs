@@ -22,7 +22,7 @@ namespace NumbersBlast.DI
             builder.Register<AudioManager>(Lifetime.Singleton);
 
 
-            builder.Register<UIManager>(Lifetime.Singleton)
+            builder.Register<IUIManager, UIManager>(Lifetime.Singleton)
                 .WithParameter("popupContainer", _popupContainer)
                 .WithParameter("config", _uiConfig);
 

@@ -10,10 +10,10 @@ namespace NumbersBlast.UI
         [SerializeField] private Button _pauseButton;
         [SerializeField] private Button _settingsButton;
 
-        private UIManager _uiManager;
+        private IUIManager _uiManager;
         private GameStateManager _gameStateManager;
 
-        public void Initialize(UIManager uiManager, GameStateManager gameStateManager)
+        public void Initialize(IUIManager uiManager, GameStateManager gameStateManager)
         {
             _uiManager = uiManager;
             _gameStateManager = gameStateManager;

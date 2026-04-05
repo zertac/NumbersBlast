@@ -17,7 +17,7 @@ namespace NumbersBlast.Multiplayer
         private readonly MultiplayerHUD _hud;
         private readonly BoardManager _boardManager;
         private readonly PieceTray _pieceTray;
-        private readonly UIManager _uiManager;
+        private readonly IUIManager _uiManager;
         private readonly PlacementHandler _placementHandler;
 
         private bool _isActive;
@@ -29,7 +29,7 @@ namespace NumbersBlast.Multiplayer
 
         public MultiplayerManager(MultiplayerConfig config, TurnManager turnManager, OpponentAI opponentAI,
             OpponentVisualPlayer visualPlayer, MultiplayerHUD hud, BoardManager boardManager,
-            PieceTray pieceTray, UIManager uiManager, PlacementHandler placementHandler)
+            PieceTray pieceTray, IUIManager uiManager, PlacementHandler placementHandler)
         {
             _config = config;
             _turnManager = turnManager;

@@ -6,7 +6,7 @@ using NumbersBlast.Piece;
 
 namespace NumbersBlast.Gameplay
 {
-    public class MergeResolver
+    public class MergeResolver : IMergeResolver
     {
         private readonly HashSet<Vector2Int> _placedPositions = new();
         private readonly List<Vector2Int> _neighborMatches = new(4);

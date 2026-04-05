@@ -46,16 +46,16 @@ namespace NumbersBlast.DI
             if (_audioConfig != null)
                 builder.RegisterInstance(_audioConfig);
 
-            builder.Register<UIManager>(Lifetime.Singleton)
+            builder.Register<IUIManager, UIManager>(Lifetime.Singleton)
                 .WithParameter("popupContainer", _popupContainer)
                 .WithParameter("config", _uiConfig);
 
             builder.Register<AudioManager>(Lifetime.Singleton);
-            builder.Register<FeedbackManager>(Lifetime.Singleton);
+            builder.Register<IFeedbackManager, FeedbackManager>(Lifetime.Singleton);
             builder.Register<GameStateManager>(Lifetime.Singleton);
             builder.Register<BoardManager>(Lifetime.Singleton);
-            builder.Register<MergeResolver>(Lifetime.Singleton);
-            builder.Register<LineClearResolver>(Lifetime.Singleton);
+            builder.Register<IMergeResolver, MergeResolver>(Lifetime.Singleton);
+            builder.Register<ILineClearResolver, LineClearResolver>(Lifetime.Singleton);
             builder.Register<PlacementHandler>(Lifetime.Singleton);
             builder.Register<TutorialManager>(Lifetime.Singleton);
 

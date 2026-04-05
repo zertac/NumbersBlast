@@ -16,7 +16,7 @@ namespace NumbersBlast.UI
         [SerializeField] private Button _exitButton;
 
         [Inject] private AudioManager _audioManager;
-        [Inject] private UIManager _uiManager;
+        [Inject] private IUIManager _uiManager;
 
         private void Awake()
         {

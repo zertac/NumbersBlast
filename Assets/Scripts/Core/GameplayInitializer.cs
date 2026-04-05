@@ -22,9 +22,9 @@ namespace NumbersBlast.Core
         private readonly BoardView _boardView;
         private readonly PlacementHandler _placementHandler;
         private readonly GameStateManager _gameStateManager;
-        private readonly UIManager _uiManager;
+        private readonly IUIManager _uiManager;
         private readonly AudioManager _audioManager;
-        private readonly FeedbackManager _feedbackManager;
+        private readonly IFeedbackManager _feedbackManager;
 
         // UI - property inject
         [Inject] private PieceTray _pieceTray;
@@ -43,8 +43,8 @@ namespace NumbersBlast.Core
 
         [Inject]
         public GameplayInitializer(BoardManager boardManager, BoardConfig config, BoardView boardView,
-            PlacementHandler placementHandler, GameStateManager gameStateManager, UIManager uiManager,
-            AudioManager audioManager, FeedbackManager feedbackManager)
+            PlacementHandler placementHandler, GameStateManager gameStateManager, IUIManager uiManager,
+            AudioManager audioManager, IFeedbackManager feedbackManager)
         {
             _boardManager = boardManager;
             _config = config;

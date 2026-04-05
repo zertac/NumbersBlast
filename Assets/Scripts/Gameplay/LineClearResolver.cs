@@ -3,7 +3,7 @@ using NumbersBlast.Board;
 
 namespace NumbersBlast.Gameplay
 {
-    public class LineClearResolver
+    public class LineClearResolver : ILineClearResolver
     {
         private readonly List<int> _rowsToClear = new(8);
         private readonly List<int> _columnsToClear = new(8);

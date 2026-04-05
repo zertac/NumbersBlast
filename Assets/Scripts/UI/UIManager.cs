@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace NumbersBlast.UI
 {
-    public class UIManager
+    public class UIManager : IUIManager
     {
         private readonly UIConfig _config;
         private readonly Transform _popupContainer;

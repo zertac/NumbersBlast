@@ -6,7 +6,7 @@ using NumbersBlast.Data;
 
 namespace NumbersBlast.Feedback
 {
-    public class FeedbackManager
+    public class FeedbackManager : IFeedbackManager
     {
         private readonly FeedbackConfig _config;
 

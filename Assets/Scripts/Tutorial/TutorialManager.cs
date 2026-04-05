@@ -15,7 +15,7 @@ namespace NumbersBlast.Tutorial
         private readonly BoardView _boardView;
         private readonly PieceTray _pieceTray;
         private readonly TutorialOverlay _overlay;
-        private readonly UIManager _uiManager;
+        private readonly IUIManager _uiManager;
         private readonly BoardConfig _boardConfig;
 
         private int _currentStepIndex;
@@ -26,7 +26,7 @@ namespace NumbersBlast.Tutorial
         public Vector2Int? ForcedPlacement => _isActive ? _currentStep?.TargetBoardPosition : null;
 
         public TutorialManager(TutorialConfig config, BoardManager boardManager, BoardView boardView,
-            PieceTray pieceTray, TutorialOverlay overlay, UIManager uiManager, BoardConfig boardConfig)
+            PieceTray pieceTray, TutorialOverlay overlay, IUIManager uiManager, BoardConfig boardConfig)
         {
             _config = config;
             _boardManager = boardManager;

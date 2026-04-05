@@ -12,17 +12,17 @@ namespace NumbersBlast.Gameplay
     public class PlacementHandler
     {
         private readonly BoardManager _boardManager;
-        private readonly MergeResolver _mergeResolver;
-        private readonly LineClearResolver _lineClearResolver;
+        private readonly IMergeResolver _mergeResolver;
+        private readonly ILineClearResolver _lineClearResolver;
         private readonly PieceTray _pieceTray;
         private readonly BoardView _boardView;
-        private readonly FeedbackManager _feedbackManager;
+        private readonly IFeedbackManager _feedbackManager;
         private readonly GameStateManager _gameStateManager;
         private readonly AudioManager _audioManager;
 
         public event System.Action OnPlacementComplete;
 
-        public PlacementHandler(BoardManager boardManager, MergeResolver mergeResolver, LineClearResolver lineClearResolver, PieceTray pieceTray, BoardView boardView, FeedbackManager feedbackManager, GameStateManager gameStateManager, AudioManager audioManager)
+        public PlacementHandler(BoardManager boardManager, IMergeResolver mergeResolver, ILineClearResolver lineClearResolver, PieceTray pieceTray, BoardView boardView, IFeedbackManager feedbackManager, GameStateManager gameStateManager, AudioManager audioManager)
         {
             _boardManager = boardManager;
             _mergeResolver = mergeResolver;

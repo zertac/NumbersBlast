@@ -34,7 +34,7 @@ namespace NumbersBlast.Input
         private const float DragOffsetY = 150f;
 
         private TutorialManager _tutorialManager;
-        private FeedbackManager _feedbackManager;
+        private IFeedbackManager _feedbackManager;
         private GameStateManager _gameStateManager;
         private readonly List<CellView> _currentMergeHoverCells = new(16);
         private readonly List<CellView> _mergeCellCache = new(16);
@@ -42,7 +42,7 @@ namespace NumbersBlast.Input
         private readonly HashSet<Vector2Int> _placedSet = new(16);
         private readonly HashSet<Vector2Int> _occupiedAfterPlace = new(64);
 
-        public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null, GameStateManager gameStateManager = null)
+        public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null, IFeedbackManager feedbackManager = null, GameStateManager gameStateManager = null)
         {
             _pieceView = pieceView;
             _canvas = canvas;
