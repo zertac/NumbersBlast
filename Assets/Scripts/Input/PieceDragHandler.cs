@@ -31,7 +31,8 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     private TutorialManager _tutorialManager;
     private FeedbackManager _feedbackManager;
     private GameStateManager _gameStateManager;
-    private CellView[] _currentMergeHoverCells;
+    private List<CellView> _currentMergeHoverCells;
+    private readonly List<CellView> _mergeCellCache = new(16);
 
     public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null, GameStateManager gameStateManager = null)
     {
@@ -161,7 +162,7 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
                     _currentMergeHoverCells = null;
                 }
 
-                if (mergeCells != null && mergeCells.Length > 0)
+                if (mergeCells != null && mergeCells.Count > 0)
                 {
                     _feedbackManager.StartMergeHover(mergeCells);
                     _currentMergeHoverCells = mergeCells;
@@ -187,12 +188,12 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         }
     }
 
-    private CellView[] HighlightMerges(Vector2Int boardPos)
+    private List<CellView> HighlightMerges(Vector2Int boardPos)
     {
         var model = _boardManager.Model;
         var pieceModel = _pieceView.Model;
         var placedSet = new HashSet<Vector2Int>();
-        var mergeCellList = new System.Collections.Generic.List<CellView>();
+        _mergeCellCache.Clear();
 
         for (int i = 0; i < pieceModel.CellCount; i++)
         {
@@ -222,21 +223,21 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
                     if (cellView != null)
                     {
                         cellView.SetHighlight(HighlightType.Merge);
-                        mergeCellList.Add(cellView);
+                        _mergeCellCache.Add(cellView);
                     }
                 }
             }
         }
 
-        return mergeCellList.Count > 0 ? mergeCellList.ToArray() : null;
+        return _mergeCellCache;
     }
 
-    private bool AreSameCells(CellView[] a, CellView[] b)
+    private bool AreSameCells(List<CellView> a, List<CellView> b)
     {
         if (a == null && b == null) return true;
         if (a == null || b == null) return false;
-        if (a.Length != b.Length) return false;
-        for (int i = 0; i < a.Length; i++)
+        if (a.Count != b.Count) return false;
+        for (int i = 0; i < a.Count; i++)
         {
             if (a[i] != b[i]) return false;
         }

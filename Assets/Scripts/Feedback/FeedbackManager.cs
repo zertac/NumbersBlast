@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
@@ -35,7 +36,7 @@ public class FeedbackManager
 
     // === HOVER STATE ===
 
-    public void StartMergeHover(CellView[] mergeCells)
+    public void StartMergeHover(IReadOnlyList<CellView> mergeCells)
     {
         if (_shakeTarget == null) return;
         _isHoveringMerge = true;
@@ -53,7 +54,7 @@ public class FeedbackManager
                     .SetLink(_shakeTarget.gameObject);
             });
 
-        for (int i = 0; i < mergeCells.Length; i++)
+        for (int i = 0; i < mergeCells.Count; i++)
         {
             var cell = mergeCells[i];
             cell.transform.DOKill();
@@ -64,7 +65,7 @@ public class FeedbackManager
         }
     }
 
-    public void StopMergeHover(CellView[] mergeCells)
+    public void StopMergeHover(IReadOnlyList<CellView> mergeCells)
     {
         if (!_isHoveringMerge) return;
         _isHoveringMerge = false;
@@ -76,7 +77,7 @@ public class FeedbackManager
 
         if (mergeCells != null)
         {
-            for (int i = 0; i < mergeCells.Length; i++)
+            for (int i = 0; i < mergeCells.Count; i++)
             {
                 mergeCells[i].transform.DOKill();
                 mergeCells[i].transform.localScale = Vector3.one;
