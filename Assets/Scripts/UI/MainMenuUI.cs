@@ -36,6 +36,7 @@ public class MainMenuUI : MonoBehaviour
 
     private void Start()
     {
+        Application.runInBackground = false;
         _audioManager?.StopMusic();
         _audioManager?.PlayMenuMusic();
     }

@@ -26,9 +26,16 @@ public class GameplayHUD : MonoBehaviour
 
     private void OnPause()
     {
-        _gameStateManager.Pause();
+        bool isMultiplayer = GameModeHolder.CurrentMode == GameMode.Multiplayer;
+
+        // Multiplayer: just show popup, game continues in background
+        // Single player: pause game state
+        if (!isMultiplayer)
+            _gameStateManager.Pause();
+
         var pausePopup = _uiManager.ShowPopup<PausePopup>();
         pausePopup?.SetGameStateManager(_gameStateManager);
+        pausePopup?.SetMultiplayerMode(isMultiplayer);
     }
 
     private void OnSettings()

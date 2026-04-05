@@ -9,6 +9,7 @@ public class PausePopup : BasePopup
     [SerializeField] private Button _mainMenuButton;
 
     private GameStateManager _gameStateManager;
+    private bool _isMultiplayer;
 
     protected override void Awake()
     {
@@ -23,21 +24,29 @@ public class PausePopup : BasePopup
         _gameStateManager = gameStateManager;
     }
 
+    public void SetMultiplayerMode(bool isMultiplayer)
+    {
+        _isMultiplayer = isMultiplayer;
+    }
+
     private void OnResume()
     {
         Hide();
-        _gameStateManager?.Resume();
+        if (!_isMultiplayer)
+            _gameStateManager?.Resume();
     }
 
     private void OnRestart()
     {
-        _gameStateManager?.Resume();
+        if (!_isMultiplayer)
+            _gameStateManager?.Resume();
         SceneManager.LoadScene(GameConstants.GameScene);
     }
 
     private void OnMainMenu()
     {
-        _gameStateManager?.Resume();
+        if (!_isMultiplayer)
+            _gameStateManager?.Resume();
         SceneManager.LoadScene(GameConstants.MainMenuScene);
     }
 

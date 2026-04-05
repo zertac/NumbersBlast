@@ -74,6 +74,8 @@ public class GameplayInitializer : IStartable
         _audioManager.PlayGameplayMusic();
         _audioManager.PlayGameStart();
 
+        Application.runInBackground = isMultiplayer;
+
         if (isMultiplayer)
             StartMultiplayer();
         else
