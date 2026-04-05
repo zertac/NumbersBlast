@@ -1,12 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 
 public class TutorialFeedbackPopup : BasePopup
 {
     [SerializeField] private TextMeshProUGUI _titleText;
     [SerializeField] private TextMeshProUGUI _descriptionText;
     [SerializeField] private Button _continueButton;
+    [SerializeField] private RectTransform _checkIcon;
 
     private System.Action _onContinue;
 
@@ -22,6 +24,21 @@ public class TutorialFeedbackPopup : BasePopup
         _titleText.text = title;
         _descriptionText.text = description;
         Show();
+        PlayCheckAnimation();
+    }
+
+    private void PlayCheckAnimation()
+    {
+        if (_checkIcon == null) return;
+
+        _checkIcon.localScale = Vector3.zero;
+        _checkIcon.DOScale(Vector3.one, 0.4f)
+            .SetEase(DG.Tweening.Ease.OutBack)
+            .SetDelay(0.2f)
+            .OnComplete(() =>
+            {
+                _checkIcon.DOPunchScale(Vector3.one * 0.15f, 0.25f, 2);
+            });
     }
 
     protected override void OnDestroy()
