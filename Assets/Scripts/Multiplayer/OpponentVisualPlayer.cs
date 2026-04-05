@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.UI;
 using DG.Tweening;
 using Cysharp.Threading.Tasks;
 
@@ -25,6 +27,8 @@ public class OpponentVisualPlayer : MonoBehaviour
     private BoardConfig _boardConfig;
 
     private GameObject _ghostPiece;
+    private CanvasGroup _ghostCanvasGroup;
+    private readonly List<GameObject> _ghostCellPool = new(8);
     private Vector3 _selectedPieceOriginalScale;
     private PieceView _selectedPiece;
     private CancellationTokenSource _cts;
@@ -51,7 +55,7 @@ public class OpponentVisualPlayer : MonoBehaviour
     {
         _cts?.Cancel();
         ClearHighlights();
-        DestroyGhost();
+        HideGhost();
         if (_selectedPiece != null)
         {
             _selectedPiece.transform.localScale = _selectedPieceOriginalScale;
@@ -141,7 +145,7 @@ public class OpponentVisualPlayer : MonoBehaviour
         if (token.IsCancellationRequested) return;
 
         ClearHighlights();
-        DestroyGhost();
+        HideGhost();
 
         if (_selectedPiece != null && _selectedPiece.gameObject != null)
         {
@@ -213,22 +217,19 @@ public class OpponentVisualPlayer : MonoBehaviour
 
     private void CreateGhost(PieceView piece)
     {
-        DestroyGhost();
-
-        _ghostPiece = new GameObject("OpponentGhost", typeof(RectTransform), typeof(CanvasGroup));
-        _ghostPiece.transform.SetParent(_boardView.transform.parent, false);
-
-        var canvasGroup = _ghostPiece.GetComponent<CanvasGroup>();
-        canvasGroup.alpha = GhostAlpha;
+        HideGhost();
+        EnsureGhostRoot();
 
         var model = piece.Model;
         var theme = _boardConfig.Theme;
         float cellSize = _boardView.CellSize;
 
+        EnsureGhostCells(model.CellCount);
+
         for (int i = 0; i < model.CellCount; i++)
         {
-            var cellGo = new GameObject($"Cell_{i}", typeof(RectTransform), typeof(UnityEngine.UI.Image));
-            cellGo.transform.SetParent(_ghostPiece.transform, false);
+            var cellGo = _ghostCellPool[i];
+            cellGo.SetActive(true);
 
             var rect = cellGo.GetComponent<RectTransform>();
             rect.sizeDelta = new Vector2(cellSize, cellSize);
@@ -236,11 +237,40 @@ public class OpponentVisualPlayer : MonoBehaviour
                 model.Positions[i].y * cellSize,
                 -model.Positions[i].x * cellSize);
 
-            var image = cellGo.GetComponent<UnityEngine.UI.Image>();
+            var image = cellGo.GetComponent<Image>();
             var visual = theme.GetBlockVisual(model.GetValueAt(i));
             image.color = visual.Color;
             if (theme.BlockSprite != null)
                 image.sprite = theme.BlockSprite;
+
+            var text = cellGo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            text.text = model.GetValueAt(i).ToString();
+        }
+
+        // Hide unused cells
+        for (int i = model.CellCount; i < _ghostCellPool.Count; i++)
+            _ghostCellPool[i].SetActive(false);
+
+        _ghostPiece.SetActive(true);
+        _ghostPiece.transform.position = piece.transform.position;
+    }
+
+    private void EnsureGhostRoot()
+    {
+        if (_ghostPiece != null) return;
+
+        _ghostPiece = new GameObject("OpponentGhost", typeof(RectTransform), typeof(CanvasGroup));
+        _ghostPiece.transform.SetParent(_boardView.transform.parent, false);
+        _ghostCanvasGroup = _ghostPiece.GetComponent<CanvasGroup>();
+        _ghostCanvasGroup.alpha = GhostAlpha;
+    }
+
+    private void EnsureGhostCells(int count)
+    {
+        while (_ghostCellPool.Count < count)
+        {
+            var cellGo = new GameObject($"GhostCell_{_ghostCellPool.Count}", typeof(RectTransform), typeof(Image));
+            cellGo.transform.SetParent(_ghostPiece.transform, false);
 
             var textGo = new GameObject("Value", typeof(RectTransform), typeof(TMPro.TextMeshProUGUI));
             textGo.transform.SetParent(cellGo.transform, false);
@@ -249,13 +279,19 @@ public class OpponentVisualPlayer : MonoBehaviour
             textRect.anchorMax = Vector2.one;
             textRect.sizeDelta = Vector2.zero;
             var text = textGo.GetComponent<TMPro.TextMeshProUGUI>();
-            text.text = model.GetValueAt(i).ToString();
             text.alignment = TMPro.TextAlignmentOptions.Center;
             text.fontSize = GhostTextFontSize;
             text.color = Color.white;
-        }
 
-        _ghostPiece.transform.position = piece.transform.position;
+            cellGo.SetActive(false);
+            _ghostCellPool.Add(cellGo);
+        }
+    }
+
+    private void HideGhost()
+    {
+        if (_ghostPiece != null)
+            _ghostPiece.SetActive(false);
     }
 
     private void HighlightBoardCells(Vector2Int boardPos, bool canPlace)
@@ -300,19 +336,11 @@ public class OpponentVisualPlayer : MonoBehaviour
         return true;
     }
 
-    private void DestroyGhost()
-    {
-        if (_ghostPiece != null)
-        {
-            Destroy(_ghostPiece);
-            _ghostPiece = null;
-        }
-    }
-
     private void OnDestroy()
     {
         _cts?.Cancel();
         _cts?.Dispose();
-        DestroyGhost();
+        if (_ghostPiece != null)
+            Destroy(_ghostPiece);
     }
 }

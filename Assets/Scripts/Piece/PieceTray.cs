@@ -14,6 +14,7 @@ public class PieceTray : MonoBehaviour
     private TutorialManager _tutorialManager;
     private FeedbackManager _feedbackManager;
     private GameStateManager _gameStateManager;
+    private RectTransform[] _slotRects;
 
     public void Initialize(BoardConfig config, float cellSize, Canvas canvas, BoardView boardView, BoardManager boardManager, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null, GameStateManager gameStateManager = null)
     {
@@ -25,6 +26,10 @@ public class PieceTray : MonoBehaviour
         _tutorialManager = tutorialManager;
         _feedbackManager = feedbackManager;
         _gameStateManager = gameStateManager;
+
+        _slotRects = new RectTransform[_pieceSlots.Length];
+        for (int i = 0; i < _pieceSlots.Length; i++)
+            _slotRects[i] = _pieceSlots[i].GetComponent<RectTransform>();
         _pieceViews = new PieceView[_pieceSlots.Length];
     }
 
@@ -43,10 +48,12 @@ public class PieceTray : MonoBehaviour
             var pieceView = pieceGo.GetComponent<PieceView>();
             pieceView.Initialize(model, _config, _cellSize);
 
-            var dragHandler = pieceGo.AddComponent<PieceDragHandler>();
+            var dragHandler = pieceGo.GetComponent<PieceDragHandler>();
+            if (dragHandler == null)
+                dragHandler = pieceGo.AddComponent<PieceDragHandler>();
             dragHandler.Initialize(pieceView, _canvas, _boardView, _boardManager, _config, _tutorialManager, _feedbackManager, _gameStateManager);
 
-            var slotRect = _pieceSlots[i].GetComponent<RectTransform>();
+            var slotRect = _slotRects[i];
             float scale = CalculateFitScale(model.Shape, slotRect);
             pieceView.SetScale(scale);
 
@@ -88,10 +95,12 @@ public class PieceTray : MonoBehaviour
         var pieceView = pieceGo.GetComponent<PieceView>();
         pieceView.Initialize(model, _config, _cellSize);
 
-        var dragHandler = pieceGo.AddComponent<PieceDragHandler>();
-        dragHandler.Initialize(pieceView, _canvas, _boardView, _boardManager, _config, _tutorialManager);
+        var dragHandler = pieceGo.GetComponent<PieceDragHandler>();
+        if (dragHandler == null)
+            dragHandler = pieceGo.AddComponent<PieceDragHandler>();
+        dragHandler.Initialize(pieceView, _canvas, _boardView, _boardManager, _config, _tutorialManager, _feedbackManager, _gameStateManager);
 
-        var slotRect = _pieceSlots[0].GetComponent<RectTransform>();
+        var slotRect = _slotRects[0];
         float pieceWidth = 1;
         float pieceHeight = 1;
         for (int i = 0; i < model.Positions.Length; i++)

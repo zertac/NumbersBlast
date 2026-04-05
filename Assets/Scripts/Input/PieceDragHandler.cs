@@ -9,6 +9,7 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     private Canvas _canvas;
     private RectTransform _canvasRect;
     private BoardView _boardView;
+    private RectTransform _boardRect;
     private BoardManager _boardManager;
     private BoardConfig _config;
 
@@ -40,6 +41,7 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         _canvas = canvas;
         _canvasRect = canvas.GetComponent<RectTransform>();
         _boardView = boardView;
+        _boardRect = boardView.GetComponent<RectTransform>();
         _boardManager = boardManager;
         _config = config;
         _tutorialManager = tutorialManager;
@@ -346,7 +348,7 @@ public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         var positions = _pieceView.Model.Positions;
         if (positions.Length == 0) return null;
 
-        var boardRect = _boardView.GetComponent<RectTransform>();
+        var boardRect = _boardRect;
         var pieceWorldPos = _pieceView.RectTransform.position;
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(

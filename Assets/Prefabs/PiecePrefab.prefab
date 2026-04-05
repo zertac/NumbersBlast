@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4237306012595081171}
   - component: {fileID: 7013068203185415243}
+  - component: {fileID: -4030922686186420269}
   m_Layer: 0
   m_Name: PiecePrefab
   m_TagString: Untagged
@@ -49,3 +50,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PieceView
   _cellPrefab: {fileID: 1796806088825726581, guid: dcbb26e293cca594f99546ef84e4c298, type: 3}
+--- !u!114 &-4030922686186420269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870609939805945472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3df9dd8b76685fc42bf06e0cb81f4f3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PieceDragHandler

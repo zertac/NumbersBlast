@@ -16,10 +16,16 @@ public class SettingsPopup : BasePopup
     [SerializeField] private Sprite _toggleOffSprite;
 
     private AudioManager _audioManager;
+    private Image _musicImage;
+    private Image _sfxImage;
+    private Image _hapticImage;
 
     protected override void Awake()
     {
         base.Awake();
+        _musicImage = _musicToggle.GetComponent<Image>();
+        _sfxImage = _sfxToggle.GetComponent<Image>();
+        _hapticImage = _hapticToggle.GetComponent<Image>();
         _musicToggle.onClick.AddListener(OnMusicToggle);
         _sfxToggle.onClick.AddListener(OnSFXToggle);
         _hapticToggle.onClick.AddListener(OnHapticToggle);
@@ -69,23 +75,22 @@ public class SettingsPopup : BasePopup
         {
             bool musicOn = _audioManager.MusicEnabled;
             _musicLabel.text = musicOn ? "ON" : "OFF";
-            SetToggleSprite(_musicToggle, musicOn);
+            SetToggleSprite(_musicImage, musicOn);
 
             bool sfxOn = _audioManager.SFXEnabled;
             _sfxLabel.text = sfxOn ? "ON" : "OFF";
-            SetToggleSprite(_sfxToggle, sfxOn);
+            SetToggleSprite(_sfxImage, sfxOn);
         }
 
         bool hapticOn = HapticManager.Enabled;
         _hapticLabel.text = hapticOn ? "ON" : "OFF";
-        SetToggleSprite(_hapticToggle, hapticOn);
+        SetToggleSprite(_hapticImage, hapticOn);
     }
 
-    private void SetToggleSprite(Button toggle, bool isOn)
+    private void SetToggleSprite(Image image, bool isOn)
     {
-        var image = toggle.GetComponent<Image>();
         var sprite = isOn ? _toggleOnSprite : _toggleOffSprite;
-        if (sprite != null)
+        if (sprite != null && image != null)
             image.sprite = sprite;
     }
 
