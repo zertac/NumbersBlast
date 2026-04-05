@@ -6,7 +6,7 @@ using DG.Tweening;
 public class TutorialOverlay : MonoBehaviour
 {
     [SerializeField] private RawImage _overlayImage;
-    [SerializeField] private TextMeshProUGUI _handIcon;
+    [SerializeField] private RectTransform _handIcon;
     [SerializeField] private TextMeshProUGUI _instructionText;
     [SerializeField] private CanvasGroup _canvasGroup;
 
@@ -108,9 +108,9 @@ public class TutorialOverlay : MonoBehaviour
     {
         KillHandTween();
         _handIcon.gameObject.SetActive(true);
-        _handIcon.rectTransform.anchoredPosition = canvasPosition;
+        _handIcon.anchoredPosition = canvasPosition;
 
-        _handTween = _handIcon.rectTransform
+        _handTween = _handIcon
             .DOAnchorPosY(canvasPosition.y + 15f, 0.5f)
             .SetEase(Ease.InOutSine)
             .SetLoops(-1, LoopType.Yoyo);
