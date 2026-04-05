@@ -8,6 +8,8 @@ namespace NumbersBlast.Tutorial
     {
         [Header("Message")]
         public string InstructionText;
+        public string CompletionTitle;
+        public string CompletionDescription;
 
         [Header("Board State")]
         public int BoardRows = 8;

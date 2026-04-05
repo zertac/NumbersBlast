@@ -52,6 +52,20 @@ namespace NumbersBlast.Editor
                 step.InstructionText = text;
                 EditorUtility.SetDirty(step);
             }
+
+            EditorGUILayout.Space(5);
+            EditorGUILayout.LabelField("Completion Feedback", EditorStyles.boldLabel);
+
+            EditorGUI.BeginChangeCheck();
+            string title = EditorGUILayout.TextField("Title", step.CompletionTitle);
+            string desc = EditorGUILayout.TextField("Description", step.CompletionDescription);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(step, "Change Completion Feedback");
+                step.CompletionTitle = title;
+                step.CompletionDescription = desc;
+                EditorUtility.SetDirty(step);
+            }
         }
 
         private void DrawBoardSection(TutorialStepData step)

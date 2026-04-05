@@ -166,28 +166,9 @@ namespace NumbersBlast.Tutorial
             ClearBoardHighlight();
             _overlay.HideHand();
 
-            string title;
-            string desc;
-
-            switch (_currentStepIndex)
-            {
-                case 0:
-                    title = "Well Done!";
-                    desc = "You placed your first block!";
-                    break;
-                case 1:
-                    title = "Great!";
-                    desc = "Same numbers merge together!";
-                    break;
-                case 2:
-                    title = "Awesome!";
-                    desc = "Full rows and columns get cleared for points!";
-                    break;
-                default:
-                    title = "Nice!";
-                    desc = "";
-                    break;
-            }
+            string title = !string.IsNullOrEmpty(_currentStep.CompletionTitle)
+                ? _currentStep.CompletionTitle : "Nice!";
+            string desc = _currentStep.CompletionDescription ?? "";
 
             _overlay.Hide();
 

@@ -36,15 +36,41 @@ namespace NumbersBlast.Data
         public Color PlayerTurnColor = new(0.3f, 0.85f, 0.4f);
         public Color OpponentTurnColor = new(0.9f, 0.5f, 0.3f);
 
+        private BlockVisual[] _visualCache;
+        private static readonly BlockVisual DefaultVisual = new() { Value = -1, Color = Color.gray };
+
         public BlockVisual GetBlockVisual(int value)
         {
+            if (_visualCache == null || _visualCache.Length == 0)
+                BuildCache();
+
+            if (value >= 0 && value < _visualCache.Length && _visualCache[value].Value == value)
+                return _visualCache[value];
+
+            return DefaultVisual;
+        }
+
+        private void BuildCache()
+        {
+            if (BlockVisuals == null || BlockVisuals.Length == 0) return;
+
+            int maxValue = 0;
             for (int i = 0; i < BlockVisuals.Length; i++)
             {
-                if (BlockVisuals[i].Value == value)
-                    return BlockVisuals[i];
+                if (BlockVisuals[i].Value > maxValue)
+                    maxValue = BlockVisuals[i].Value;
             }
 
-            return new BlockVisual { Value = value, Color = Color.gray };
+            _visualCache = new BlockVisual[maxValue + 1];
+            for (int i = 0; i < BlockVisuals.Length; i++)
+            {
+                _visualCache[BlockVisuals[i].Value] = BlockVisuals[i];
+            }
+        }
+
+        private void OnEnable()
+        {
+            BuildCache();
         }
     }
 

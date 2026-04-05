@@ -7,6 +7,7 @@ namespace NumbersBlast.Piece
     public class PieceView : MonoBehaviour
     {
         [SerializeField] private GameObject _cellPrefab;
+        [SerializeField] private Image _raycastImage;
 
         private PieceModel _model;
         private BoardConfig _config;
@@ -59,10 +60,10 @@ namespace NumbersBlast.Piece
 
             RectTransform.sizeDelta = new Vector2(totalWidth, totalHeight);
 
-            // TODO: Image should be pre-attached on the piece prefab instead of added at runtime.
-            var image = gameObject.AddComponent<Image>();
-            image.color = new Color(0, 0, 0, 0);
-            image.raycastTarget = true;
+            if (_raycastImage == null)
+                _raycastImage = gameObject.AddComponent<Image>();
+            _raycastImage.color = new Color(0, 0, 0, 0);
+            _raycastImage.raycastTarget = true;
         }
 
         public void SetScale(float scale)

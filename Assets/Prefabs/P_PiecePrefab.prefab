@@ -9,8 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4237306012595081171}
+  - component: {fileID: 8754242768589242573}
   - component: {fileID: 7013068203185415243}
   - component: {fileID: -4030922686186420269}
+  - component: {fileID: 8625582858476817668}
   m_Layer: 0
   m_Name: P_PiecePrefab
   m_TagString: Untagged
@@ -37,6 +39,36 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8754242768589242573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870609939805945472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &7013068203185415243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50,6 +82,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PieceView
   _cellPrefab: {fileID: 1796806088825726581, guid: dcbb26e293cca594f99546ef84e4c298, type: 3}
+  _raycastImage: {fileID: 8754242768589242573}
 --- !u!114 &-4030922686186420269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,3 +95,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3df9dd8b76685fc42bf06e0cb81f4f3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PieceDragHandler
+--- !u!222 &8625582858476817668
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870609939805945472}
+  m_CullTransparentMesh: 1
