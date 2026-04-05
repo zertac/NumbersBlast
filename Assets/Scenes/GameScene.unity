@@ -119,61 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &70443401
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 70443403}
-  - component: {fileID: 70443402}
-  m_Layer: 0
-  m_Name: FeedbackManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &70443402
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 70443401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c7d0038869d641499c696dd363c270b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FeedbackManager
-  _shakeStrength: 10
-  _shakeDuration: 0.3
-  _shakeVibrato: 15
-  _placePunchScale: 0.2
-  _placeDuration: 0.25
-  _mergePunchScale: 0.3
-  _clearDuration: 0.3
-  _clearDelay: 0.03
-  _hoverBoardScale: 1.015
-  _hoverGrowDuration: 0.3
-  _hoverCellShake: 2
---- !u!4 &70443403
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 70443401}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &120177251
 GameObject:
   m_ObjectHideFlags: 0
@@ -1119,6 +1064,64 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1001371591
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1001371593}
+  - component: {fileID: 1001371592}
+  m_Layer: 0
+  m_Name: GameplayScope
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1001371592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1001371591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c203d918668c96548a8d97bd732652a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameplayLifetimeScope
+  parentReference:
+    TypeName: 
+  autoRun: 1
+  autoInjectGameObjects: []
+  _boardConfig: {fileID: 11400000, guid: 1595f2fbaa170cb44a0dc5d9a5e006f2, type: 2}
+  _boardView: {fileID: 1894877545}
+  _pieceTray: {fileID: 184191674}
+  _scoreUI: {fileID: 209940303}
+  _tutorialOverlay: {fileID: 1652300397}
+  _tutorialConfig: {fileID: 11400000, guid: 129dab123ec61364d945670607db0768, type: 2}
+  _feedbackConfig: {fileID: 11400000, guid: c6cc5e9d5c6963a4f8322926885c9f9f, type: 2}
+  _uiConfig: {fileID: 11400000, guid: 7e27737753ff39e49b58c1d169f7daed, type: 2}
+  _popupContainer: {fileID: 2020932953}
+  _audioConfig: {fileID: 11400000, guid: 5cc012a916f60884297d1c593faa1450, type: 2}
+--- !u!4 &1001371593
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1001371591}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1080220382
 GameObject:
   m_ObjectHideFlags: 0
@@ -1515,63 +1518,6 @@ MonoBehaviour:
   _gridLayout: {fileID: 1894877544}
   _boardRect: {fileID: 1894877543}
   _boardFrame: {fileID: 412472929}
---- !u!1 &1922353018
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1922353020}
-  - component: {fileID: 1922353019}
-  m_Layer: 0
-  m_Name: GameplayScope
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1922353019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1922353018}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c203d918668c96548a8d97bd732652a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameplayLifetimeScope
-  parentReference:
-    TypeName: 
-  autoRun: 1
-  autoInjectGameObjects: []
-  _boardConfig: {fileID: 11400000, guid: 1595f2fbaa170cb44a0dc5d9a5e006f2, type: 2}
-  _boardView: {fileID: 1894877545}
-  _pieceTray: {fileID: 184191674}
-  _scoreUI: {fileID: 209940303}
-  _tutorialOverlay: {fileID: 1652300397}
-  _tutorialConfig: {fileID: 11400000, guid: 129dab123ec61364d945670607db0768, type: 2}
-  _feedbackManager: {fileID: 70443402}
-  _uiConfig: {fileID: 11400000, guid: 7e27737753ff39e49b58c1d169f7daed, type: 2}
-  _popupContainer: {fileID: 2020932953}
---- !u!4 &1922353020
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1922353018}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1932866774
 GameObject:
   m_ObjectHideFlags: 0
@@ -1748,8 +1694,7 @@ RectTransform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1001371593}
+  - {fileID: 849602687}
   - {fileID: 1080220385}
   - {fileID: 961739753}
-  - {fileID: 849602687}
-  - {fileID: 70443403}
-  - {fileID: 1922353020}

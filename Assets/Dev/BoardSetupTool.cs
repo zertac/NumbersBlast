@@ -27,10 +27,10 @@ public static class BoardSetupTool
         var boardView = SetupBoardView(canvas.transform);
         var pieceTray = SetupPieceTray(canvas.transform);
         var scoreUI = SetupScoreUI(canvas.transform);
-        var feedbackManager = SetupFeedbackManager(canvas.transform);
+        var feedbackConfig = CreateOrLoadFeedbackConfig();
         var tutorialOverlay = SetupTutorialOverlay(canvas.transform);
         UISetupTool.RunSetup();
-        SetupGameplayScope(config, boardView, pieceTray, scoreUI, feedbackManager, tutorialOverlay);
+        SetupGameplayScope(config, boardView, pieceTray, scoreUI, feedbackConfig, tutorialOverlay);
 
         AssetDatabase.SaveAssets();
         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
@@ -485,20 +485,22 @@ public static class BoardSetupTool
         return overlay;
     }
 
-    private static FeedbackManager SetupFeedbackManager(Transform canvasTransform)
+    private static FeedbackConfig CreateOrLoadFeedbackConfig()
     {
-        var existing = Object.FindAnyObjectByType<FeedbackManager>();
+        var path = SOPath + "/FeedbackConfig.asset";
+        var existing = AssetDatabase.LoadAssetAtPath<FeedbackConfig>(path);
         if (existing != null) return existing;
 
-        var go = new GameObject("FeedbackManager");
-        go.transform.SetParent(null);
-        return go.AddComponent<FeedbackManager>();
+        var config = ScriptableObject.CreateInstance<FeedbackConfig>();
+        AssetDatabase.CreateAsset(config, path);
+        return config;
     }
 
-    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, FeedbackManager feedbackManager, TutorialOverlay tutorialOverlay)
+    private static void SetupGameplayScope(BoardConfig config, BoardView boardView, PieceTray pieceTray, ScoreUI scoreUI, FeedbackConfig feedbackConfig, TutorialOverlay tutorialOverlay)
     {
         var tutorialConfig = AssetDatabase.LoadAssetAtPath<TutorialConfig>("Assets/ScriptableObjects/Tutorial/TutorialConfig.asset");
         var uiConfig = AssetDatabase.LoadAssetAtPath<UIConfig>("Assets/ScriptableObjects/UIConfig.asset");
+        var audioConfig = AssetDatabase.LoadAssetAtPath<AudioConfig>("Assets/ScriptableObjects/AudioConfig.asset");
         var canvas = Object.FindAnyObjectByType<Canvas>();
         var popupContainer = canvas != null ? canvas.transform.Find("PopupContainer") : null;
         var existingScope = Object.FindAnyObjectByType<GameplayLifetimeScope>();
@@ -509,7 +511,7 @@ public static class BoardSetupTool
             so.FindProperty("_boardView").objectReferenceValue = boardView;
             so.FindProperty("_pieceTray").objectReferenceValue = pieceTray;
             so.FindProperty("_scoreUI").objectReferenceValue = scoreUI;
-            so.FindProperty("_feedbackManager").objectReferenceValue = feedbackManager;
+            so.FindProperty("_feedbackConfig").objectReferenceValue = feedbackConfig;
             so.FindProperty("_tutorialOverlay").objectReferenceValue = tutorialOverlay;
             if (uiConfig != null)
                 so.FindProperty("_uiConfig").objectReferenceValue = uiConfig;
@@ -517,6 +519,8 @@ public static class BoardSetupTool
                 so.FindProperty("_popupContainer").objectReferenceValue = popupContainer;
             if (tutorialConfig != null)
                 so.FindProperty("_tutorialConfig").objectReferenceValue = tutorialConfig;
+            if (audioConfig != null)
+                so.FindProperty("_audioConfig").objectReferenceValue = audioConfig;
             so.ApplyModifiedPropertiesWithoutUndo();
         };
 

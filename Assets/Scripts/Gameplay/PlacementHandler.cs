@@ -10,8 +10,9 @@ public class PlacementHandler
     private readonly BoardView _boardView;
     private readonly FeedbackManager _feedbackManager;
     private readonly GameStateManager _gameStateManager;
+    private readonly AudioManager _audioManager;
 
-    public PlacementHandler(BoardManager boardManager, MergeResolver mergeResolver, LineClearResolver lineClearResolver, PieceTray pieceTray, BoardView boardView, FeedbackManager feedbackManager, GameStateManager gameStateManager)
+    public PlacementHandler(BoardManager boardManager, MergeResolver mergeResolver, LineClearResolver lineClearResolver, PieceTray pieceTray, BoardView boardView, FeedbackManager feedbackManager, GameStateManager gameStateManager, AudioManager audioManager)
     {
         _boardManager = boardManager;
         _mergeResolver = mergeResolver;
@@ -20,6 +21,7 @@ public class PlacementHandler
         _boardView = boardView;
         _feedbackManager = feedbackManager;
         _gameStateManager = gameStateManager;
+        _audioManager = audioManager;
     }
 
     public void Enable()
@@ -62,15 +64,22 @@ public class PlacementHandler
             }
 
             if (merge.IsChain)
+            {
                 _feedbackManager.PlayChainMergeSmash(targetView);
+                _audioManager.PlayChainMerge();
+            }
             else
+            {
                 _feedbackManager.PlayMergeSmash(targetView, absorbedViews);
+                _audioManager.PlayMerge();
+            }
         }
 
         // Line clear
         var clearResult = _lineClearResolver.Resolve(model, _boardView);
         if (clearResult.Score > 0)
         {
+            _audioManager.PlayLineClear();
             GameEvents.ScoreChanged(clearResult.Score);
 
             var clearViews = new CellView[clearResult.ClearedPositions.Count];

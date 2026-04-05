@@ -163,6 +163,7 @@ public class PieceTray : MonoBehaviour
         if (IsEmpty())
         {
             SpawnPieces();
+            GameEvents.TrayRefilled();
         }
     }
 }

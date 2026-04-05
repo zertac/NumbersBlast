@@ -72,8 +72,8 @@ public abstract class BasePopup : MonoBehaviour
         _hideTween = sequence;
     }
 
-    protected virtual void OnShow() { }
-    protected virtual void OnHide() { }
+    protected virtual void OnShow() { GameEvents.PopupOpened(); }
+    protected virtual void OnHide() { GameEvents.PopupClosed(); }
 
     protected virtual void OnDestroy()
     {

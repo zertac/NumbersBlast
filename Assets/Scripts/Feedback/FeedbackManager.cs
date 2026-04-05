@@ -1,34 +1,20 @@
 using UnityEngine;
 using DG.Tweening;
 
-public class FeedbackManager : MonoBehaviour
+public class FeedbackManager
 {
-    [Header("Screen Shake")]
-    [SerializeField] private float _shakeStrength = 10f;
-    [SerializeField] private float _shakeDuration = 0.3f;
-    [SerializeField] private int _shakeVibrato = 15;
-
-    [Header("Cell Place")]
-    [SerializeField] private float _placePunchScale = 0.2f;
-    [SerializeField] private float _placeDuration = 0.25f;
-
-    [Header("Merge")]
-    [SerializeField] private float _mergePunchScale = 0.3f;
-
-    [Header("Line Clear")]
-    [SerializeField] private float _clearDuration = 0.3f;
-    [SerializeField] private float _clearDelay = 0.03f;
-
-    [Header("Hover Anticipation")]
-    [SerializeField] private float _hoverBoardScale = 1.015f;
-    [SerializeField] private float _hoverGrowDuration = 0.3f;
-    [SerializeField] private float _hoverCellShake = 2f;
+    private readonly FeedbackConfig _config;
 
     private RectTransform _shakeTarget;
     private Vector2 _shakeOriginalPos;
     private bool _isHoveringMerge;
     private Tween _hoverBoardTween;
     private Tween _hoverPulseTween;
+
+    public FeedbackManager(FeedbackConfig config)
+    {
+        _config = config;
+    }
 
     public void Initialize(RectTransform shakeTarget)
     {
@@ -42,19 +28,17 @@ public class FeedbackManager : MonoBehaviour
     {
         _isHoveringMerge = true;
 
-        // Board pulse (breathe)
         _hoverBoardTween?.Kill();
         _hoverPulseTween?.Kill();
-        _hoverBoardTween = _shakeTarget.DOScale(Vector3.one * _hoverBoardScale, _hoverGrowDuration)
+        _hoverBoardTween = _shakeTarget.DOScale(Vector3.one * _config.HoverBoardScale, _config.HoverGrowDuration)
             .SetEase(Ease.InOutSine)
             .OnComplete(() =>
             {
-                _hoverPulseTween = _shakeTarget.DOScale(Vector3.one * (_hoverBoardScale + 0.005f), 0.4f)
+                _hoverPulseTween = _shakeTarget.DOScale(Vector3.one * (_config.HoverBoardScale + 0.005f), 0.4f)
                     .SetEase(Ease.InOutSine)
                     .SetLoops(-1, LoopType.Yoyo);
             });
 
-        // Merge cells gentle pulse
         for (int i = 0; i < mergeCells.Length; i++)
         {
             var cell = mergeCells[i];
@@ -92,27 +76,25 @@ public class FeedbackManager : MonoBehaviour
         {
             var cell = cells[i];
             cell.transform.localScale = Vector3.zero;
-            cell.transform.DOScale(Vector3.one, _placeDuration)
+            cell.transform.DOScale(Vector3.one, _config.PlaceDuration)
                 .SetEase(Ease.OutBack)
                 .SetDelay(i * 0.03f);
         }
 
-        ShakeScreen(_shakeStrength * 0.5f, _shakeDuration * 0.5f);
+        ShakeScreen(_config.ShakeStrength * 0.5f, _config.ShakeDuration * 0.5f);
     }
 
-    // === MERGE (called on drop, after hover anticipation) ===
+    // === MERGE ===
 
     public void PlayMergeSmash(CellView targetCell, CellView[] absorbedCells)
     {
         _isHoveringMerge = false;
 
-        // Board snaps back (smash!)
         _hoverBoardTween?.Kill();
         _hoverPulseTween?.Kill();
         _shakeTarget.DOScale(Vector3.one, 0.05f).SetEase(Ease.OutQuad);
-        ShakeScreen(_shakeStrength * 0.6f, _shakeDuration * 0.5f);
+        ShakeScreen(_config.ShakeStrength * 0.6f, _config.ShakeDuration * 0.5f);
 
-        // Absorbed cells flash + vanish
         for (int i = 0; i < absorbedCells.Length; i++)
         {
             var absorbed = absorbedCells[i];
@@ -125,7 +107,6 @@ public class FeedbackManager : MonoBehaviour
             seq.OnComplete(() => absorbed.transform.localScale = Vector3.one);
         }
 
-        // Target cell impact after absorb
         DOVirtual.DelayedCall(0.18f, () =>
         {
             targetCell.Refresh();
@@ -140,7 +121,7 @@ public class FeedbackManager : MonoBehaviour
 
     public void PlayChainMergeSmash(CellView targetCell)
     {
-        ShakeScreen(_shakeStrength * 0.8f, _shakeDuration * 0.6f);
+        ShakeScreen(_config.ShakeStrength * 0.8f, _config.ShakeDuration * 0.6f);
 
         targetCell.Refresh();
 
@@ -161,12 +142,12 @@ public class FeedbackManager : MonoBehaviour
         for (int i = 0; i < cells.Length; i++)
         {
             var cell = cells[i];
-            float delay = i * _clearDelay;
+            float delay = i * _config.ClearDelay;
 
             var sequence = DOTween.Sequence();
             sequence.SetDelay(delay);
-            sequence.Append(cell.transform.DOScale(Vector3.one * 1.2f, _clearDuration * 0.3f).SetEase(Ease.OutQuad));
-            sequence.Append(cell.transform.DOScale(Vector3.zero, _clearDuration * 0.7f).SetEase(Ease.InBack));
+            sequence.Append(cell.transform.DOScale(Vector3.one * 1.2f, _config.ClearDuration * 0.3f).SetEase(Ease.OutQuad));
+            sequence.Append(cell.transform.DOScale(Vector3.zero, _config.ClearDuration * 0.7f).SetEase(Ease.InBack));
             sequence.OnComplete(() =>
             {
                 cell.transform.localScale = Vector3.one;
@@ -176,15 +157,15 @@ public class FeedbackManager : MonoBehaviour
             });
         }
 
-        ShakeScreen(_shakeStrength, _shakeDuration);
+        ShakeScreen(_config.ShakeStrength, _config.ShakeDuration);
     }
 
     // === GAME OVER ===
 
     public void PlayGameOverEffect(System.Action onComplete)
     {
-        ShakeScreen(_shakeStrength * 2f, _shakeDuration * 2f);
-        DOVirtual.DelayedCall(_shakeDuration * 2f, () => onComplete?.Invoke());
+        ShakeScreen(_config.ShakeStrength * 2f, _config.ShakeDuration * 2f);
+        DOVirtual.DelayedCall(_config.ShakeDuration * 2f, () => onComplete?.Invoke());
     }
 
     // === PIECE PICKUP ===
@@ -202,7 +183,7 @@ public class FeedbackManager : MonoBehaviour
 
         _shakeTarget.DOKill(true);
         _shakeTarget.anchoredPosition = _shakeOriginalPos;
-        _shakeTarget.DOShakeAnchorPos(duration, strength, _shakeVibrato, 90f, false, true, ShakeRandomnessMode.Harmonic)
+        _shakeTarget.DOShakeAnchorPos(duration, strength, _config.ShakeVibrato, 90f, false, true, ShakeRandomnessMode.Harmonic)
             .OnComplete(() => _shakeTarget.anchoredPosition = _shakeOriginalPos);
     }
 }

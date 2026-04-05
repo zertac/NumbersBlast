@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 882edc27c6f22c5458b8f2bfa044b526, type: 3}
+  m_Name: AudioConfig
+  m_EditorClassIdentifier: Assembly-CSharp::AudioConfig
+  MenuMusic: {fileID: 8300000, guid: 46335a13975e0014986e8ac4857bbf3c, type: 3}
+  GameplayMusic: {fileID: 8300000, guid: f1a184c668c7f02469e57b42a9401531, type: 3}
+  MusicVolume: 0.5
+  ButtonClick: {fileID: 8300000, guid: 595543cd52e614a4b94831d2d6a01e90, type: 3}
+  PopupOpen: {fileID: 8300000, guid: 8349471e9ebf69443b9c0083467a18fe, type: 3}
+  PopupClose: {fileID: 8300000, guid: d3ac62416d209e14187b26d8efe88be8, type: 3}
+  PiecePickup: {fileID: 8300000, guid: c9b554e6e443684409d943e08d0f7e8c, type: 3}
+  PiecePlace: {fileID: 8300000, guid: 11c4970cecbb4394d8bea7197bc3a638, type: 3}
+  PieceReturn: {fileID: 8300000, guid: 8b90ee0b2e6b6424ea2c9744ea62cdfe, type: 3}
+  Merge: {fileID: 8300000, guid: aaac1208d904d02489027f95a2f8d46b, type: 3}
+  LineClear: {fileID: 8300000, guid: e215cba77fd21444e9c9f89767421ad6, type: 3}
+  ScoreUp: {fileID: 8300000, guid: c9a17d1e23ed87d4ab1700b66018d7ec, type: 3}
+  GameOver: {fileID: 8300000, guid: 474abd680b1b5ff4ebff628616621801, type: 3}
+  GameStart: {fileID: 8300000, guid: f6f8d1b2eade32b44981a5167e6bbdaf, type: 3}
+  NewPiecesSpawn: {fileID: 8300000, guid: 0f6671f51bbd6254a800d3c3794b4634, type: 3}
+  TutorialStep: {fileID: 8300000, guid: a8bb2b8aa4c81204d8305fb009470374, type: 3}
+  TutorialComplete: {fileID: 8300000, guid: 4c702de27205b8944b3db968606debfb, type: 3}
+  SFXVolume: 1

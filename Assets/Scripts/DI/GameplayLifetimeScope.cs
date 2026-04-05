@@ -10,9 +10,10 @@ public class GameplayLifetimeScope : LifetimeScope
     [SerializeField] private ScoreUI _scoreUI;
     [SerializeField] private TutorialOverlay _tutorialOverlay;
     [SerializeField] private TutorialConfig _tutorialConfig;
-    [SerializeField] private FeedbackManager _feedbackManager;
+    [SerializeField] private FeedbackConfig _feedbackConfig;
     [SerializeField] private UIConfig _uiConfig;
     [SerializeField] private Transform _popupContainer;
+    [SerializeField] private AudioConfig _audioConfig;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -21,13 +22,18 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterInstance(_pieceTray);
         builder.RegisterInstance(_scoreUI);
         builder.RegisterInstance(_tutorialOverlay);
-        builder.RegisterInstance(_feedbackManager);
         builder.RegisterInstance(_tutorialConfig);
+        builder.RegisterInstance(_feedbackConfig);
 
+        if (_audioConfig != null)
+            builder.RegisterInstance(_audioConfig);
+
+        builder.Register<AudioManager>(Lifetime.Singleton);
         builder.Register<UIManager>(Lifetime.Singleton)
             .WithParameter("popupContainer", _popupContainer)
             .WithParameter("config", _uiConfig);
 
+        builder.Register<FeedbackManager>(Lifetime.Singleton);
         builder.Register<GameStateManager>(Lifetime.Singleton);
         builder.Register<BoardManager>(Lifetime.Singleton);
         builder.Register<MergeResolver>(Lifetime.Singleton);
