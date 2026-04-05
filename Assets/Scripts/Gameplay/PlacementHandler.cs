@@ -93,9 +93,12 @@ public class PlacementHandler
 
             _feedbackManager.PlayLineClearEffect(clearViews, () =>
             {
+                if (_gameStateManager.CurrentState == GameState.GameOver) return;
+
                 _boardView.RefreshAll();
                 CheckGameOver();
-                if (_gameStateManager.CurrentState != GameState.GameOver)
+                if (_gameStateManager.CurrentState != GameState.GameOver
+                    && _gameStateManager.CurrentState != GameState.Paused)
                 {
                     _gameStateManager.TransitionTo(GameState.Idle);
                     OnPlacementComplete?.Invoke();

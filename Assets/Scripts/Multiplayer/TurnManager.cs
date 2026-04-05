@@ -9,6 +9,7 @@ public class TurnManager
     private float _turnTimer;
     private bool _isActive;
     private bool _isPlayerTurn;
+    private bool _turnEnded;
     private MonoBehaviour _coroutineRunner;
 
     public bool IsActive => _isActive;
@@ -63,6 +64,7 @@ public class TurnManager
 
         _isPlayerTurn = true;
         _turnTimer = _config.TurnDuration;
+        _turnEnded = false;
 
         if (_gameStateManager.CurrentState != GameState.Idle)
             _gameStateManager.TransitionTo(GameState.Idle);
@@ -77,6 +79,7 @@ public class TurnManager
 
         _isPlayerTurn = false;
         _turnTimer = _config.TurnDuration;
+        _turnEnded = false;
         _gameStateManager.TransitionTo(GameState.Processing);
         OnOpponentTurnStart?.Invoke();
     }
@@ -84,6 +87,10 @@ public class TurnManager
     public void EndCurrentTurn()
     {
         if (!_isActive) return;
+        if (_turnEnded) return;
+        if (_gameStateManager.CurrentState == GameState.GameOver) return;
+
+        _turnEnded = true;
 
         if (_isPlayerTurn)
             StartOpponentTurn();
