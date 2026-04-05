@@ -6,6 +6,8 @@ namespace NumbersBlast.Audio
 {
     public class AudioManager
     {
+        // Static instance for MonoBehaviour access (UIButton, SettingsPopup) where DI injection is not available.
+        // All pure C# classes should receive AudioManager via constructor injection.
         private static AudioManager _instance;
         private static GameObject _audioGo;
 
