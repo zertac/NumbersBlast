@@ -19,6 +19,9 @@ public class BoardManager
 
     public void Initialize()
     {
+        if (_config == null) { Debug.LogError("[BoardManager] BoardConfig is null!"); return; }
+        if (_view == null) { Debug.LogError("[BoardManager] BoardView is null!"); return; }
+
         _model = new BoardModel(_config.Rows, _config.Columns);
         _view.Initialize(_model, _config);
     }

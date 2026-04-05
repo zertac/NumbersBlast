@@ -18,6 +18,11 @@ public class AudioManager
 
     public AudioManager(AudioConfig config)
     {
+        if (config == null)
+        {
+            Debug.LogError("[AudioManager] AudioConfig is null!");
+            return;
+        }
         _config = config;
 
         _musicEnabled = PlayerPrefs.GetInt(GameConstants.MusicEnabledKey, 1) == 1;
