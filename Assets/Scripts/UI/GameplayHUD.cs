@@ -27,14 +27,12 @@ public class GameplayHUD : MonoBehaviour
     private void OnPause()
     {
         _gameStateManager.Pause();
-        _uiManager.ShowPopup(PopupType.Pause);
-
-        var pausePopup = _uiManager.GetPopup<PausePopup>(PopupType.Pause);
+        var pausePopup = _uiManager.ShowPopup<PausePopup>();
         pausePopup?.SetGameStateManager(_gameStateManager);
     }
 
     private void OnSettings()
     {
-        _uiManager.ShowPopup(PopupType.Settings);
+        _uiManager.ShowPopup<SettingsPopup>();
     }
 }

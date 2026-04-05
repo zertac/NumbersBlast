@@ -181,8 +181,7 @@ public class TutorialManager
 
         _overlay.Hide();
 
-        _uiManager.ShowPopup(PopupType.TutorialFeedback);
-        var feedbackPopup = _uiManager.GetPopup<TutorialFeedbackPopup>(PopupType.TutorialFeedback);
+        var feedbackPopup = _uiManager.ShowPopup<TutorialFeedbackPopup>();
         feedbackPopup.ShowWithMessage(title, desc, () =>
         {
             _currentStepIndex++;

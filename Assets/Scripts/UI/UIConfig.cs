@@ -6,11 +6,12 @@ public class UIConfig : ScriptableObject
 {
     public PopupEntry[] Popups;
 
-    public GameObject GetPopupPrefab(PopupType type)
+    public GameObject GetPopupPrefab<T>() where T : BasePopup
     {
+        var targetType = typeof(T);
         for (int i = 0; i < Popups.Length; i++)
         {
-            if (Popups[i].Type == type)
+            if (Popups[i].Prefab != null && Popups[i].Prefab.GetComponent<T>() != null)
                 return Popups[i].Prefab;
         }
         return null;
@@ -20,6 +21,5 @@ public class UIConfig : ScriptableObject
 [Serializable]
 public struct PopupEntry
 {
-    public PopupType Type;
     public GameObject Prefab;
 }

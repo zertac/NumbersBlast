@@ -42,6 +42,8 @@ public class TurnManager
     public void Tick(float deltaTime)
     {
         if (!_isActive) return;
+        // Timer runs even during pause for realism
+        if (_gameStateManager.CurrentState == GameState.GameOver) return;
 
         _turnTimer -= deltaTime;
         OnTimerTick?.Invoke(TurnTimeNormalized);

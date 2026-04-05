@@ -79,10 +79,12 @@ public class MultiplayerManager
     private void HandleOpponentTurnStart()
     {
         _isScoreForPlayer = false;
+        _isProcessingAITurn = true;
         _hud.SetOpponentTurn();
 
         _visualPlayer.PerformTurn(() =>
         {
+            _isProcessingAITurn = false;
             if (_isActive)
                 _turnManager.EndCurrentTurn();
         });
@@ -111,14 +113,14 @@ public class MultiplayerManager
             _hud.AddOpponentScore(points);
     }
 
+    private bool _isProcessingAITurn;
+
     private void HandlePlacementComplete()
     {
         if (!_isActive) return;
+        if (_isProcessingAITurn) return;
 
-        if (_turnManager.IsPlayerTurn)
-        {
-            _turnManager.EndCurrentTurn();
-        }
+        _turnManager.EndCurrentTurn();
     }
 
     public string GetWinner()

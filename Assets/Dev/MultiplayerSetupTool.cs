@@ -98,12 +98,12 @@ public static class MultiplayerSetupTool
         // Check if already added
         for (int i = 0; i < config.Popups.Length; i++)
         {
-            if (config.Popups[i].Type == PopupType.OpponentSearch) return;
+            if (config.Popups[i].Prefab != null && config.Popups[i].Prefab.GetComponent<OpponentSearchPopup>() != null) return;
         }
 
         var newPopups = new PopupEntry[config.Popups.Length + 1];
         config.Popups.CopyTo(newPopups, 0);
-        newPopups[config.Popups.Length] = new PopupEntry { Type = PopupType.OpponentSearch, Prefab = searchPrefab };
+        newPopups[config.Popups.Length] = new PopupEntry { Prefab = searchPrefab };
         config.Popups = newPopups;
         EditorUtility.SetDirty(config);
     }

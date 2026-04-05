@@ -29,6 +29,7 @@ public class GameStateManager
             (GameState.Dragging, GameState.Processing) => true,
             (GameState.Processing, GameState.Idle) => true,
             (GameState.Processing, GameState.GameOver) => true,
+            (GameState.Processing, GameState.Paused) => true,
             (GameState.Paused, GameState.Idle) => true,
             (GameState.Paused, GameState.Tutorial) => true,
             (GameState.Tutorial, GameState.Dragging) => true,

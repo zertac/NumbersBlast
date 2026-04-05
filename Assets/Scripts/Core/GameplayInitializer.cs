@@ -111,8 +111,7 @@ public class GameplayInitializer : IStartable
             new OpponentAI(_multiplayerConfig), _config);
 
         // Show search popup
-        _uiManager.ShowPopup(PopupType.OpponentSearch);
-        var searchPopup = _uiManager.GetPopup<OpponentSearchPopup>(PopupType.OpponentSearch);
+        var searchPopup = _uiManager.ShowPopup<OpponentSearchPopup>();
         searchPopup?.StartSearch(_multiplayerConfig,
             onFound: () =>
             {
@@ -134,7 +133,7 @@ public class GameplayInitializer : IStartable
     private void HandlePopupOpened()
     {
         _audioManager.PlayPopupOpen();
-        var settingsPopup = _uiManager.GetPopup<SettingsPopup>(PopupType.Settings);
+        var settingsPopup = _uiManager.GetPopup<SettingsPopup>();
         if (settingsPopup != null)
             settingsPopup.SetAudioManager(_audioManager);
     }
@@ -147,15 +146,13 @@ public class GameplayInitializer : IStartable
         {
             _multiplayerManager.Stop();
             string result = _multiplayerManager.GetWinner();
-            _uiManager.ShowPopup(PopupType.GameOver);
-            var gameOverUI = _uiManager.GetPopup<GameOverUI>(PopupType.GameOver);
+            var gameOverUI = _uiManager.ShowPopup<GameOverUI>();
             if (gameOverUI != null)
                 gameOverUI.SetScore(_multiplayerHUD.PlayerScore);
         }
         else
         {
-            _uiManager.ShowPopup(PopupType.GameOver);
-            var gameOverUI = _uiManager.GetPopup<GameOverUI>(PopupType.GameOver);
+            var gameOverUI = _uiManager.ShowPopup<GameOverUI>();
             if (gameOverUI != null)
                 gameOverUI.SetScore(_scoreUI.GetScore());
         }

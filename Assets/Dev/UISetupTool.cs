@@ -198,10 +198,10 @@ public static class UISetupTool
 
         config.Popups = new PopupEntry[]
         {
-            new() { Type = PopupType.GameOver, Prefab = gameOverPrefab },
-            new() { Type = PopupType.TutorialFeedback, Prefab = tutorialPrefab },
-            new() { Type = PopupType.Settings, Prefab = settingsPrefab },
-            new() { Type = PopupType.Pause, Prefab = pausePrefab }
+            new() { Prefab = gameOverPrefab },
+            new() { Prefab = tutorialPrefab },
+            new() { Prefab = settingsPrefab },
+            new() { Prefab = pausePrefab }
         };
 
         AssetDatabase.CreateAsset(config, path);

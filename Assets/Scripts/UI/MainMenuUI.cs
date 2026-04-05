@@ -71,9 +71,9 @@ public class MainMenuUI : MonoBehaviour
     private void OnSettings()
     {
         _audioManager?.PlayButtonClick();
-        _uiManager.ShowPopup(PopupType.Settings);
+        _uiManager.ShowPopup<SettingsPopup>();
 
-        var settingsPopup = _uiManager.GetPopup<SettingsPopup>(PopupType.Settings);
+        var settingsPopup = _uiManager.GetPopup<SettingsPopup>();
         if (settingsPopup != null)
             settingsPopup.SetAudioManager(_audioManager);
     }

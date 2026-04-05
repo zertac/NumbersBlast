@@ -157,7 +157,8 @@ public class OpponentVisualPlayer : MonoBehaviour
         if (selectedPiece != null && selectedPiece.gameObject != null)
             GameEvents.PiecePlaced(selectedPiece, finalMove.BoardPosition);
 
-        yield return new WaitForSeconds(0.5f);
+        // Wait for placement processing to complete
+        yield return new WaitForSeconds(1.5f);
 
         _selectedPiece = null;
         _onMoveComplete?.Invoke();
