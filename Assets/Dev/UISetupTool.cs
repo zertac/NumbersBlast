@@ -23,6 +23,7 @@ public static class UISetupTool
 
         CreateGameOverPrefab();
         CreateTutorialFeedbackPrefab();
+        CreateSettingsPrefab();
         CreateUIConfig();
         SetupPopupContainer();
 
@@ -104,6 +105,62 @@ public static class UISetupTool
         Object.DestroyImmediate(root);
     }
 
+    private static void CreateSettingsPrefab()
+    {
+        var path = PrefabPath + "/SettingsPopup.prefab";
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null) return;
+
+        var root = CreatePopupRoot("SettingsPopup");
+        var content = CreatePopupContent(root.transform);
+        content.GetComponent<RectTransform>().sizeDelta = new Vector2(500, 450);
+
+        var title = CreateText(content.transform, "Title", "SETTINGS", 48, FontStyles.Bold);
+        SetAnchors(title, 0, 0.82f, 1, 1);
+
+        var musicBtn = CreateToggleButton(content.transform, "MusicToggle", "Music: ON", 0.1f, 0.58f, 0.9f, 0.75f);
+        var sfxBtn = CreateToggleButton(content.transform, "SFXToggle", "SFX: ON", 0.1f, 0.38f, 0.9f, 0.55f);
+        var hapticBtn = CreateToggleButton(content.transform, "HapticToggle", "Haptic: ON", 0.1f, 0.18f, 0.9f, 0.35f);
+        var closeBtn = CreateButton(content.transform, "CloseButton", "CLOSE", 0.2f, 0.02f, 0.8f, 0.15f);
+
+        var settingsPopup = root.AddComponent<SettingsPopup>();
+        var so = new SerializedObject(settingsPopup);
+        so.FindProperty("_dimBackground").objectReferenceValue = root.transform.Find("DimBackground").GetComponent<Image>();
+        so.FindProperty("_content").objectReferenceValue = content.GetComponent<RectTransform>();
+        so.FindProperty("_musicToggle").objectReferenceValue = musicBtn.GetComponent<Button>();
+        so.FindProperty("_sfxToggle").objectReferenceValue = sfxBtn.GetComponent<Button>();
+        so.FindProperty("_hapticToggle").objectReferenceValue = hapticBtn.GetComponent<Button>();
+        so.FindProperty("_closeButton").objectReferenceValue = closeBtn.GetComponent<Button>();
+        so.FindProperty("_musicLabel").objectReferenceValue = musicBtn.GetComponentInChildren<TextMeshProUGUI>();
+        so.FindProperty("_sfxLabel").objectReferenceValue = sfxBtn.GetComponentInChildren<TextMeshProUGUI>();
+        so.FindProperty("_hapticLabel").objectReferenceValue = hapticBtn.GetComponentInChildren<TextMeshProUGUI>();
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        PrefabUtility.SaveAsPrefabAsset(root, path);
+        Object.DestroyImmediate(root);
+    }
+
+    private static GameObject CreateToggleButton(Transform parent, string name, string text, float minX, float minY, float maxX, float maxY)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+        go.transform.SetParent(parent, false);
+        SetAnchors(go, minX, minY, maxX, maxY);
+        go.GetComponent<Image>().color = new Color(0.25f, 0.25f, 0.4f);
+
+        var textGo = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+        textGo.transform.SetParent(go.transform, false);
+        var textRect = textGo.GetComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.sizeDelta = Vector2.zero;
+        var tmp = textGo.GetComponent<TextMeshProUGUI>();
+        tmp.text = text;
+        tmp.fontSize = 28;
+        tmp.alignment = TextAlignmentOptions.Center;
+        tmp.color = Color.white;
+
+        return go;
+    }
+
     private static void CreateUIConfig()
     {
         var path = SOPath + "/UIConfig.asset";
@@ -113,11 +170,13 @@ public static class UISetupTool
 
         var gameOverPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath + "/GameOverPopup.prefab");
         var tutorialPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath + "/TutorialFeedbackPopup.prefab");
+        var settingsPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath + "/SettingsPopup.prefab");
 
         config.Popups = new PopupEntry[]
         {
             new() { Type = PopupType.GameOver, Prefab = gameOverPrefab },
-            new() { Type = PopupType.TutorialFeedback, Prefab = tutorialPrefab }
+            new() { Type = PopupType.TutorialFeedback, Prefab = tutorialPrefab },
+            new() { Type = PopupType.Settings, Prefab = settingsPrefab }
         };
 
         AssetDatabase.CreateAsset(config, path);

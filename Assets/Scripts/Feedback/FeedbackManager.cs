@@ -82,6 +82,7 @@ public class FeedbackManager
         }
 
         ShakeScreen(_config.ShakeStrength * 0.5f, _config.ShakeDuration * 0.5f);
+        HapticManager.Light();
     }
 
     // === MERGE ===
@@ -94,6 +95,7 @@ public class FeedbackManager
         _hoverPulseTween?.Kill();
         _shakeTarget.DOScale(Vector3.one, 0.05f).SetEase(Ease.OutQuad);
         ShakeScreen(_config.ShakeStrength * 0.6f, _config.ShakeDuration * 0.5f);
+        HapticManager.Medium();
 
         for (int i = 0; i < absorbedCells.Length; i++)
         {
@@ -122,6 +124,7 @@ public class FeedbackManager
     public void PlayChainMergeSmash(CellView targetCell)
     {
         ShakeScreen(_config.ShakeStrength * 0.8f, _config.ShakeDuration * 0.6f);
+        HapticManager.Medium();
 
         targetCell.Refresh();
 
@@ -158,6 +161,7 @@ public class FeedbackManager
         }
 
         ShakeScreen(_config.ShakeStrength, _config.ShakeDuration);
+        HapticManager.Heavy();
     }
 
     // === GAME OVER ===
@@ -165,6 +169,7 @@ public class FeedbackManager
     public void PlayGameOverEffect(System.Action onComplete)
     {
         ShakeScreen(_config.ShakeStrength * 2f, _config.ShakeDuration * 2f);
+        HapticManager.Heavy();
         DOVirtual.DelayedCall(_config.ShakeDuration * 2f, () => onComplete?.Invoke());
     }
 

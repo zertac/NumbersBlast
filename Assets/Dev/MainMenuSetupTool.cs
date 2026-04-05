@@ -18,6 +18,7 @@ public static class MainMenuSetupTool
         var camera = cameraGo.AddComponent<Camera>();
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = new Color(0.12f, 0.12f, 0.25f);
+        cameraGo.AddComponent<AudioListener>();
         cameraGo.tag = "MainCamera";
 
         // Canvas
@@ -81,12 +82,26 @@ public static class MainMenuSetupTool
         var settingsBtn = CreateButton(buttonsGo.transform, "SettingsButton", "SETTINGS", new Color(0.4f, 0.5f, 0.8f), 70);
         var exitBtn = CreateButton(buttonsGo.transform, "ExitButton", "EXIT", new Color(0.7f, 0.35f, 0.35f), 70);
 
+        // Popup container
+        var popupContainerGo = new GameObject("PopupContainer", typeof(RectTransform));
+        popupContainerGo.transform.SetParent(canvasGo.transform, false);
+        popupContainerGo.transform.SetAsLastSibling();
+        var pcRect = popupContainerGo.GetComponent<RectTransform>();
+        pcRect.anchorMin = Vector2.zero;
+        pcRect.anchorMax = Vector2.one;
+        pcRect.sizeDelta = Vector2.zero;
+
         // MainMenuUI
+        var uiConfig = AssetDatabase.LoadAssetAtPath<UIConfig>("Assets/ScriptableObjects/UIConfig.asset");
+        var audioConfig = AssetDatabase.LoadAssetAtPath<AudioConfig>("Assets/ScriptableObjects/AudioConfig.asset");
         var menuUI = canvasGo.AddComponent<MainMenuUI>();
         var so = new SerializedObject(menuUI);
         so.FindProperty("_playButton").objectReferenceValue = playBtn.GetComponent<Button>();
         so.FindProperty("_settingsButton").objectReferenceValue = settingsBtn.GetComponent<Button>();
         so.FindProperty("_exitButton").objectReferenceValue = exitBtn.GetComponent<Button>();
+        so.FindProperty("_uiConfig").objectReferenceValue = uiConfig;
+        so.FindProperty("_audioConfig").objectReferenceValue = audioConfig;
+        so.FindProperty("_popupContainer").objectReferenceValue = popupContainerGo.transform;
         so.ApplyModifiedPropertiesWithoutUndo();
 
         // Save scene

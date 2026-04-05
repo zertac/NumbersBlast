@@ -54,9 +54,10 @@ public class GameplayInitializer : IStartable
         GameEvents.OnPieceReleased += _ => _audioManager.PlayPieceReturn();
         GameEvents.OnScoreChanged += _ => _audioManager.PlayScoreUp();
         GameEvents.OnTrayRefilled += () => _audioManager.PlayNewPiecesSpawn();
-        GameEvents.OnPopupOpened += () => _audioManager.PlayPopupOpen();
+        GameEvents.OnPopupOpened += HandlePopupOpened;
         GameEvents.OnPopupClosed += () => _audioManager.PlayPopupClose();
 
+        _audioManager.StopMusic();
         _audioManager.PlayGameplayMusic();
         _audioManager.PlayGameStart();
 
@@ -70,6 +71,14 @@ public class GameplayInitializer : IStartable
             _gameStateManager.Initialize(GameState.Idle);
             _pieceTray.SpawnPieces();
         }
+    }
+
+    private void HandlePopupOpened()
+    {
+        _audioManager.PlayPopupOpen();
+        var settingsPopup = _uiManager.GetPopup<SettingsPopup>(PopupType.Settings);
+        if (settingsPopup != null)
+            settingsPopup.SetAudioManager(_audioManager);
     }
 
     private void HandleGameOver()
