@@ -4,46 +4,43 @@ using VContainer.Unity;
 
 public class GameplayInitializer : IStartable
 {
+    // Core - constructor inject
     private readonly BoardManager _boardManager;
-    private readonly PieceTray _pieceTray;
     private readonly BoardConfig _config;
     private readonly BoardView _boardView;
     private readonly PlacementHandler _placementHandler;
-    private readonly ScoreUI _scoreUI;
-    private readonly UIManager _uiManager;
-    private readonly TutorialManager _tutorialManager;
-    private readonly FeedbackManager _feedbackManager;
     private readonly GameStateManager _gameStateManager;
+    private readonly UIManager _uiManager;
     private readonly AudioManager _audioManager;
-    private readonly GameplayHUD _gameplayHUD;
-    private readonly MultiplayerManager _multiplayerManager;
-    private readonly OpponentVisualPlayer _opponentVisualPlayer;
-    private readonly MultiplayerConfig _multiplayerConfig;
-    private readonly MultiplayerHUD _multiplayerHUD;
+    private readonly FeedbackManager _feedbackManager;
+
+    // UI - property inject
+    [Inject] private PieceTray _pieceTray;
+    [Inject] private ScoreUI _scoreUI;
+    [Inject] private GameplayHUD _gameplayHUD;
+
+    // Tutorial - property inject
+    [Inject] private TutorialManager _tutorialManager;
+
+    // Multiplayer - property inject
+    [Inject] private MultiplayerManager _multiplayerManager;
+    [Inject] private OpponentVisualPlayer _opponentVisualPlayer;
+    [Inject] private MultiplayerConfig _multiplayerConfig;
+    [Inject] private MultiplayerHUD _multiplayerHUD;
 
     [Inject]
-    public GameplayInitializer(BoardManager boardManager, PieceTray pieceTray, BoardConfig config,
-        BoardView boardView, PlacementHandler placementHandler, ScoreUI scoreUI, UIManager uiManager,
-        TutorialManager tutorialManager, FeedbackManager feedbackManager, GameStateManager gameStateManager,
-        AudioManager audioManager, GameplayHUD gameplayHUD, MultiplayerManager multiplayerManager,
-        OpponentVisualPlayer opponentVisualPlayer, MultiplayerConfig multiplayerConfig, MultiplayerHUD multiplayerHUD)
+    public GameplayInitializer(BoardManager boardManager, BoardConfig config, BoardView boardView,
+        PlacementHandler placementHandler, GameStateManager gameStateManager, UIManager uiManager,
+        AudioManager audioManager, FeedbackManager feedbackManager)
     {
         _boardManager = boardManager;
-        _pieceTray = pieceTray;
         _config = config;
         _boardView = boardView;
         _placementHandler = placementHandler;
-        _scoreUI = scoreUI;
-        _uiManager = uiManager;
-        _tutorialManager = tutorialManager;
-        _feedbackManager = feedbackManager;
         _gameStateManager = gameStateManager;
+        _uiManager = uiManager;
         _audioManager = audioManager;
-        _gameplayHUD = gameplayHUD;
-        _multiplayerManager = multiplayerManager;
-        _opponentVisualPlayer = opponentVisualPlayer;
-        _multiplayerConfig = multiplayerConfig;
-        _multiplayerHUD = multiplayerHUD;
+        _feedbackManager = feedbackManager;
     }
 
     public void Start()
@@ -55,7 +52,11 @@ public class GameplayInitializer : IStartable
         var canvas = _boardView.GetComponentInParent<Canvas>();
         float cellSize = _boardManager.GetCellSize();
 
-        _pieceTray.Initialize(_config, cellSize, canvas, _boardView, _boardManager, _tutorialManager, _feedbackManager, _gameStateManager);
+        bool isMultiplayer = GameModeHolder.CurrentMode == GameMode.Multiplayer;
+
+        _pieceTray.Initialize(_config, cellSize, canvas, _boardView, _boardManager,
+            isMultiplayer ? null : _tutorialManager, _feedbackManager, _gameStateManager);
+
         _feedbackManager.Initialize(_boardView.GetComponent<RectTransform>());
         _gameplayHUD.Initialize(_uiManager, _gameStateManager);
         _placementHandler.Enable();
@@ -73,16 +74,10 @@ public class GameplayInitializer : IStartable
         _audioManager.PlayGameplayMusic();
         _audioManager.PlayGameStart();
 
-        bool isMultiplayer = GameModeHolder.CurrentMode == GameMode.Multiplayer;
-
         if (isMultiplayer)
-        {
             StartMultiplayer();
-        }
         else
-        {
             StartSinglePlayer();
-        }
     }
 
     private void StartSinglePlayer()
@@ -110,7 +105,6 @@ public class GameplayInitializer : IStartable
         _opponentVisualPlayer.Initialize(_multiplayerConfig, _boardView, _pieceTray, _boardManager,
             new OpponentAI(_multiplayerConfig), _config);
 
-        // Show search popup
         var searchPopup = _uiManager.ShowPopup<OpponentSearchPopup>();
         searchPopup?.StartSearch(_multiplayerConfig,
             onFound: () =>
@@ -145,7 +139,6 @@ public class GameplayInitializer : IStartable
         if (GameModeHolder.CurrentMode == GameMode.Multiplayer)
         {
             _multiplayerManager.Stop();
-            string result = _multiplayerManager.GetWinner();
             var gameOverUI = _uiManager.ShowPopup<GameOverUI>();
             if (gameOverUI != null)
                 gameOverUI.SetScore(_multiplayerHUD.PlayerScore);
