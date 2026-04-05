@@ -50,9 +50,7 @@ namespace NumbersBlast.DI
                 .WithParameter("popupContainer", _popupContainer)
                 .WithParameter("config", _uiConfig);
 
-            // AudioManager: only register if not already provided by ProjectLifetimeScope
-            if (AudioManager.Instance == null)
-                builder.Register<AudioManager>(Lifetime.Singleton);
+            builder.Register<AudioManager>(Lifetime.Singleton);
             builder.Register<FeedbackManager>(Lifetime.Singleton);
             builder.Register<GameStateManager>(Lifetime.Singleton);
             builder.Register<BoardManager>(Lifetime.Singleton);

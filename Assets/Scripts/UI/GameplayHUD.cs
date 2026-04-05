@@ -30,7 +30,7 @@ namespace NumbersBlast.UI
 
         private void OnPause()
         {
-            bool isMultiplayer = GameModeHolder.CurrentMode == GameMode.Multiplayer;
+            bool isMultiplayer = GameModeHolder.Instance.CurrentMode == GameMode.Multiplayer;
 
             // Multiplayer: just show popup, game continues in background
             // Single player: pause game state

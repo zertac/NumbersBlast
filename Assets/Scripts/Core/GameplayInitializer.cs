@@ -64,7 +64,7 @@ namespace NumbersBlast.Core
             var canvas = _boardView.GetComponentInParent<Canvas>();
             float cellSize = _boardManager.GetCellSize();
 
-            bool isMultiplayer = GameModeHolder.CurrentMode == GameMode.Multiplayer;
+            bool isMultiplayer = GameModeHolder.Instance.CurrentMode == GameMode.Multiplayer;
 
             _pieceTray.Initialize(_config, cellSize, canvas, _boardView, _boardManager,
                 isMultiplayer ? null : _tutorialManager, _feedbackManager, _gameStateManager);
@@ -175,7 +175,7 @@ namespace NumbersBlast.Core
         {
             _audioManager.PlayGameOver();
 
-            if (GameModeHolder.CurrentMode == GameMode.Multiplayer)
+            if (GameModeHolder.Instance.CurrentMode == GameMode.Multiplayer)
             {
                 _multiplayerManager.Stop();
                 var gameOverUI = _uiManager.ShowPopup<GameOverUI>();

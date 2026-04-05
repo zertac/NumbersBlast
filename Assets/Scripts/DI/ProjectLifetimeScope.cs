@@ -3,6 +3,7 @@ using VContainer;
 using VContainer.Unity;
 using NumbersBlast.Audio;
 using NumbersBlast.Data;
+using NumbersBlast.Multiplayer;
 
 namespace NumbersBlast.DI
 {
@@ -16,6 +17,7 @@ namespace NumbersBlast.DI
                 builder.RegisterInstance(_audioConfig);
 
             builder.Register<AudioManager>(Lifetime.Singleton);
+            builder.Register<GameModeHolder>(Lifetime.Singleton);
         }
     }
 }

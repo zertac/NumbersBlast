@@ -7,7 +7,7 @@ namespace NumbersBlast.Board
     public class BoardView : MonoBehaviour
     {
         private const float FallbackBoardWidth = 832f;
-        [SerializeField] private GameObject _cellPrefab;
+        [SerializeField] private CellView _cellPrefab;
         [SerializeField] private GridLayoutGroup _gridLayout;
         [SerializeField] private RectTransform _boardRect;
 
@@ -101,10 +101,8 @@ namespace NumbersBlast.Board
             {
                 for (int c = 0; c < model.Columns; c++)
                 {
-                    var cellGo = Instantiate(_cellPrefab, _gridLayout.transform);
-                    cellGo.name = $"Cell_{r}_{c}";
-
-                    var cellView = cellGo.GetComponent<CellView>();
+                    var cellView = Instantiate(_cellPrefab, _gridLayout.transform);
+                    cellView.name = $"Cell_{r}_{c}";
                     cellView.Initialize(model.GetCell(r, c), config.Theme);
                     _cellViews[r, c] = cellView;
                 }

@@ -47,32 +47,44 @@ namespace NumbersBlast.Tutorial
 
         public int GetBoardValue(int row, int col)
         {
-            return BoardCellValues[row * BoardColumns + col];
+            int index = row * BoardColumns + col;
+            if (index < 0 || index >= BoardCellValues.Length) return 0;
+            return BoardCellValues[index];
         }
 
         public void SetBoardValue(int row, int col, int value)
         {
-            BoardCellValues[row * BoardColumns + col] = value;
+            int index = row * BoardColumns + col;
+            if (index < 0 || index >= BoardCellValues.Length) return;
+            BoardCellValues[index] = value;
         }
 
         public bool GetPieceCell(int row, int col)
         {
-            return PieceCells[row * PieceColumns + col];
+            int index = row * PieceColumns + col;
+            if (index < 0 || index >= PieceCells.Length) return false;
+            return PieceCells[index];
         }
 
         public void SetPieceCell(int row, int col, bool active)
         {
-            PieceCells[row * PieceColumns + col] = active;
+            int index = row * PieceColumns + col;
+            if (index < 0 || index >= PieceCells.Length) return;
+            PieceCells[index] = active;
         }
 
         public int GetPieceValue(int row, int col)
         {
-            return PieceValues[row * PieceColumns + col];
+            int index = row * PieceColumns + col;
+            if (index < 0 || index >= PieceValues.Length) return 0;
+            return PieceValues[index];
         }
 
         public void SetPieceValue(int row, int col, int value)
         {
-            PieceValues[row * PieceColumns + col] = value;
+            int index = row * PieceColumns + col;
+            if (index < 0 || index >= PieceValues.Length) return;
+            PieceValues[index] = value;
         }
 
         public Vector2Int[] GetPieceNormalizedPositions()

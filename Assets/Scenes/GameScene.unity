@@ -452,7 +452,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be1a8204ada3fd947a05a2e5d442ca4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoardView
-  _cellPrefab: {fileID: 5283431290121348085, guid: 1d0db0f07c12f354db75c249477802a4, type: 3}
+  _cellPrefab: {fileID: 4018407061593580661, guid: 1d0db0f07c12f354db75c249477802a4, type: 3}
   _gridLayout: {fileID: 196265773}
   _boardRect: {fileID: 196265772}
   _boardFrame: {fileID: 1862979544}

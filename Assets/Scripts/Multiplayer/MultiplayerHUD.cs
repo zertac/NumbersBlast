@@ -171,10 +171,21 @@ namespace NumbersBlast.Multiplayer
         public int PlayerScore => _playerScore;
         public int OpponentScore => _opponentScore;
 
+        private int _lastDisplayedPlayerScore = -1;
+        private int _lastDisplayedOpponentScore = -1;
+
         private void UpdateScores()
         {
-            _playerScoreText.text = _playerScore.ToString();
-            _opponentScoreText.text = _opponentScore.ToString();
+            if (_playerScore != _lastDisplayedPlayerScore)
+            {
+                _playerScoreText.text = _playerScore.ToString();
+                _lastDisplayedPlayerScore = _playerScore;
+            }
+            if (_opponentScore != _lastDisplayedOpponentScore)
+            {
+                _opponentScoreText.text = _opponentScore.ToString();
+                _lastDisplayedOpponentScore = _opponentScore;
+            }
         }
     }
 }

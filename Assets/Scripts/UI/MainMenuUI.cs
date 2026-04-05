@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using VContainer;
 using NumbersBlast.Audio;
 using NumbersBlast.Core;
-using NumbersBlast.Data;
 using NumbersBlast.Multiplayer;
 
 namespace NumbersBlast.UI
@@ -14,20 +14,12 @@ namespace NumbersBlast.UI
         [SerializeField] private Button _multiplayerButton;
         [SerializeField] private Button _settingsButton;
         [SerializeField] private Button _exitButton;
-        [SerializeField] private UIConfig _uiConfig;
-        [SerializeField] private AudioConfig _audioConfig;
-        [SerializeField] private Transform _popupContainer;
 
-        private UIManager _uiManager;
-        private AudioManager _audioManager;
+        [Inject] private AudioManager _audioManager;
+        [Inject] private UIManager _uiManager;
 
         private void Awake()
         {
-            if (_audioConfig != null)
-                _audioManager = new AudioManager(_audioConfig);
-
-            _uiManager = new UIManager(_uiConfig, _popupContainer);
-
             _playButton.onClick.AddListener(OnPlay);
 
             if (_multiplayerButton != null)
@@ -64,14 +56,14 @@ namespace NumbersBlast.UI
         private void OnPlay()
         {
             _audioManager?.PlayButtonClick();
-            GameModeHolder.CurrentMode = GameMode.SinglePlayer;
+            GameModeHolder.Instance.CurrentMode = GameMode.SinglePlayer;
             SceneManager.LoadScene(GameConstants.GameScene);
         }
 
         private void OnMultiplayer()
         {
             _audioManager?.PlayButtonClick();
-            GameModeHolder.CurrentMode = GameMode.Multiplayer;
+            GameModeHolder.Instance.CurrentMode = GameMode.Multiplayer;
             SceneManager.LoadScene(GameConstants.GameScene);
         }
 

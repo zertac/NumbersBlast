@@ -15,8 +15,6 @@ namespace NumbersBlast.Data
         public string[] FakeNames;
 
         [Header("Opponent Personality")]
-        // TODO: SkillLevel is currently unused. Consider using it to scale MistakeChance or remove this field.
-        [Range(0f, 1f)] public float SkillLevel = 0.7f;
         [Range(0f, 1f)] public float MistakeChance = 0.2f;
         [Range(0f, 1f)] public float HesitationChance = 0.5f;
         [Range(0f, 1f)] public float CancelChance = 0.3f;
