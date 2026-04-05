@@ -53,15 +53,16 @@ namespace NumbersBlast.Gameplay
             DG.Tweening.DOTween.Kill(pieceView.transform);
             Object.Destroy(pieceView.gameObject);
             _pieceTray.RemovePiece(pieceView);
+
+            // Merge (data only, no visual yet)
+            var mergeResult = _mergeResolver.Resolve(model, pieceModel, boardPos);
+
+            // Single refresh after place + merge data is resolved
             _boardView.RefreshAll();
 
             // Place feedback
             var placedCells = GetCellViews(pieceModel, boardPos);
             _feedbackManager.PlayPlaceEffect(placedCells);
-
-            // Merge
-            var mergeResult = _mergeResolver.Resolve(model, pieceModel, boardPos);
-            _boardView.RefreshAll();
 
             // Merge feedback
             for (int i = 0; i < mergeResult.Count; i++)

@@ -38,6 +38,7 @@ namespace NumbersBlast.Input
         private GameStateManager _gameStateManager;
         private readonly List<CellView> _currentMergeHoverCells = new(16);
         private readonly List<CellView> _mergeCellCache = new(16);
+        private Vector2Int? _lastHighlightedPos;
         private readonly HashSet<Vector2Int> _placedSet = new(16);
         private readonly HashSet<Vector2Int> _occupiedAfterPlace = new(64);
 
@@ -102,6 +103,7 @@ namespace NumbersBlast.Input
         {
             if (!_isDragging) return;
             _isDragging = false;
+            _lastHighlightedPos = null;
 
             if (_feedbackManager != null && _currentMergeHoverCells.Count > 0)
             {
@@ -142,9 +144,15 @@ namespace NumbersBlast.Input
 
         private void UpdateBoardHighlight()
         {
-            ClearDragHighlight();
-
             var boardPos = GetBoardPosition();
+
+            // Skip recalculation if hovering same cell
+            if (boardPos.HasValue && _lastHighlightedPos.HasValue && boardPos.Value == _lastHighlightedPos.Value)
+                return;
+
+            ClearDragHighlight();
+            _lastHighlightedPos = boardPos;
+
             if (!boardPos.HasValue) return;
 
             bool canPlace = CanPlace(boardPos.Value);
