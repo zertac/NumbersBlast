@@ -48,7 +48,7 @@ public class MultiplayerHUD : MonoBehaviour
     public void UpdateTimer(float normalized)
     {
         float clamped = Mathf.Clamp01(normalized);
-        _timerBar.rectTransform.anchorMax = new Vector2(clamped, 1f);
+        _timerBar.fillAmount = clamped;
 
         if (clamped < 0.25f)
             _timerBar.color = Color.red;
