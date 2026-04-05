@@ -13,8 +13,9 @@ namespace NumbersBlast.Gameplay
         };
 
         private readonly HashSet<Vector2Int> _placedPositions = new();
+        private readonly List<Vector2Int> _neighborMatches = new(4);
 
-        public List<MergeEvent> Resolve(BoardModel model, PieceModel pieceModel, Vector2Int boardPos, BoardView boardView)
+        public List<MergeEvent> Resolve(BoardModel model, PieceModel pieceModel, Vector2Int boardPos)
         {
             var mergeEvents = new List<MergeEvent>();
             _placedPositions.Clear();
@@ -82,7 +83,8 @@ namespace NumbersBlast.Gameplay
 
         private List<Vector2Int> FindMatchingNeighbors(BoardModel model, Vector2Int pos, int value, bool excludePlaced)
         {
-            var matches = new List<Vector2Int>(4);
+            _neighborMatches.Clear();
+            var matches = _neighborMatches;
 
             for (int i = 0; i < Directions.Length; i++)
             {

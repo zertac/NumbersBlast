@@ -5,21 +5,17 @@ using NumbersBlast.Data;
 
 namespace NumbersBlast.Board
 {
-    public enum HighlightType
-    {
-        None,
-        Placement,
-        Invalid,
-        Merge,
-        LineClear,
-        TutorialTarget
-    }
-
     public class CellView : MonoBehaviour
     {
         [SerializeField] private Image _background;
         [SerializeField] private Image _highlight;
         [SerializeField] private TextMeshProUGUI _valueText;
+
+        private static readonly string[] ValueStrings =
+        {
+            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"
+        };
 
         private CellData _data;
         private ThemeData _theme;
@@ -52,7 +48,7 @@ namespace NumbersBlast.Board
             }
 
             var visual = _theme.GetBlockVisual(_data.Value);
-            _valueText.text = _data.Value.ToString();
+            _valueText.text = _data.Value < ValueStrings.Length ? ValueStrings[_data.Value] : _data.Value.ToString();
             _background.sprite = visual.Sprite != null ? visual.Sprite : _theme.BlockSprite;
             _background.color = visual.Color;
         }

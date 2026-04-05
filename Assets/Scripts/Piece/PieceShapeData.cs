@@ -34,11 +34,15 @@ namespace NumbersBlast.Piece
 
         public bool GetCell(int row, int column)
         {
+            if (row < 0 || row >= Rows || column < 0 || column >= Columns)
+                return false;
             return Cells[row * Columns + column];
         }
 
         public void SetCell(int row, int column, bool value)
         {
+            if (row < 0 || row >= Rows || column < 0 || column >= Columns)
+                return;
             Cells[row * Columns + column] = value;
         }
 

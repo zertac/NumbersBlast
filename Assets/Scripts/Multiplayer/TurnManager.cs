@@ -14,7 +14,6 @@ namespace NumbersBlast.Multiplayer
         private bool _isActive;
         private bool _isPlayerTurn;
         private bool _turnEnded;
-        private MonoBehaviour _coroutineRunner;
 
         public bool IsActive => _isActive;
         public bool IsPlayerTurn => _isPlayerTurn;
@@ -32,9 +31,8 @@ namespace NumbersBlast.Multiplayer
             _gameStateManager = gameStateManager;
         }
 
-        public void Start(MonoBehaviour coroutineRunner)
+        public void Start()
         {
-            _coroutineRunner = coroutineRunner;
             _isActive = true;
 
             if (UnityEngine.Random.value > 0.5f)

@@ -43,6 +43,8 @@ namespace NumbersBlast.Input
         private GameStateManager _gameStateManager;
         private readonly List<CellView> _currentMergeHoverCells = new(16);
         private readonly List<CellView> _mergeCellCache = new(16);
+        private readonly HashSet<Vector2Int> _placedSet = new(16);
+        private readonly HashSet<Vector2Int> _occupiedAfterPlace = new(64);
 
         public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null, FeedbackManager feedbackManager = null, GameStateManager gameStateManager = null)
         {
@@ -84,6 +86,7 @@ namespace NumbersBlast.Input
 
             _dragOffset = new Vector2(0, DragOffsetY);
 
+            _feedbackManager?.PlayPiecePickupEffect(_pieceView.transform);
             _tutorialManager?.OnPiecePickedUp();
             GameEvents.PiecePickedUp(_pieceView);
         }
@@ -204,12 +207,12 @@ namespace NumbersBlast.Input
         {
             var model = _boardManager.Model;
             var pieceModel = _pieceView.Model;
-            var placedSet = new HashSet<Vector2Int>();
+            _placedSet.Clear();
             _mergeCellCache.Clear();
 
             for (int i = 0; i < pieceModel.CellCount; i++)
             {
-                placedSet.Add(new Vector2Int(
+                _placedSet.Add(new Vector2Int(
                     boardPos.x + pieceModel.Positions[i].x,
                     boardPos.y + pieceModel.Positions[i].y
                 ));
@@ -226,7 +229,7 @@ namespace NumbersBlast.Input
                     int nRow = cellRow + MergeDirections[d].x;
                     int nCol = cellCol + MergeDirections[d].y;
 
-                    if (placedSet.Contains(new Vector2Int(nRow, nCol))) continue;
+                    if (_placedSet.Contains(new Vector2Int(nRow, nCol))) continue;
 
                     var neighbor = model.GetCell(nRow, nCol);
                     if (neighbor != null && !neighbor.IsEmpty && neighbor.Value == value)
@@ -260,7 +263,7 @@ namespace NumbersBlast.Input
             var model = _boardManager.Model;
             var pieceModel = _pieceView.Model;
 
-            var occupiedAfterPlace = new HashSet<Vector2Int>();
+            _occupiedAfterPlace.Clear();
 
             // Collect currently occupied cells
             for (int r = 0; r < model.Rows; r++)
@@ -268,14 +271,14 @@ namespace NumbersBlast.Input
                 for (int c = 0; c < model.Columns; c++)
                 {
                     if (!model.IsCellEmpty(r, c))
-                        occupiedAfterPlace.Add(new Vector2Int(r, c));
+                        _occupiedAfterPlace.Add(new Vector2Int(r, c));
                 }
             }
 
             // Add piece cells
             for (int i = 0; i < pieceModel.CellCount; i++)
             {
-                occupiedAfterPlace.Add(new Vector2Int(
+                _occupiedAfterPlace.Add(new Vector2Int(
                     boardPos.x + pieceModel.Positions[i].x,
                     boardPos.y + pieceModel.Positions[i].y
                 ));
@@ -287,7 +290,7 @@ namespace NumbersBlast.Input
                 bool full = true;
                 for (int c = 0; c < model.Columns; c++)
                 {
-                    if (!occupiedAfterPlace.Contains(new Vector2Int(r, c)))
+                    if (!_occupiedAfterPlace.Contains(new Vector2Int(r, c)))
                     {
                         full = false;
                         break;
@@ -309,7 +312,7 @@ namespace NumbersBlast.Input
                 bool full = true;
                 for (int r = 0; r < model.Rows; r++)
                 {
-                    if (!occupiedAfterPlace.Contains(new Vector2Int(r, c)))
+                    if (!_occupiedAfterPlace.Contains(new Vector2Int(r, c)))
                     {
                         full = false;
                         break;
@@ -322,18 +325,6 @@ namespace NumbersBlast.Input
                     {
                         _boardView.GetCellView(r, c)?.SetHighlight(HighlightType.LineClear);
                     }
-                }
-            }
-        }
-
-        private void ClearBoardHighlight()
-        {
-            var cellViews = _boardView.CellViews;
-            for (int r = 0; r < cellViews.GetLength(0); r++)
-            {
-                for (int c = 0; c < cellViews.GetLength(1); c++)
-                {
-                    cellViews[r, c].SetHighlight(HighlightType.None);
                 }
             }
         }

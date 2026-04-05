@@ -49,6 +49,7 @@ namespace NumbersBlast.Audio
 
         public static AudioManager Instance => _instance;
 
+        // One-time runtime creation; persists across scenes via DontDestroyOnLoad.
         private void CreateAudioSources()
         {
             _audioGo = new GameObject("AudioSources");

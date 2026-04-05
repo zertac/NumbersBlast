@@ -34,7 +34,16 @@ namespace NumbersBlast.Multiplayer
 
         private GameObject _ghostPiece;
         private CanvasGroup _ghostCanvasGroup;
-        private readonly List<GameObject> _ghostCellPool = new(8);
+
+        private struct GhostCellCache
+        {
+            public GameObject Go;
+            public RectTransform Rect;
+            public Image Image;
+            public TMPro.TextMeshProUGUI Text;
+        }
+
+        private readonly List<GhostCellCache> _ghostCellPool = new(8);
         private Vector3 _selectedPieceOriginalScale;
         private PieceView _selectedPiece;
         private CancellationTokenSource _cts;
@@ -118,7 +127,16 @@ namespace NumbersBlast.Multiplayer
                 // Skip if same as final
                 if (wanderPos == finalMove.BoardPosition) continue;
 
+                // Use InvalidMoveChance to sometimes force hovering over invalid positions
                 bool canPlace = CanFitAt(piece, wanderPos);
+                if (canPlace && UnityEngine.Random.value < _config.InvalidMoveChance)
+                {
+                    // Offset to likely invalid position for more natural hesitation
+                    wanderPos = new Vector2Int(
+                        Mathf.Clamp(wanderPos.x + board.Rows - 1, 0, board.Rows - 1),
+                        Mathf.Clamp(wanderPos.y + board.Columns - 1, 0, board.Columns - 1));
+                    canPlace = CanFitAt(piece, wanderPos);
+                }
                 await AnimateHoverAsync(wanderPos, canPlace, token);
 
                 float wanderPause = UnityEngine.Random.Range(_config.MinWanderPause, _config.MaxWanderPause);
@@ -239,28 +257,25 @@ namespace NumbersBlast.Multiplayer
 
             for (int i = 0; i < model.CellCount; i++)
             {
-                var cellGo = _ghostCellPool[i];
-                cellGo.SetActive(true);
+                var cached = _ghostCellPool[i];
+                cached.Go.SetActive(true);
 
-                var rect = cellGo.GetComponent<RectTransform>();
-                rect.sizeDelta = new Vector2(cellSize, cellSize);
-                rect.anchoredPosition = new Vector2(
+                cached.Rect.sizeDelta = new Vector2(cellSize, cellSize);
+                cached.Rect.anchoredPosition = new Vector2(
                     model.Positions[i].y * cellSize,
                     -model.Positions[i].x * cellSize);
 
-                var image = cellGo.GetComponent<Image>();
                 var visual = theme.GetBlockVisual(model.GetValueAt(i));
-                image.color = visual.Color;
+                cached.Image.color = visual.Color;
                 if (theme.BlockSprite != null)
-                    image.sprite = theme.BlockSprite;
+                    cached.Image.sprite = theme.BlockSprite;
 
-                var text = cellGo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                text.text = model.GetValueAt(i).ToString();
+                cached.Text.text = model.GetValueAt(i).ToString();
             }
 
             // Hide unused cells
             for (int i = model.CellCount; i < _ghostCellPool.Count; i++)
-                _ghostCellPool[i].SetActive(false);
+                _ghostCellPool[i].Go.SetActive(false);
 
             _ghostPiece.SetActive(true);
             _ghostPiece.transform.position = piece.transform.position;
@@ -295,7 +310,13 @@ namespace NumbersBlast.Multiplayer
                 text.color = Color.white;
 
                 cellGo.SetActive(false);
-                _ghostCellPool.Add(cellGo);
+                _ghostCellPool.Add(new GhostCellCache
+                {
+                    Go = cellGo,
+                    Rect = cellGo.GetComponent<RectTransform>(),
+                    Image = cellGo.GetComponent<Image>(),
+                    Text = text
+                });
             }
         }
 

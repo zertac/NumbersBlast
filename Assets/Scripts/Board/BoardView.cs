@@ -6,6 +6,7 @@ namespace NumbersBlast.Board
 {
     public class BoardView : MonoBehaviour
     {
+        private const float FallbackBoardWidth = 832f;
         [SerializeField] private GameObject _cellPrefab;
         [SerializeField] private GridLayoutGroup _gridLayout;
         [SerializeField] private RectTransform _boardRect;
@@ -86,7 +87,7 @@ namespace NumbersBlast.Board
             float availableWidth = _boardRect.rect.width;
 
             if (availableWidth <= 0)
-                availableWidth = 832f;
+                availableWidth = FallbackBoardWidth;
 
             float cellSize = (availableWidth - (config.CellSpacing * (config.Columns - 1))) / config.Columns;
             return new Vector2(cellSize, cellSize);

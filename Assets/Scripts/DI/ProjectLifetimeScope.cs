@@ -2,7 +2,6 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 using NumbersBlast.Audio;
-using NumbersBlast.Core;
 using NumbersBlast.Data;
 
 namespace NumbersBlast.DI
@@ -17,7 +16,6 @@ namespace NumbersBlast.DI
                 builder.RegisterInstance(_audioConfig);
 
             builder.Register<AudioManager>(Lifetime.Singleton);
-            builder.Register<SceneLoader>(Lifetime.Singleton);
         }
     }
 }

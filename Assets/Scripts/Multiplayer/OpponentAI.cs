@@ -9,6 +9,8 @@ namespace NumbersBlast.Multiplayer
     public class OpponentAI
     {
         private readonly MultiplayerConfig _config;
+        private readonly List<OpponentMove> _allMoves = new(64);
+        private readonly HashSet<Vector2Int> _occupiedAfterPlace = new(64);
 
         private static readonly Vector2Int[] MergeDirections =
         {
@@ -24,7 +26,7 @@ namespace NumbersBlast.Multiplayer
         {
             var bestMove = new OpponentMove();
             float bestScore = -1f;
-            var allMoves = new List<OpponentMove>();
+            _allMoves.Clear();
 
             for (int p = 0; p < trayPieces.Length; p++)
             {
@@ -45,7 +47,7 @@ namespace NumbersBlast.Multiplayer
                             Score = score
                         };
 
-                        allMoves.Add(move);
+                        _allMoves.Add(move);
 
                         if (score > bestScore)
                         {
@@ -56,17 +58,17 @@ namespace NumbersBlast.Multiplayer
                 }
             }
 
-            if (allMoves.Count == 0)
+            if (_allMoves.Count == 0)
                 return new OpponentMove { IsValid = false };
 
             // Skill level: chance to pick best vs random
             bool makeMistake = Random.value < _config.MistakeChance;
 
-            if (makeMistake && allMoves.Count > 1)
+            if (makeMistake && _allMoves.Count > 1)
             {
                 // Pick a random non-best move
-                allMoves.Remove(bestMove);
-                bestMove = allMoves[Random.Range(0, allMoves.Count)];
+                _allMoves.Remove(bestMove);
+                bestMove = _allMoves[Random.Range(0, _allMoves.Count)];
             }
 
             bestMove.IsValid = true;
@@ -132,15 +134,15 @@ namespace NumbersBlast.Multiplayer
             score += mergeCount * 10f;
 
             // Score for line clear potential
-            var occupiedAfterPlace = new HashSet<Vector2Int>();
+            _occupiedAfterPlace.Clear();
             for (int r = 0; r < board.Rows; r++)
                 for (int c = 0; c < board.Columns; c++)
                     if (!board.IsCellEmpty(r, c))
-                        occupiedAfterPlace.Add(new Vector2Int(r, c));
+                        _occupiedAfterPlace.Add(new Vector2Int(r, c));
 
             for (int i = 0; i < piece.CellCount; i++)
             {
-                occupiedAfterPlace.Add(new Vector2Int(
+                _occupiedAfterPlace.Add(new Vector2Int(
                     startRow + piece.Positions[i].x,
                     startCol + piece.Positions[i].y
                 ));
@@ -151,7 +153,7 @@ namespace NumbersBlast.Multiplayer
                 bool full = true;
                 for (int c = 0; c < board.Columns; c++)
                 {
-                    if (!occupiedAfterPlace.Contains(new Vector2Int(r, c)))
+                    if (!_occupiedAfterPlace.Contains(new Vector2Int(r, c)))
                     {
                         full = false;
                         break;
@@ -165,7 +167,7 @@ namespace NumbersBlast.Multiplayer
                 bool full = true;
                 for (int r = 0; r < board.Rows; r++)
                 {
-                    if (!occupiedAfterPlace.Contains(new Vector2Int(r, c)))
+                    if (!_occupiedAfterPlace.Contains(new Vector2Int(r, c)))
                     {
                         full = false;
                         break;
@@ -195,13 +197,5 @@ namespace NumbersBlast.Multiplayer
             }
             return true;
         }
-    }
-
-    public struct OpponentMove
-    {
-        public int PieceIndex;
-        public Vector2Int BoardPosition;
-        public float Score;
-        public bool IsValid;
     }
 }

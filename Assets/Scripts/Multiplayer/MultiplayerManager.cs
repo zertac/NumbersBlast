@@ -22,6 +22,7 @@ namespace NumbersBlast.Multiplayer
 
         private bool _isActive;
         private bool _isScoreForPlayer;
+        private bool _isProcessingAITurn;
 
         public bool IsActive => _isActive;
         public bool IsPlayerTurn => _turnManager.IsPlayerTurn;
@@ -54,7 +55,7 @@ namespace NumbersBlast.Multiplayer
             GameEvents.OnScoreChanged += HandleScoreChanged;
             _placementHandler.OnPlacementComplete += HandlePlacementComplete;
 
-            _turnManager.Start(_visualPlayer);
+            _turnManager.Start();
         }
 
         public void Stop()
@@ -127,8 +128,6 @@ namespace NumbersBlast.Multiplayer
             else
                 _hud.AddOpponentScore(points);
         }
-
-        private bool _isProcessingAITurn;
 
         private void HandlePlacementComplete()
         {

@@ -74,13 +74,13 @@ namespace NumbersBlast.Core
             _placementHandler.Enable();
 
             GameEvents.OnGameOver += HandleGameOver;
-            GameEvents.OnPiecePickedUp += _ => _audioManager.PlayPiecePickup();
+            GameEvents.OnPiecePickedUp += HandlePiecePickedUp;
             GameEvents.OnPiecePlaced += HandlePiecePlaced;
-            GameEvents.OnPieceReleased += _ => _audioManager.PlayPieceReturn();
-            GameEvents.OnScoreChanged += _ => _audioManager.PlayScoreUp();
-            GameEvents.OnTrayRefilled += () => _audioManager.PlayNewPiecesSpawn();
+            GameEvents.OnPieceReleased += HandlePieceReleased;
+            GameEvents.OnScoreChanged += HandleScoreChanged;
+            GameEvents.OnTrayRefilled += HandleTrayRefilled;
             GameEvents.OnPopupOpened += HandlePopupOpened;
-            GameEvents.OnPopupClosed += () => _audioManager.PlayPopupClose();
+            GameEvents.OnPopupClosed += HandlePopupClosed;
 
             _audioManager.StopMusic();
             _audioManager.PlayGameplayMusic();
@@ -131,6 +131,31 @@ namespace NumbersBlast.Core
                 {
                     UnityEngine.SceneManagement.SceneManager.LoadScene(GameConstants.MainMenuScene);
                 });
+        }
+
+        private void HandlePiecePickedUp(PieceView piece)
+        {
+            _audioManager.PlayPiecePickup();
+        }
+
+        private void HandlePieceReleased(PieceView piece)
+        {
+            _audioManager.PlayPieceReturn();
+        }
+
+        private void HandleScoreChanged(int score)
+        {
+            _audioManager.PlayScoreUp();
+        }
+
+        private void HandleTrayRefilled()
+        {
+            _audioManager.PlayNewPiecesSpawn();
+        }
+
+        private void HandlePopupClosed()
+        {
+            _audioManager.PlayPopupClose();
         }
 
         private void HandlePiecePlaced(PieceView piece, Vector2Int pos)

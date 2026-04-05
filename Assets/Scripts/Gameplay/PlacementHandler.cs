@@ -60,7 +60,7 @@ namespace NumbersBlast.Gameplay
             _feedbackManager.PlayPlaceEffect(placedCells);
 
             // Merge
-            var mergeResult = _mergeResolver.Resolve(model, pieceModel, boardPos, _boardView);
+            var mergeResult = _mergeResolver.Resolve(model, pieceModel, boardPos);
             _boardView.RefreshAll();
 
             // Merge feedback
@@ -87,7 +87,7 @@ namespace NumbersBlast.Gameplay
             }
 
             // Line clear
-            var clearResult = _lineClearResolver.Resolve(model, _boardView);
+            var clearResult = _lineClearResolver.Resolve(model);
             if (clearResult.Score > 0)
             {
                 _audioManager.PlayLineClear();

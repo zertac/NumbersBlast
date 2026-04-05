@@ -71,7 +71,12 @@ namespace NumbersBlast.Feedback
                 }
                 _vibrator.Call("vibrate", milliseconds);
             }
-            catch (System.Exception) { }
+            catch (System.Exception e)
+            {
+#if DEBUG || UNITY_EDITOR
+                Debug.LogWarning($"[Haptic] {e.Message}");
+#endif
+            }
         }
 #endif
 
@@ -85,7 +90,12 @@ namespace NumbersBlast.Feedback
             {
                 AudioServicesPlaySystemSound(soundId);
             }
-            catch (System.Exception) { }
+            catch (System.Exception e)
+            {
+#if DEBUG || UNITY_EDITOR
+                Debug.LogWarning($"[Haptic] {e.Message}");
+#endif
+            }
         }
 #endif
     }

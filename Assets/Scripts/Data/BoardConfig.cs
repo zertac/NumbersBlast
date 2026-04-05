@@ -27,7 +27,7 @@ namespace NumbersBlast.Data
             return size.x <= Rows && size.y <= Columns;
         }
 
-        public void OnValidate()
+        private void OnValidate()
         {
             if (PieceSpawnConfig == null || PieceSpawnConfig.Shapes == null) return;
 

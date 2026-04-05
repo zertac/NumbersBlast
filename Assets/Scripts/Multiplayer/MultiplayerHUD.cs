@@ -143,6 +143,7 @@ namespace NumbersBlast.Multiplayer
             ShowPenaltyText(scoreText.transform, penalty);
         }
 
+        // Runtime GameObject creation is acceptable here: only called on turn timeout (rare event).
         private void ShowPenaltyText(Transform anchor, int amount)
         {
             var penaltyGo = new GameObject("PenaltyText", typeof(RectTransform), typeof(TextMeshProUGUI));

@@ -5,10 +5,16 @@ namespace NumbersBlast.Gameplay
 {
     public class LineClearResolver
     {
-        public LineClearResult Resolve(BoardModel model, BoardView boardView)
+        private readonly List<int> _rowsToClear = new(8);
+        private readonly List<int> _columnsToClear = new(8);
+        private readonly HashSet<long> _clearedCells = new(64);
+
+        public LineClearResult Resolve(BoardModel model)
         {
-            var rowsToClear = new List<int>();
-            var columnsToClear = new List<int>();
+            _rowsToClear.Clear();
+            _columnsToClear.Clear();
+            var rowsToClear = _rowsToClear;
+            var columnsToClear = _columnsToClear;
 
             for (int r = 0; r < model.Rows; r++)
             {
@@ -31,7 +37,8 @@ namespace NumbersBlast.Gameplay
             if (rowsToClear.Count == 0 && columnsToClear.Count == 0)
                 return result;
 
-            var clearedCells = new HashSet<long>();
+            _clearedCells.Clear();
+            var clearedCells = _clearedCells;
 
             for (int i = 0; i < rowsToClear.Count; i++)
             {

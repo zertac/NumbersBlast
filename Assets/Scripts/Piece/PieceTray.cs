@@ -57,6 +57,7 @@ namespace NumbersBlast.Piece
                 var pieceView = pieceGo.GetComponent<PieceView>();
                 pieceView.Initialize(model, _config, _cellSize);
 
+                // TODO: PieceDragHandler should be pre-attached on the piece prefab instead of added as fallback.
                 var dragHandler = pieceGo.GetComponent<PieceDragHandler>();
                 if (dragHandler == null)
                     dragHandler = pieceGo.AddComponent<PieceDragHandler>();
@@ -104,6 +105,7 @@ namespace NumbersBlast.Piece
             var pieceView = pieceGo.GetComponent<PieceView>();
             pieceView.Initialize(model, _config, _cellSize);
 
+            // TODO: PieceDragHandler should be pre-attached on the piece prefab instead of added as fallback.
             var dragHandler = pieceGo.GetComponent<PieceDragHandler>();
             if (dragHandler == null)
                 dragHandler = pieceGo.AddComponent<PieceDragHandler>();
