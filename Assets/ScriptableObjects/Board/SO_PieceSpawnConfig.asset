@@ -17,4 +17,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0dacb6da5e47a1441af64fc549d7dd59, type: 2}
   - {fileID: 11400000, guid: 76a215ae275f88246809f6a005ba57c5, type: 2}
   - {fileID: 11400000, guid: 29ed95126d6826042b25c318bd7545ca, type: 2}
+  - {fileID: 11400000, guid: 810bed98110eab94a9213ac87ddca182, type: 2}
+  - {fileID: 11400000, guid: 0ae0745eb3854724ea1b84ded8cbef84, type: 2}
+  - {fileID: 11400000, guid: 985e782470dc3ca468f8186127b7f9ce, type: 2}
+  - {fileID: 11400000, guid: 0467858031be41b4dae395005d7e6d9d, type: 2}
+  - {fileID: 11400000, guid: 2eba25e7dc67dd849acedbfb8e91b43f, type: 2}
   PiecesPerTray: 3
