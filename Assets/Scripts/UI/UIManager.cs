@@ -36,7 +36,9 @@ namespace NumbersBlast.UI
                 var prefab = _config.GetPopupPrefab<T>();
                 if (prefab == null)
                 {
+#if UNITY_EDITOR || DEBUG
                     Debug.LogWarning($"[UIManager] No prefab for popup type: {type.Name}");
+#endif
                     return null;
                 }
 

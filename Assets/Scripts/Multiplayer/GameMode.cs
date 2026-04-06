@@ -5,7 +5,9 @@ namespace NumbersBlast.Multiplayer
     /// </summary>
     public enum GameMode
     {
+        /// <summary>Standard solo gameplay against the board.</summary>
         SinglePlayer,
+        /// <summary>Fake real-time multiplayer with AI opponent.</summary>
         Multiplayer
     }
 }

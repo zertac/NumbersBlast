@@ -42,8 +42,9 @@ namespace NumbersBlast.Gameplay
 
             bool merged = true;
             bool isFirstPass = true;
+            int maxIterations = 100;
 
-            while (merged)
+            while (merged && maxIterations-- > 0)
             {
                 merged = false;
                 nextCheck.Clear();

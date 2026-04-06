@@ -143,6 +143,7 @@ namespace NumbersBlast.Feedback
             for (int i = 0; i < absorbedCells.Length; i++)
             {
                 var absorbed = absorbedCells[i];
+                if (absorbed == null) continue;
                 absorbed.transform.DOKill();
                 absorbed.transform.localScale = Vector3.one;
 

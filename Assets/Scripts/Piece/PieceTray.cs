@@ -57,6 +57,7 @@ namespace NumbersBlast.Piece
         public void SpawnPieces()
         {
             var spawnConfig = _config.PieceSpawnConfig;
+            if (spawnConfig?.Shapes == null || spawnConfig.Shapes.Length == 0) return;
 
             for (int i = 0; i < _pieceSlots.Length; i++)
             {

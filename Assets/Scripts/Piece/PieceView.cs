@@ -63,7 +63,7 @@ namespace NumbersBlast.Piece
 
             if (_raycastImage == null)
                 _raycastImage = gameObject.AddComponent<Image>();
-            _raycastImage.color = new Color(0, 0, 0, 0);
+            _raycastImage.color = Color.clear;
             _raycastImage.raycastTarget = true;
         }
 

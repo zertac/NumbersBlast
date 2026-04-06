@@ -77,7 +77,9 @@ namespace NumbersBlast.StateMachine
 
             if (!CanTransitionTo(newState))
             {
+#if UNITY_EDITOR || DEBUG
                 Debug.LogWarning($"[GameState] Invalid transition: {_currentState} -> {newState}");
+#endif
                 return false;
             }
 
