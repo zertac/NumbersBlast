@@ -1,8 +1,5 @@
 using UnityEngine;
 using NumbersBlast.Core;
-#if UNITY_IOS && !UNITY_EDITOR
-using System.Runtime.InteropServices;
-#endif
 
 namespace NumbersBlast.Feedback
 {
@@ -38,10 +35,8 @@ namespace NumbersBlast.Feedback
         public static void Light()
         {
             if (!_enabled) return;
-#if UNITY_ANDROID && !UNITY_EDITOR
-            VibrateAndroid(20);
-#elif UNITY_IOS && !UNITY_EDITOR
-            VibrateIOS(1519);
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+            Handheld.Vibrate();
 #endif
         }
 
@@ -51,10 +46,8 @@ namespace NumbersBlast.Feedback
         public static void Medium()
         {
             if (!_enabled) return;
-#if UNITY_ANDROID && !UNITY_EDITOR
-            VibrateAndroid(40);
-#elif UNITY_IOS && !UNITY_EDITOR
-            VibrateIOS(1520);
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+            Handheld.Vibrate();
 #endif
         }
 
@@ -64,54 +57,9 @@ namespace NumbersBlast.Feedback
         public static void Heavy()
         {
             if (!_enabled) return;
-#if UNITY_ANDROID && !UNITY_EDITOR
-            VibrateAndroid(80);
-#elif UNITY_IOS && !UNITY_EDITOR
-            VibrateIOS(1521);
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+            Handheld.Vibrate();
 #endif
         }
-
-#if UNITY_ANDROID && !UNITY_EDITOR
-        private static AndroidJavaObject _vibrator;
-
-        private static void VibrateAndroid(long milliseconds)
-        {
-            try
-            {
-                if (_vibrator == null)
-                {
-                    using var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                    using var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                    _vibrator = activity.Call<AndroidJavaObject>("getSystemService", "vibrator");
-                }
-                _vibrator.Call("vibrate", milliseconds);
-            }
-            catch (System.Exception e)
-            {
-#if DEBUG || UNITY_EDITOR
-                Debug.LogWarning($"[Haptic] {e.Message}");
-#endif
-            }
-        }
-#endif
-
-#if UNITY_IOS && !UNITY_EDITOR
-        [DllImport("__Internal")]
-        private static extern void AudioServicesPlaySystemSound(int soundId);
-
-        private static void VibrateIOS(int soundId)
-        {
-            try
-            {
-                AudioServicesPlaySystemSound(soundId);
-            }
-            catch (System.Exception e)
-            {
-#if DEBUG || UNITY_EDITOR
-                Debug.LogWarning($"[Haptic] {e.Message}");
-#endif
-            }
-        }
-#endif
     }
 }
