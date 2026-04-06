@@ -13,16 +13,19 @@ namespace NumbersBlast.Gameplay
     {
         private readonly HashSet<Vector2Int> _placedPositions = new();
         private readonly List<Vector2Int> _neighborMatches = new(4);
+        private readonly List<MergeEvent> _mergeEvents = new(8);
+        private readonly List<Vector2Int> _cellsToCheck = new(8);
+        private readonly List<Vector2Int> _nextCheck = new(8);
 
         /// <summary>
         /// Finds and executes all merges triggered by placing a piece, including chain merges.
         /// </summary>
         public List<MergeEvent> Resolve(BoardModel model, PieceModel pieceModel, Vector2Int boardPos)
         {
-            var mergeEvents = new List<MergeEvent>();
+            _mergeEvents.Clear();
             _placedPositions.Clear();
-
-            var cellsToCheck = new List<Vector2Int>(pieceModel.CellCount);
+            _cellsToCheck.Clear();
+            _nextCheck.Clear();
 
             for (int i = 0; i < pieceModel.CellCount; i++)
             {
@@ -30,9 +33,12 @@ namespace NumbersBlast.Gameplay
                     boardPos.x + pieceModel.Positions[i].x,
                     boardPos.y + pieceModel.Positions[i].y
                 );
-                cellsToCheck.Add(pos);
+                _cellsToCheck.Add(pos);
                 _placedPositions.Add(pos);
             }
+
+            var cellsToCheck = _cellsToCheck;
+            var nextCheck = _nextCheck;
 
             bool merged = true;
             bool isFirstPass = true;
@@ -40,7 +46,7 @@ namespace NumbersBlast.Gameplay
             while (merged)
             {
                 merged = false;
-                var nextCheck = new List<Vector2Int>();
+                nextCheck.Clear();
 
                 for (int i = 0; i < cellsToCheck.Count; i++)
                 {
@@ -53,7 +59,7 @@ namespace NumbersBlast.Gameplay
                     if (mergedNeighbors.Count > 0)
                     {
                         int sum = cellData.Value;
-                        var absorbedPositions = new List<Vector2Int>();
+                        var absorbedPositions = new List<Vector2Int>(mergedNeighbors.Count);
 
                         for (int j = 0; j < mergedNeighbors.Count; j++)
                         {
@@ -67,7 +73,7 @@ namespace NumbersBlast.Gameplay
                         merged = true;
                         nextCheck.Add(cell);
 
-                        mergeEvents.Add(new MergeEvent
+                        _mergeEvents.Add(new MergeEvent
                         {
                             TargetPos = cell,
                             AbsorbedPositions = absorbedPositions,
@@ -76,11 +82,12 @@ namespace NumbersBlast.Gameplay
                     }
                 }
 
-                cellsToCheck = nextCheck;
+                // Swap references so cellsToCheck points to the freshly built list
+                (cellsToCheck, nextCheck) = (nextCheck, cellsToCheck);
                 isFirstPass = false;
             }
 
-            return mergeEvents;
+            return new List<MergeEvent>(_mergeEvents);
         }
 
         private List<Vector2Int> FindMatchingNeighbors(BoardModel model, Vector2Int pos, int value, bool excludePlaced)

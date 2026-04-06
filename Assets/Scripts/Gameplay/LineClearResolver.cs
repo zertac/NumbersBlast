@@ -24,13 +24,13 @@ namespace NumbersBlast.Gameplay
 
             for (int r = 0; r < model.Rows; r++)
             {
-                if (IsRowFull(model, r))
+                if (model.IsRowFull(r))
                     rowsToClear.Add(r);
             }
 
             for (int c = 0; c < model.Columns; c++)
             {
-                if (IsColumnFull(model, c))
+                if (model.IsColumnFull(c))
                     columnsToClear.Add(c);
             }
 
@@ -82,24 +82,6 @@ namespace NumbersBlast.Gameplay
             }
 
             return result;
-        }
-
-        private bool IsRowFull(BoardModel model, int row)
-        {
-            for (int c = 0; c < model.Columns; c++)
-            {
-                if (model.IsCellEmpty(row, c)) return false;
-            }
-            return true;
-        }
-
-        private bool IsColumnFull(BoardModel model, int column)
-        {
-            for (int r = 0; r < model.Rows; r++)
-            {
-                if (model.IsCellEmpty(r, column)) return false;
-            }
-            return true;
         }
     }
 }

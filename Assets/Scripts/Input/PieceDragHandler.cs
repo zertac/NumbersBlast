@@ -80,15 +80,16 @@ namespace NumbersBlast.Input
             _isDragging = true;
             _gameStateManager?.TransitionTo(GameState.Dragging);
 
-            _pieceView.transform.SetParent(_canvasRect, true);
+            _pieceView.transform.SetParent(_canvasRect, false);
             _pieceView.transform.SetAsLastSibling();
+
+            // Restore tray scale after reparenting, then animate to full size
+            _pieceView.transform.localScale = Vector3.one * _originalScale;
 
             _pieceView.transform.DOKill();
             _pieceView.transform.DOScale(DragScale, PickupDuration).SetEase(Ease.OutBack).SetLink(_pieceView.gameObject);
 
             _dragOffset = new Vector2(0, DragOffsetY);
-
-            _feedbackManager?.PlayPiecePickupEffect(_pieceView.transform);
             _tutorialManager?.OnPiecePickedUp();
             GameEvents.PiecePickedUp(_pieceView);
         }

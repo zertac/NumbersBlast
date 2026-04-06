@@ -282,7 +282,7 @@ namespace NumbersBlast.Multiplayer
                 if (theme.BlockSprite != null)
                     cached.Image.sprite = theme.BlockSprite;
 
-                cached.Text.text = model.GetValueAt(i).ToString();
+                cached.Text.text = StringCache.IntToString(model.GetValueAt(i));
             }
 
             // Hide unused cells

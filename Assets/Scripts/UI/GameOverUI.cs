@@ -24,7 +24,7 @@ namespace NumbersBlast.UI
         /// </summary>
         public void SetScore(int score)
         {
-            _finalScoreText.text = score.ToString();
+            _finalScoreText.text = StringCache.IntToString(score);
         }
 
         protected override void OnDestroy()

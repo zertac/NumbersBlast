@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using NumbersBlast.Core;
 
 namespace NumbersBlast.Multiplayer
 {
@@ -211,12 +212,12 @@ namespace NumbersBlast.Multiplayer
         {
             if (_playerScore != _lastDisplayedPlayerScore)
             {
-                _playerScoreText.text = _playerScore.ToString();
+                _playerScoreText.text = StringCache.IntToString(_playerScore);
                 _lastDisplayedPlayerScore = _playerScore;
             }
             if (_opponentScore != _lastDisplayedOpponentScore)
             {
-                _opponentScoreText.text = _opponentScore.ToString();
+                _opponentScoreText.text = StringCache.IntToString(_opponentScore);
                 _lastDisplayedOpponentScore = _opponentScore;
             }
         }

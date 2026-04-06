@@ -48,6 +48,26 @@ namespace NumbersBlast.Board
         }
 
         /// <summary>
+        /// Returns true if every cell in the specified row is occupied.
+        /// </summary>
+        public bool IsRowFull(int row)
+        {
+            for (int c = 0; c < Columns; c++)
+                if (IsCellEmpty(row, c)) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if every cell in the specified column is occupied.
+        /// </summary>
+        public bool IsColumnFull(int column)
+        {
+            for (int r = 0; r < Rows; r++)
+                if (IsCellEmpty(r, column)) return false;
+            return true;
+        }
+
+        /// <summary>
         /// Checks whether a piece with the given shape can be placed at the specified board position without overlapping.
         /// </summary>
         public bool CanFitPiece(UnityEngine.Vector2Int[] positions, int startRow, int startCol)

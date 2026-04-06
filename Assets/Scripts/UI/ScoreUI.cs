@@ -47,7 +47,7 @@ namespace NumbersBlast.UI
 
         private void UpdateDisplay()
         {
-            _scoreText.text = _currentScore.ToString();
+            _scoreText.text = StringCache.IntToString(_currentScore);
         }
 
         /// <summary>
