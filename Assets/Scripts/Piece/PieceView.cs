@@ -14,7 +14,6 @@ namespace NumbersBlast.Piece
 
         private PieceModel _model;
         private BoardConfig _config;
-        private PieceCellView[] _cellViews;
         private float _cellSize;
 
         public RectTransform RectTransform { get; private set; }
@@ -35,8 +34,6 @@ namespace NumbersBlast.Piece
 
         private void CreateCells()
         {
-            _cellViews = new PieceCellView[_model.CellCount];
-
             int maxRow = 0, maxCol = 0;
             for (int i = 0; i < _model.CellCount; i++)
             {
@@ -60,8 +57,6 @@ namespace NumbersBlast.Piece
                     offsetX + _model.Positions[i].y * _cellSize + _cellSize * 0.5f,
                     offsetY - _model.Positions[i].x * _cellSize - _cellSize * 0.5f
                 );
-
-                _cellViews[i] = cellView;
             }
 
             RectTransform.sizeDelta = new Vector2(totalWidth, totalHeight);
