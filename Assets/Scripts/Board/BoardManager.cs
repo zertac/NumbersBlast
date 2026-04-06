@@ -41,16 +41,25 @@ namespace NumbersBlast.Board
             _view.Initialize(_model, _config);
         }
 
+        /// <summary>
+        /// Returns the CellView at the given position, or null if out of bounds.
+        /// </summary>
         public CellView GetCellView(int row, int column)
         {
             return _view.GetCellView(row, column);
         }
 
+        /// <summary>
+        /// Returns the computed cell size in pixels used by the board layout.
+        /// </summary>
         public float GetCellSize()
         {
             return _view.CellSize;
         }
 
+        /// <summary>
+        /// Refreshes the visual state of all board cells to match the current model data.
+        /// </summary>
         public void RefreshView()
         {
             _view.RefreshAll();

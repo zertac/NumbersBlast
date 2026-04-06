@@ -47,6 +47,9 @@ namespace NumbersBlast.Piece
             Values = fixedValues;
         }
 
+        /// <summary>
+        /// Returns the numeric value of the piece cell at the given index.
+        /// </summary>
         public int GetValueAt(int index)
         {
             return Values[index];

@@ -111,7 +111,6 @@ namespace NumbersBlast.Gameplay
             }
             else
             {
-                _boardView.RefreshAll();
                 CheckGameOver();
                 if (_gameStateManager.CurrentState != GameState.GameOver)
                 {

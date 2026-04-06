@@ -46,7 +46,9 @@ namespace NumbersBlast.Data
 
                 if (!ValidatePieceShape(shape))
                 {
+#if UNITY_EDITOR || DEBUG
                     Debug.LogWarning($"[BoardConfig] Piece shape '{shape.name}' is too large for {Rows}x{Columns} board.");
+#endif
                 }
             }
         }

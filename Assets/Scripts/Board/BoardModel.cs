@@ -41,6 +41,9 @@ namespace NumbersBlast.Board
             return Cells[row, column];
         }
 
+        /// <summary>
+        /// Returns true if the cell at the given position is empty, or false if occupied or out of bounds.
+        /// </summary>
         public bool IsCellEmpty(int row, int column)
         {
             if (!IsInBounds(row, column)) return false;

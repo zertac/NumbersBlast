@@ -88,6 +88,11 @@ namespace NumbersBlast.Gameplay
                 isFirstPass = false;
             }
 
+#if UNITY_EDITOR || DEBUG
+            if (maxIterations < 0)
+                UnityEngine.Debug.LogWarning("[MergeResolver] Hit max iterations during merge chain");
+#endif
+
             return new List<MergeEvent>(_mergeEvents);
         }
 

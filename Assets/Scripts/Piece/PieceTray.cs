@@ -69,11 +69,17 @@ namespace NumbersBlast.Piece
             }
         }
 
+        /// <summary>
+        /// Returns the array of piece views currently in the tray, including null entries for empty slots.
+        /// </summary>
         public PieceView[] GetRemainingPieces()
         {
             return _pieceViews;
         }
 
+        /// <summary>
+        /// Returns true if all tray slots are empty (no pieces remaining).
+        /// </summary>
         public bool IsEmpty()
         {
             for (int i = 0; i < _pieceViews.Length; i++)

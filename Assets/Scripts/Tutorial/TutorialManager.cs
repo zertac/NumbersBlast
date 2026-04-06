@@ -208,7 +208,6 @@ namespace NumbersBlast.Tutorial
         {
             if (!_isActive) return;
 
-            Canvas.ForceUpdateCanvases();
             HighlightTargetCells();
             _overlay.SetInstruction("Place it here!");
 

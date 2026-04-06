@@ -36,7 +36,9 @@ namespace NumbersBlast.Audio
         {
             if (config == null)
             {
+#if UNITY_EDITOR || DEBUG
                 Debug.LogError("[AudioManager] AudioConfig is null!");
+#endif
                 return;
             }
             _config = config;

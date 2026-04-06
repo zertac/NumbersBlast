@@ -48,6 +48,9 @@ namespace NumbersBlast.Piece
             Cells = newCells;
         }
 
+        /// <summary>
+        /// Returns whether the cell at the given row and column is active, or false if out of bounds.
+        /// </summary>
         public bool GetCell(int row, int column)
         {
             if (row < 0 || row >= Rows || column < 0 || column >= Columns)
@@ -55,6 +58,9 @@ namespace NumbersBlast.Piece
             return Cells[row * Columns + column];
         }
 
+        /// <summary>
+        /// Sets the active state of the cell at the given row and column. No-op if out of bounds.
+        /// </summary>
         public void SetCell(int row, int column, bool value)
         {
             if (row < 0 || row >= Rows || column < 0 || column >= Columns)
@@ -62,6 +68,9 @@ namespace NumbersBlast.Piece
             Cells[row * Columns + column] = value;
         }
 
+        /// <summary>
+        /// Returns the number of active cells in this piece shape.
+        /// </summary>
         public int GetActiveCellCount()
         {
             int count = 0;
