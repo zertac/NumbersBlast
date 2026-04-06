@@ -34,10 +34,7 @@ namespace NumbersBlast.Feedback
         /// </summary>
         public static void Light()
         {
-            if (!_enabled) return;
-#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-            Handheld.Vibrate();
-#endif
+            // Intentionally empty — Handheld.Vibrate is too strong for light taps
         }
 
         /// <summary>
