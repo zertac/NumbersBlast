@@ -5,6 +5,9 @@ using DG.Tweening;
 
 namespace NumbersBlast.Multiplayer
 {
+    /// <summary>
+    /// Displays the multiplayer UI including player/opponent scores, turn indicator, and countdown timer with animations.
+    /// </summary>
     public class MultiplayerHUD : MonoBehaviour
     {
         [SerializeField] private GameObject _multiplayerPanel;
@@ -40,6 +43,9 @@ namespace NumbersBlast.Multiplayer
         private static readonly Color PlayerTurnColor = new Color(0.3f, 0.85f, 0.4f);
         private static readonly Color OpponentTurnColor = new Color(0.9f, 0.5f, 0.3f);
 
+        /// <summary>
+        /// Shows the multiplayer panel and resets scores with the given opponent name.
+        /// </summary>
         public void Initialize(string opponentName)
         {
             _multiplayerPanel.SetActive(true);
@@ -55,6 +61,9 @@ namespace NumbersBlast.Multiplayer
             _multiplayerPanel.SetActive(false);
         }
 
+        /// <summary>
+        /// Switches the turn indicator to show the player's turn with a punch animation.
+        /// </summary>
         public void SetPlayerTurn()
         {
             _turnIndicatorText.text = "YOUR TURN";
@@ -64,6 +73,9 @@ namespace NumbersBlast.Multiplayer
                 .SetLink(_turnIndicatorText.gameObject);
         }
 
+        /// <summary>
+        /// Switches the turn indicator to show the opponent's turn with a punch animation.
+        /// </summary>
         public void SetOpponentTurn()
         {
             _turnIndicatorText.text = "OPPONENT'S TURN";
@@ -77,6 +89,9 @@ namespace NumbersBlast.Multiplayer
         private static readonly Color TimerMidColor = new(0.95f, 0.85f, 0.3f);
         private static readonly Color TimerLowColor = new(0.9f, 0.3f, 0.3f);
 
+        /// <summary>
+        /// Updates the timer bar fill and color based on normalized remaining time, with a pulse effect when low.
+        /// </summary>
         public void UpdateTimer(float normalized)
         {
             float clamped = Mathf.Clamp01(normalized);
@@ -109,6 +124,9 @@ namespace NumbersBlast.Multiplayer
             }
         }
 
+        /// <summary>
+        /// Adds points to the player's score and plays a punch animation on the score text.
+        /// </summary>
         public void AddPlayerScore(int points)
         {
             _playerScore += points;
@@ -118,6 +136,9 @@ namespace NumbersBlast.Multiplayer
                 .SetLink(_playerScoreText.gameObject);
         }
 
+        /// <summary>
+        /// Adds points to the opponent's score and plays a punch animation on the score text.
+        /// </summary>
         public void AddOpponentScore(int points)
         {
             _opponentScore += points;
@@ -127,6 +148,9 @@ namespace NumbersBlast.Multiplayer
                 .SetLink(_opponentScoreText.gameObject);
         }
 
+        /// <summary>
+        /// Applies a score penalty with red flash, shake, and floating penalty text animation.
+        /// </summary>
         public void ApplyPenalty(bool isPlayer, int penalty)
         {
             var scoreText = isPlayer ? _playerScoreText : _opponentScoreText;

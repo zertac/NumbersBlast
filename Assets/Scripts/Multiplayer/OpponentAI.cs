@@ -7,6 +7,9 @@ using NumbersBlast.Piece;
 
 namespace NumbersBlast.Multiplayer
 {
+    /// <summary>
+    /// AI decision engine that evaluates all possible piece placements and selects a move based on configurable skill level.
+    /// </summary>
     public class OpponentAI
     {
         private readonly MultiplayerConfig _config;
@@ -18,6 +21,9 @@ namespace NumbersBlast.Multiplayer
             _config = config;
         }
 
+        /// <summary>
+        /// Evaluates all valid placements and returns the best move, with a configurable chance of making a mistake.
+        /// </summary>
         public OpponentMove CalculateMove(BoardModel board, PieceView[] trayPieces)
         {
             var bestMove = new OpponentMove();
@@ -71,6 +77,9 @@ namespace NumbersBlast.Multiplayer
             return bestMove;
         }
 
+        /// <summary>
+        /// Picks a random valid placement to use as a decoy during hesitation animations.
+        /// </summary>
         public OpponentMove CalculateDecoyMove(BoardModel board, PieceView[] trayPieces)
         {
             // Pick a random valid position for hesitation/cancel behavior

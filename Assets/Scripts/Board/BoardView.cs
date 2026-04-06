@@ -4,6 +4,9 @@ using NumbersBlast.Data;
 
 namespace NumbersBlast.Board
 {
+    /// <summary>
+    /// MonoBehaviour responsible for rendering the board grid, creating cell views, and applying the visual theme.
+    /// </summary>
     public class BoardView : MonoBehaviour
     {
         private const float FallbackBoardWidth = 832f;
@@ -13,11 +16,21 @@ namespace NumbersBlast.Board
 
         private CellView[,] _cellViews;
 
+        /// <summary>
+        /// Two-dimensional array of all instantiated cell views on the board.
+        /// </summary>
         public CellView[,] CellViews => _cellViews;
+
+        /// <summary>
+        /// The calculated pixel size of each cell, based on board width and column count.
+        /// </summary>
         public float CellSize { get; private set; }
 
         [SerializeField] private Image _boardFrame;
 
+        /// <summary>
+        /// Sets up the board visuals by applying the theme, configuring the grid layout, and instantiating all cell views.
+        /// </summary>
         public void Initialize(BoardModel model, BoardConfig config)
         {
             ApplyTheme(config.Theme);
@@ -109,6 +122,9 @@ namespace NumbersBlast.Board
             }
         }
 
+        /// <summary>
+        /// Returns the CellView at the given row and column, or null if out of bounds.
+        /// </summary>
         public CellView GetCellView(int row, int column)
         {
             if (row < 0 || row >= _cellViews.GetLength(0)) return null;
@@ -116,6 +132,9 @@ namespace NumbersBlast.Board
             return _cellViews[row, column];
         }
 
+        /// <summary>
+        /// Refreshes the visual state of every cell on the board to match current data.
+        /// </summary>
         public void RefreshAll()
         {
             for (int r = 0; r < _cellViews.GetLength(0); r++)

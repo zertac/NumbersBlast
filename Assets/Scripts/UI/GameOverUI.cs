@@ -5,6 +5,9 @@ using NumbersBlast.Core;
 
 namespace NumbersBlast.UI
 {
+    /// <summary>
+    /// Game over popup that displays the final score and provides a restart option.
+    /// </summary>
     public class GameOverUI : BasePopup
     {
         [SerializeField] private TextMeshProUGUI _finalScoreText;
@@ -16,6 +19,9 @@ namespace NumbersBlast.UI
             _restartButton.onClick.AddListener(HandleRestart);
         }
 
+        /// <summary>
+        /// Sets the final score value displayed on the game over screen.
+        /// </summary>
         public void SetScore(int score)
         {
             _finalScoreText.text = score.ToString();

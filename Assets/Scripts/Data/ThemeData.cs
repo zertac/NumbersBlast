@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace NumbersBlast.Data
 {
+    /// <summary>
+    /// ScriptableObject holding all visual theme settings including background, board, cell, highlight, and UI colors and sprites.
+    /// </summary>
     [CreateAssetMenu(fileName = "ThemeData", menuName = "NumbersBlast/Theme Data")]
     public class ThemeData : ScriptableObject
     {
@@ -39,6 +42,9 @@ namespace NumbersBlast.Data
         private BlockVisual[] _visualCache;
         private static readonly BlockVisual DefaultVisual = new() { Value = -1, Color = Color.gray };
 
+        /// <summary>
+        /// Returns the <see cref="BlockVisual"/> for the given block value, or a default gray visual if not found.
+        /// </summary>
         public BlockVisual GetBlockVisual(int value)
         {
             if (_visualCache == null || _visualCache.Length == 0)

@@ -5,6 +5,9 @@ using NumbersBlast.Core;
 
 namespace NumbersBlast.UI
 {
+    /// <summary>
+    /// Displays and animates the player's current score with a punch-scale effect on score changes.
+    /// </summary>
     public class ScoreUI : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI _scoreText;
@@ -17,6 +20,9 @@ namespace NumbersBlast.UI
         private int _currentScore;
         private RectTransform _rectTransform;
 
+        /// <summary>
+        /// Resets the score to zero and subscribes to score change events.
+        /// </summary>
         public void Initialize()
         {
             _currentScore = 0;
@@ -44,6 +50,9 @@ namespace NumbersBlast.UI
             _scoreText.text = _currentScore.ToString();
         }
 
+        /// <summary>
+        /// Returns the current accumulated score.
+        /// </summary>
         public int GetScore()
         {
             return _currentScore;

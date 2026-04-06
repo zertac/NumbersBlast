@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace NumbersBlast.Data
 {
+    /// <summary>
+    /// ScriptableObject containing multiplayer settings including turn timing, opponent AI behavior weights, and fake opponent personality parameters.
+    /// </summary>
     [CreateAssetMenu(fileName = "MultiplayerConfig", menuName = "NumbersBlast/Multiplayer Config")]
     public class MultiplayerConfig : ScriptableObject
     {

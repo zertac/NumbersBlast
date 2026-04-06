@@ -14,6 +14,9 @@ using NumbersBlast.UI;
 
 namespace NumbersBlast.Core
 {
+    /// <summary>
+    /// Bootstraps the gameplay scene by initializing all core systems, wiring up event listeners, and starting the appropriate game mode.
+    /// </summary>
     public class GameplayInitializer : IStartable
     {
         // Core - constructor inject
@@ -56,6 +59,9 @@ namespace NumbersBlast.Core
             _feedbackManager = feedbackManager;
         }
 
+        /// <summary>
+        /// Initializes the board, UI, audio, and event subscriptions, then starts single-player or multiplayer mode.
+        /// </summary>
         public void Start()
         {
             GameEvents.ClearAll();

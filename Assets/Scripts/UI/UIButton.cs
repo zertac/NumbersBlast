@@ -7,6 +7,9 @@ using NumbersBlast.Feedback;
 
 namespace NumbersBlast.UI
 {
+    /// <summary>
+    /// Adds press/release scale animation, click sound, and haptic feedback to a UI button.
+    /// </summary>
     [RequireComponent(typeof(Image))]
     public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
     {

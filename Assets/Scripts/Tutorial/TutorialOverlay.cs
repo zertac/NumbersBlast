@@ -6,6 +6,9 @@ using NumbersBlast.Board;
 
 namespace NumbersBlast.Tutorial
 {
+    /// <summary>
+    /// Controls the tutorial UI overlay including the dark mask with cutout highlight, hand icon animations, and instruction text.
+    /// </summary>
     public class TutorialOverlay : MonoBehaviour
     {
         [SerializeField] private RawImage _overlayImage;
@@ -27,6 +30,9 @@ namespace NumbersBlast.Tutorial
         private static readonly int CutoutCenterProp = Shader.PropertyToID("_CutoutCenter");
         private static readonly int CutoutSizeProp = Shader.PropertyToID("_CutoutSize");
 
+        /// <summary>
+        /// Initializes the overlay material and sets default state. Must be called before any other method.
+        /// </summary>
         public void Initialize(Vector2 handOffset = default)
         {
             _handOffset = handOffset == default ? new Vector2(30f, -30f) : handOffset;
@@ -54,6 +60,9 @@ namespace NumbersBlast.Tutorial
             _instructionText.text = text;
         }
 
+        /// <summary>
+        /// Animates the cutout to highlight the area covered by the target RectTransform.
+        /// </summary>
         public void HighlightRect(RectTransform target, float padding = 0.02f)
         {
             var uv = WorldToUV(target);
@@ -61,6 +70,9 @@ namespace NumbersBlast.Tutorial
             AnimateCutout(uv.center, uv.size);
         }
 
+        /// <summary>
+        /// Animates the cutout to highlight the rectangular region spanning from topLeft to bottomRight cell views.
+        /// </summary>
         public void HighlightTwoCells(CellView topLeft, CellView bottomRight, float padding = 0.02f)
         {
             Vector3[] tlCorners = new Vector3[4];
@@ -115,6 +127,9 @@ namespace NumbersBlast.Tutorial
             return (center, size);
         }
 
+        /// <summary>
+        /// Shows the hand icon at the target position with a looping breathing animation.
+        /// </summary>
         public void ShowHandAtPosition(RectTransform target)
         {
             if (_handIcon == null || target == null) return;
@@ -134,6 +149,9 @@ namespace NumbersBlast.Tutorial
             _handTween = seq;
         }
 
+        /// <summary>
+        /// Smoothly moves the hand icon to the target position, then starts a breathing animation.
+        /// </summary>
         public void MoveHandToPosition(RectTransform target, float duration = HandMoveDuration)
         {
             if (_handIcon == null || target == null) return;
@@ -157,6 +175,9 @@ namespace NumbersBlast.Tutorial
                 });
         }
 
+        /// <summary>
+        /// Scales the hand icon down to zero and deactivates it.
+        /// </summary>
         public void HideHand()
         {
             KillHandTween();

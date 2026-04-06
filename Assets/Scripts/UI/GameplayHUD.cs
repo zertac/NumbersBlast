@@ -5,6 +5,9 @@ using NumbersBlast.StateMachine;
 
 namespace NumbersBlast.UI
 {
+    /// <summary>
+    /// In-game heads-up display that handles pause and settings button interactions during gameplay.
+    /// </summary>
     public class GameplayHUD : MonoBehaviour
     {
         [SerializeField] private Button _pauseButton;
@@ -13,6 +16,9 @@ namespace NumbersBlast.UI
         private IUIManager _uiManager;
         private GameStateManager _gameStateManager;
 
+        /// <summary>
+        /// Initializes the HUD with required dependencies and wires up button listeners.
+        /// </summary>
         public void Initialize(IUIManager uiManager, GameStateManager gameStateManager)
         {
             _uiManager = uiManager;

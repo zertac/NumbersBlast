@@ -6,6 +6,9 @@ using NumbersBlast.Data;
 
 namespace NumbersBlast.Feedback
 {
+    /// <summary>
+    /// Orchestrates visual feedback (DOTween animations, screen shake) and haptic responses for gameplay events.
+    /// </summary>
     public class FeedbackManager : IFeedbackManager
     {
         private readonly FeedbackConfig _config;
@@ -25,13 +28,18 @@ namespace NumbersBlast.Feedback
         private const float ShakeRandomnessDegrees = 90f;
         private const int PickupVibrato = 1;
         private const float PickupElasticity = 0.5f;
-        private const int PunchScaleVibrato = 2;
 
+        /// <summary>
+        /// Creates a new FeedbackManager with the given animation configuration.
+        /// </summary>
         public FeedbackManager(FeedbackConfig config)
         {
             _config = config;
         }
 
+        /// <summary>
+        /// Initializes the feedback system with the target RectTransform used for screen shake.
+        /// </summary>
         public void Initialize(RectTransform shakeTarget)
         {
             _shakeTarget = shakeTarget;
@@ -40,6 +48,9 @@ namespace NumbersBlast.Feedback
 
         // === HOVER STATE ===
 
+        /// <summary>
+        /// Starts the hover animation on the board and merge-candidate cells.
+        /// </summary>
         public void StartMergeHover(IReadOnlyList<CellView> mergeCells)
         {
             if (_shakeTarget == null) return;
@@ -69,6 +80,9 @@ namespace NumbersBlast.Feedback
             }
         }
 
+        /// <summary>
+        /// Stops the merge hover animation and resets cell scales.
+        /// </summary>
         public void StopMergeHover(IReadOnlyList<CellView> mergeCells)
         {
             if (!_isHoveringMerge) return;
@@ -91,6 +105,9 @@ namespace NumbersBlast.Feedback
 
         // === PLACEMENT ===
 
+        /// <summary>
+        /// Plays a pop-in scale effect on newly placed cells with a light haptic.
+        /// </summary>
         public void PlayPlaceEffect(CellView[] cells)
         {
             for (int i = 0; i < cells.Length; i++)
@@ -109,6 +126,9 @@ namespace NumbersBlast.Feedback
 
         // === MERGE ===
 
+        /// <summary>
+        /// Plays the merge impact animation where absorbed cells shrink into the target cell.
+        /// </summary>
         public void PlayMergeSmash(CellView targetCell, CellView[] absorbedCells)
         {
             if (targetCell == null) return;
@@ -147,6 +167,9 @@ namespace NumbersBlast.Feedback
             }).SetLink(targetCell.gameObject);
         }
 
+        /// <summary>
+        /// Plays an intensified merge impact animation for chain merges.
+        /// </summary>
         public void PlayChainMergeSmash(CellView targetCell)
         {
             if (targetCell == null) return;
@@ -165,6 +188,9 @@ namespace NumbersBlast.Feedback
 
         // === LINE CLEAR ===
 
+        /// <summary>
+        /// Plays a sequential grow-and-shrink clear animation on cells, invoking onComplete when all finish.
+        /// </summary>
         public void PlayLineClearEffect(CellView[] cells, System.Action onComplete)
         {
             if (cells == null || cells.Length == 0) { onComplete?.Invoke(); return; }
@@ -196,6 +222,9 @@ namespace NumbersBlast.Feedback
 
         // === GAME OVER ===
 
+        /// <summary>
+        /// Plays a heavy screen shake and haptic for the game over event.
+        /// </summary>
         public void PlayGameOverEffect(System.Action onComplete)
         {
             ShakeScreen(_config.ShakeStrength * GameOverMultiplier, _config.ShakeDuration * GameOverMultiplier);
@@ -205,6 +234,9 @@ namespace NumbersBlast.Feedback
 
         // === PIECE PICKUP ===
 
+        /// <summary>
+        /// Plays a punch-scale effect on the piece transform when picked up.
+        /// </summary>
         public void PlayPiecePickupEffect(Transform pieceTransform)
         {
             if (pieceTransform == null) return;

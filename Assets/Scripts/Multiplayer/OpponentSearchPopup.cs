@@ -9,6 +9,9 @@ using NumbersBlast.UI;
 
 namespace NumbersBlast.Multiplayer
 {
+    /// <summary>
+    /// Simulates a fake matchmaking search with animated status text and icon, then returns a random opponent name.
+    /// </summary>
     public class OpponentSearchPopup : BasePopup
     {
         [SerializeField] private TextMeshProUGUI _statusText;
@@ -41,6 +44,9 @@ namespace NumbersBlast.Multiplayer
             _cancelButton.onClick.AddListener(OnCancelClick);
         }
 
+        /// <summary>
+        /// Begins the fake opponent search sequence, invoking onFound or onCancel when complete.
+        /// </summary>
         public void StartSearch(MultiplayerConfig config, Action onFound, Action onCancel)
         {
             _config = config;

@@ -6,11 +6,17 @@ using NumbersBlast.Piece;
 
 namespace NumbersBlast.Gameplay
 {
+    /// <summary>
+    /// Resolves merges by iterating placed cells, absorbing same-value neighbors, and chaining subsequent merges.
+    /// </summary>
     public class MergeResolver : IMergeResolver
     {
         private readonly HashSet<Vector2Int> _placedPositions = new();
         private readonly List<Vector2Int> _neighborMatches = new(4);
 
+        /// <summary>
+        /// Finds and executes all merges triggered by placing a piece, including chain merges.
+        /// </summary>
         public List<MergeEvent> Resolve(BoardModel model, PieceModel pieceModel, Vector2Int boardPos)
         {
             var mergeEvents = new List<MergeEvent>();

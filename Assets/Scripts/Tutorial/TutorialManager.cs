@@ -7,6 +7,9 @@ using NumbersBlast.UI;
 
 namespace NumbersBlast.Tutorial
 {
+    /// <summary>
+    /// Orchestrates the step-by-step tutorial flow, managing board setup, piece spawning, overlay highlights, and progression.
+    /// </summary>
     public class TutorialManager
     {
 
@@ -37,12 +40,18 @@ namespace NumbersBlast.Tutorial
             _boardConfig = boardConfig;
         }
 
+        /// <summary>
+        /// Returns true if a tutorial config exists and the player has not yet completed the tutorial.
+        /// </summary>
         public bool ShouldRunTutorial()
         {
             return _config != null && _config.Steps != null && _config.Steps.Length > 0
                 && PlayerPrefs.GetInt(GameConstants.TutorialCompleteKey, 0) == 0;
         }
 
+        /// <summary>
+        /// Begins the tutorial from the first step, initializing the overlay and subscribing to placement events.
+        /// </summary>
         public void StartTutorial()
         {
             _isActive = true;
@@ -52,6 +61,9 @@ namespace NumbersBlast.Tutorial
             LoadStep(_currentStepIndex);
         }
 
+        /// <summary>
+        /// Ends the tutorial, hides the overlay, and marks it as completed in PlayerPrefs.
+        /// </summary>
         public void StopTutorial()
         {
             _isActive = false;
@@ -189,6 +201,9 @@ namespace NumbersBlast.Tutorial
             });
         }
 
+        /// <summary>
+        /// Called when the player picks up the tutorial piece; updates the overlay to highlight the target placement area.
+        /// </summary>
         public void OnPiecePickedUp()
         {
             if (!_isActive) return;

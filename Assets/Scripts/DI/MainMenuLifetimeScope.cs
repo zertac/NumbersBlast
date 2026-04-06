@@ -7,6 +7,9 @@ using NumbersBlast.UI;
 
 namespace NumbersBlast.DI
 {
+    /// <summary>
+    /// DI scope for the main menu scene. Registers UI management, audio, and menu-specific components.
+    /// </summary>
     public class MainMenuLifetimeScope : LifetimeScope
     {
         [SerializeField] private UIConfig _uiConfig;

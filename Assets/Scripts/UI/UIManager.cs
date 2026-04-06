@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace NumbersBlast.UI
 {
+    /// <summary>
+    /// Manages popup lifecycle including instantiation, caching, and display with automatic cleanup of previous popups.
+    /// </summary>
     public class UIManager : IUIManager
     {
         private readonly UIConfig _config;
@@ -17,6 +20,7 @@ namespace NumbersBlast.UI
             _popupContainer = popupContainer;
         }
 
+        /// <inheritdoc />
         public T ShowPopup<T>() where T : BasePopup
         {
             if (_currentPopup != null)
@@ -46,6 +50,7 @@ namespace NumbersBlast.UI
             return popup as T;
         }
 
+        /// <inheritdoc />
         public void CloseCurrentPopup()
         {
             if (_currentPopup == null) return;
@@ -53,6 +58,7 @@ namespace NumbersBlast.UI
             _currentPopup = null;
         }
 
+        /// <inheritdoc />
         public T GetPopup<T>() where T : BasePopup
         {
             if (_cachedPopups.TryGetValue(typeof(T), out var popup))
@@ -60,6 +66,7 @@ namespace NumbersBlast.UI
             return null;
         }
 
+        /// <inheritdoc />
         public bool IsPopupActive => _currentPopup != null && _currentPopup.gameObject.activeSelf;
     }
 }

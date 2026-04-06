@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace NumbersBlast.Data
 {
+    /// <summary>
+    /// ScriptableObject holding all audio clip references and volume settings for music, UI, and gameplay sounds.
+    /// </summary>
     [CreateAssetMenu(fileName = "AudioConfig", menuName = "NumbersBlast/Audio Config")]
     public class AudioConfig : ScriptableObject
     {

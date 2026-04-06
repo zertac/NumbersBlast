@@ -9,6 +9,9 @@ using NumbersBlast.StateMachine;
 
 namespace NumbersBlast.Gameplay
 {
+    /// <summary>
+    /// Orchestrates piece placement on the board, triggering merges, line clears, feedback, and game-over checks.
+    /// </summary>
     public class PlacementHandler
     {
         private readonly BoardManager _boardManager;
@@ -20,8 +23,14 @@ namespace NumbersBlast.Gameplay
         private readonly GameStateManager _gameStateManager;
         private readonly AudioManager _audioManager;
 
+        /// <summary>
+        /// Raised after a placement is fully resolved, including merges and line clears.
+        /// </summary>
         public event System.Action OnPlacementComplete;
 
+        /// <summary>
+        /// Creates a PlacementHandler wired to the board, resolvers, tray, feedback, state, and audio systems.
+        /// </summary>
         public PlacementHandler(BoardManager boardManager, IMergeResolver mergeResolver, ILineClearResolver lineClearResolver, PieceTray pieceTray, BoardView boardView, IFeedbackManager feedbackManager, GameStateManager gameStateManager, AudioManager audioManager)
         {
             _boardManager = boardManager;
@@ -34,11 +43,17 @@ namespace NumbersBlast.Gameplay
             _audioManager = audioManager;
         }
 
+        /// <summary>
+        /// Subscribes to piece placement events.
+        /// </summary>
         public void Enable()
         {
             GameEvents.OnPiecePlaced += HandlePiecePlaced;
         }
 
+        /// <summary>
+        /// Unsubscribes from piece placement events.
+        /// </summary>
         public void Disable()
         {
             GameEvents.OnPiecePlaced -= HandlePiecePlaced;

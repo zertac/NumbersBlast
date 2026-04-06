@@ -12,6 +12,9 @@ using NumbersBlast.Tutorial;
 
 namespace NumbersBlast.Input
 {
+    /// <summary>
+    /// Handles drag-and-drop input for placing pieces on the board, including hover highlights and snap-back.
+    /// </summary>
     public class PieceDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler
     {
         private PieceView _pieceView;
@@ -42,6 +45,9 @@ namespace NumbersBlast.Input
         private readonly HashSet<Vector2Int> _placedSet = new(16);
         private readonly HashSet<Vector2Int> _occupiedAfterPlace = new(64);
 
+        /// <summary>
+        /// Injects all required dependencies for drag handling.
+        /// </summary>
         public void Initialize(PieceView pieceView, Canvas canvas, BoardView boardView, BoardManager boardManager, BoardConfig config, TutorialManager tutorialManager = null, IFeedbackManager feedbackManager = null, GameStateManager gameStateManager = null)
         {
             _pieceView = pieceView;

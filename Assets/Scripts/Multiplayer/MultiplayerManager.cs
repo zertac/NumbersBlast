@@ -8,6 +8,9 @@ using NumbersBlast.UI;
 
 namespace NumbersBlast.Multiplayer
 {
+    /// <summary>
+    /// Central coordinator for multiplayer mode, wiring together turn management, AI, visual playback, HUD, and scoring.
+    /// </summary>
     public class MultiplayerManager
     {
         private readonly MultiplayerConfig _config;
@@ -42,6 +45,9 @@ namespace NumbersBlast.Multiplayer
             _placementHandler = placementHandler;
         }
 
+        /// <summary>
+        /// Initializes and starts a multiplayer session, subscribing to all turn and game events.
+        /// </summary>
         public void StartMultiplayer(string opponentName)
         {
             _isActive = true;
@@ -58,6 +64,9 @@ namespace NumbersBlast.Multiplayer
             _turnManager.Start();
         }
 
+        /// <summary>
+        /// Stops the multiplayer session and unsubscribes from all events.
+        /// </summary>
         public void Stop()
         {
             _isActive = false;
@@ -73,6 +82,9 @@ namespace NumbersBlast.Multiplayer
             _placementHandler.OnPlacementComplete -= HandlePlacementComplete;
         }
 
+        /// <summary>
+        /// Forwards the frame delta to the turn manager for timer updates.
+        /// </summary>
         public void Tick(float deltaTime)
         {
             if (!_isActive) return;
@@ -137,6 +149,9 @@ namespace NumbersBlast.Multiplayer
             _turnManager.EndCurrentTurn();
         }
 
+        /// <summary>
+        /// Returns the match result string based on final player and opponent scores.
+        /// </summary>
         public string GetWinner()
         {
             if (_hud.PlayerScore > _hud.OpponentScore)

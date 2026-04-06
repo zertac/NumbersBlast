@@ -3,12 +3,18 @@ using NumbersBlast.Board;
 
 namespace NumbersBlast.Gameplay
 {
+    /// <summary>
+    /// Scans the board for fully occupied rows and columns, clears them, and calculates the score.
+    /// </summary>
     public class LineClearResolver : ILineClearResolver
     {
         private readonly List<int> _rowsToClear = new(8);
         private readonly List<int> _columnsToClear = new(8);
         private readonly HashSet<long> _clearedCells = new(64);
 
+        /// <summary>
+        /// Detects full rows and columns, clears their cells, and returns the total score with cleared positions.
+        /// </summary>
         public LineClearResult Resolve(BoardModel model)
         {
             _rowsToClear.Clear();

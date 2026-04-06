@@ -5,6 +5,9 @@ using NumbersBlast.Tutorial;
 
 namespace NumbersBlast.Editor
 {
+    /// <summary>
+    /// Custom inspector for TutorialStepData that provides visual editors for board state, piece shape, and target placement.
+    /// </summary>
     [CustomEditor(typeof(TutorialStepData))]
     public class TutorialStepDataEditor : UnityEditor.Editor
     {
@@ -21,7 +24,6 @@ namespace NumbersBlast.Editor
             new(0.91f, 0.54f, 0.54f)
         };
         private static readonly Color TargetColor = new(0.3f, 0.9f, 0.3f, 0.5f);
-        private static readonly Color PieceActiveColor = new(0.3f, 0.5f, 0.9f);
 
         private static GUIStyle _cellLabelStyle;
 
@@ -44,6 +46,9 @@ namespace NumbersBlast.Editor
             }
         }
 
+        /// <summary>
+        /// Draws the custom inspector with instruction text, board state grid, piece grid, and target placement editors.
+        /// </summary>
         public override void OnInspectorGUI()
         {
             var step = (TutorialStepData)target;
@@ -59,6 +64,9 @@ namespace NumbersBlast.Editor
             DrawTargetSection(step);
         }
 
+        /// <summary>
+        /// Draws the instruction text area and completion feedback fields with undo support.
+        /// </summary>
         private void DrawInstruction(TutorialStepData step)
         {
             EditorGUILayout.LabelField("Instruction", EditorStyles.boldLabel);
@@ -86,6 +94,9 @@ namespace NumbersBlast.Editor
             }
         }
 
+        /// <summary>
+        /// Draws the board state section with dimension sliders, brush value control, and the interactive board grid.
+        /// </summary>
         private void DrawBoardSection(TutorialStepData step)
         {
             EditorGUILayout.LabelField("Board State", EditorStyles.boldLabel);
@@ -107,6 +118,9 @@ namespace NumbersBlast.Editor
             DrawBoardGrid(step);
         }
 
+        /// <summary>
+        /// Renders the board grid cells with value colors, target highlights, and value labels.
+        /// </summary>
         private void DrawBoardGrid(TutorialStepData step)
         {
             float totalWidth = (CellSize + Spacing) * step.BoardColumns;
@@ -151,6 +165,9 @@ namespace NumbersBlast.Editor
             }
         }
 
+        /// <summary>
+        /// Processes mouse clicks on a board cell, painting the brush value on left-click or clearing on right-click.
+        /// </summary>
         private void HandleBoardCellClick(TutorialStepData step, Rect cellRect, int row, int col)
         {
             if (Event.current.type == EventType.MouseDown && cellRect.Contains(Event.current.mousePosition))
@@ -168,6 +185,9 @@ namespace NumbersBlast.Editor
             }
         }
 
+        /// <summary>
+        /// Draws the piece section with dimension sliders, piece brush value control, and the interactive piece grid.
+        /// </summary>
         private void DrawPieceSection(TutorialStepData step)
         {
             EditorGUILayout.LabelField("Piece", EditorStyles.boldLabel);
@@ -189,6 +209,9 @@ namespace NumbersBlast.Editor
             DrawPieceGrid(step);
         }
 
+        /// <summary>
+        /// Renders the piece grid with toggle and value painting support via left-click and clearing via right-click.
+        /// </summary>
         private void DrawPieceGrid(TutorialStepData step)
         {
             float totalWidth = (CellSize + Spacing) * step.PieceColumns;
@@ -241,6 +264,9 @@ namespace NumbersBlast.Editor
             }
         }
 
+        /// <summary>
+        /// Draws the target board position field with undo support.
+        /// </summary>
         private void DrawTargetSection(TutorialStepData step)
         {
             EditorGUILayout.LabelField("Target Position", EditorStyles.boldLabel);
@@ -254,6 +280,9 @@ namespace NumbersBlast.Editor
             }
         }
 
+        /// <summary>
+        /// Returns true if the given board cell falls within the piece's target placement area.
+        /// </summary>
         private bool IsTargetCell(TutorialStepData step, int row, int col)
         {
             var positions = step.GetPieceNormalizedPositions();
@@ -268,6 +297,9 @@ namespace NumbersBlast.Editor
             return false;
         }
 
+        /// <summary>
+        /// Resizes the board grid, preserving existing cell values within the overlapping region.
+        /// </summary>
         private void ResizeBoard(TutorialStepData step, int newRows, int newCols)
         {
             var newValues = new int[newRows * newCols];
@@ -283,6 +315,9 @@ namespace NumbersBlast.Editor
             step.BoardCellValues = newValues;
         }
 
+        /// <summary>
+        /// Resizes the piece grid, preserving existing cell states and values within the overlapping region.
+        /// </summary>
         private void ResizePiece(TutorialStepData step, int newRows, int newCols)
         {
             int newSize = newRows * newCols;
@@ -306,6 +341,9 @@ namespace NumbersBlast.Editor
             step.PieceValues = newValues;
         }
 
+        /// <summary>
+        /// Returns the editor display color for the given block value (1-4), or a neutral gray for unknown values.
+        /// </summary>
         private Color GetValueColor(int value)
         {
             if (value >= 1 && value <= 4) return ValueColors[value];

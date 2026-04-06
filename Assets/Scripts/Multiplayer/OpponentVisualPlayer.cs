@@ -12,6 +12,9 @@ using NumbersBlast.Piece;
 
 namespace NumbersBlast.Multiplayer
 {
+    /// <summary>
+    /// Visually animates the AI opponent's turn with human-like behaviors such as hesitation, wandering, and piece selection.
+    /// </summary>
     public class OpponentVisualPlayer : MonoBehaviour
     {
         private const float PieceSelectScale = 1.15f;
@@ -48,6 +51,9 @@ namespace NumbersBlast.Multiplayer
         private PieceView _selectedPiece;
         private CancellationTokenSource _cts;
 
+        /// <summary>
+        /// Injects all required dependencies for opponent visual playback.
+        /// </summary>
         public void Initialize(MultiplayerConfig config, BoardView boardView, PieceTray pieceTray,
             BoardManager boardManager, OpponentAI ai, BoardConfig boardConfig)
         {
@@ -59,6 +65,9 @@ namespace NumbersBlast.Multiplayer
             _boardConfig = boardConfig;
         }
 
+        /// <summary>
+        /// Starts the animated AI turn sequence asynchronously, invoking the callback on completion.
+        /// </summary>
         public void PerformTurn(Action onComplete)
         {
             _cts?.Cancel();
@@ -66,6 +75,9 @@ namespace NumbersBlast.Multiplayer
             PlayTurnAsync(onComplete, _cts.Token).Forget();
         }
 
+        /// <summary>
+        /// Cancels the current AI turn animation, clears highlights, and resets visual state.
+        /// </summary>
         public void CancelTurn()
         {
             _cts?.Cancel();

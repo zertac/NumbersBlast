@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace NumbersBlast.StateMachine
 {
+    /// <summary>
+    /// Controls game state transitions with validation, and provides pause/resume functionality.
+    /// </summary>
     public class GameStateManager
     {
         private GameState _currentState;
@@ -10,13 +13,22 @@ namespace NumbersBlast.StateMachine
 
         public GameState CurrentState => _currentState;
 
+        /// <summary>
+        /// Raised when the game state changes, providing the previous and new state.
+        /// </summary>
         public event Action<GameState, GameState> OnStateChanged;
 
+        /// <summary>
+        /// Sets the initial game state without firing any transition events.
+        /// </summary>
         public void Initialize(GameState initialState)
         {
             _currentState = initialState;
         }
 
+        /// <summary>
+        /// Returns whether transitioning from the current state to the given state is valid.
+        /// </summary>
         public bool CanTransitionTo(GameState newState)
         {
             if (_currentState == newState) return false;
@@ -56,6 +68,9 @@ namespace NumbersBlast.StateMachine
             };
         }
 
+        /// <summary>
+        /// Attempts to transition to the given state, logging a warning if the transition is invalid.
+        /// </summary>
         public bool TransitionTo(GameState newState)
         {
             if (_currentState == newState) return true;
@@ -72,6 +87,9 @@ namespace NumbersBlast.StateMachine
             return true;
         }
 
+        /// <summary>
+        /// Pauses the game by saving the current state and transitioning to Paused.
+        /// </summary>
         public void Pause()
         {
             if (_currentState == GameState.Paused || _currentState == GameState.GameOver) return;
@@ -79,6 +97,9 @@ namespace NumbersBlast.StateMachine
             TransitionTo(GameState.Paused);
         }
 
+        /// <summary>
+        /// Resumes the game by restoring the state that was active before pausing.
+        /// </summary>
         public void Resume()
         {
             if (_currentState != GameState.Paused) return;
@@ -97,6 +118,9 @@ namespace NumbersBlast.StateMachine
             OnStateChanged?.Invoke(previous, _currentState);
         }
 
+        /// <summary>
+        /// True when the current state permits player input (Idle, Dragging, or Tutorial).
+        /// </summary>
         public bool IsInputAllowed => _currentState == GameState.Idle || _currentState == GameState.Dragging || _currentState == GameState.Tutorial;
     }
 }

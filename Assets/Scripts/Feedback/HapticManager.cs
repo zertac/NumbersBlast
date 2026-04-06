@@ -6,10 +6,16 @@ using System.Runtime.InteropServices;
 
 namespace NumbersBlast.Feedback
 {
+    /// <summary>
+    /// Provides cross-platform haptic feedback for Android and iOS devices with persistent enable/disable preference.
+    /// </summary>
     public static class HapticManager
     {
         private static bool _enabled = true;
 
+        /// <summary>
+        /// Gets or sets whether haptic feedback is enabled, persisting the preference via PlayerPrefs.
+        /// </summary>
         public static bool Enabled
         {
             get => _enabled;
@@ -26,6 +32,9 @@ namespace NumbersBlast.Feedback
             _enabled = PlayerPrefs.GetInt(GameConstants.HapticEnabledKey, 1) == 1;
         }
 
+        /// <summary>
+        /// Triggers a light haptic vibration.
+        /// </summary>
         public static void Light()
         {
             if (!_enabled) return;
@@ -36,6 +45,9 @@ namespace NumbersBlast.Feedback
 #endif
         }
 
+        /// <summary>
+        /// Triggers a medium haptic vibration.
+        /// </summary>
         public static void Medium()
         {
             if (!_enabled) return;
@@ -46,6 +58,9 @@ namespace NumbersBlast.Feedback
 #endif
         }
 
+        /// <summary>
+        /// Triggers a heavy haptic vibration.
+        /// </summary>
         public static void Heavy()
         {
             if (!_enabled) return;

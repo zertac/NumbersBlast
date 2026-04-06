@@ -4,6 +4,9 @@ using NumbersBlast.Data;
 
 namespace NumbersBlast.Audio
 {
+    /// <summary>
+    /// Manages all game audio including music playback, SFX, and user sound preferences.
+    /// </summary>
     public class AudioManager
     {
         // Static instance for MonoBehaviour access (UIButton, SettingsPopup) where DI injection is not available.
@@ -19,7 +22,14 @@ namespace NumbersBlast.Audio
         private bool _sfxEnabled = true;
 
 
+        /// <summary>
+        /// Whether background music is currently enabled.
+        /// </summary>
         public bool MusicEnabled => _musicEnabled;
+
+        /// <summary>
+        /// Whether sound effects are currently enabled.
+        /// </summary>
         public bool SFXEnabled => _sfxEnabled;
 
         public AudioManager(AudioConfig config)
@@ -49,6 +59,9 @@ namespace NumbersBlast.Audio
             _instance = this;
         }
 
+        /// <summary>
+        /// Static singleton accessor for contexts where DI injection is not available (e.g. UIButton, SettingsPopup).
+        /// </summary>
         public static AudioManager Instance => _instance;
 
         // One-time runtime creation; persists across scenes via DontDestroyOnLoad.
@@ -69,16 +82,25 @@ namespace NumbersBlast.Audio
 
         // === Music ===
 
+        /// <summary>
+        /// Starts playing the main menu background music.
+        /// </summary>
         public void PlayMenuMusic()
         {
             PlayMusic(_config.MenuMusic);
         }
 
+        /// <summary>
+        /// Starts playing the gameplay background music.
+        /// </summary>
         public void PlayGameplayMusic()
         {
             PlayMusic(_config.GameplayMusic);
         }
 
+        /// <summary>
+        /// Stops the currently playing background music.
+        /// </summary>
         public void StopMusic()
         {
             if (_musicSource != null)
@@ -116,12 +138,18 @@ namespace NumbersBlast.Audio
         private const float ChainPitchMin = 1f;
         private const float ChainPitchMax = 2f;
 
+        /// <summary>
+        /// Plays the merge SFX and resets the chain pitch counter.
+        /// </summary>
         public void PlayMerge()
         {
             _chainCount = 0;
             PlaySFX(_config.Merge);
         }
 
+        /// <summary>
+        /// Plays the merge SFX with progressively increasing pitch for chain combos.
+        /// </summary>
         public void PlayChainMerge()
         {
             _chainCount++;
@@ -145,6 +173,9 @@ namespace NumbersBlast.Audio
 
         // === Settings ===
 
+        /// <summary>
+        /// Toggles music on/off and persists the preference to PlayerPrefs.
+        /// </summary>
         public void ToggleMusic()
         {
             _musicEnabled = !_musicEnabled;
@@ -154,6 +185,9 @@ namespace NumbersBlast.Audio
             PlayerPrefs.Save();
         }
 
+        /// <summary>
+        /// Toggles sound effects on/off and persists the preference to PlayerPrefs.
+        /// </summary>
         public void ToggleSFX()
         {
             _sfxEnabled = !_sfxEnabled;

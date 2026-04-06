@@ -5,6 +5,9 @@ using NumbersBlast.StateMachine;
 
 namespace NumbersBlast.Multiplayer
 {
+    /// <summary>
+    /// Manages turn-based flow in multiplayer, including turn timers, transitions, and timeout penalties.
+    /// </summary>
     public class TurnManager
     {
         private readonly MultiplayerConfig _config;
@@ -20,9 +23,13 @@ namespace NumbersBlast.Multiplayer
         public float TurnTimeRemaining => _turnTimer;
         public float TurnTimeNormalized => _turnTimer / _config.TurnDuration;
 
+        /// <summary>Raised when the player's turn begins.</summary>
         public event Action OnPlayerTurnStart;
+        /// <summary>Raised when the opponent's turn begins.</summary>
         public event Action OnOpponentTurnStart;
+        /// <summary>Raised each frame with the normalized remaining turn time.</summary>
         public event Action<float> OnTimerTick;
+        /// <summary>Raised when the current turn expires without a move.</summary>
         public event Action OnTurnTimeout;
 
         public TurnManager(MultiplayerConfig config, GameStateManager gameStateManager)
@@ -31,6 +38,9 @@ namespace NumbersBlast.Multiplayer
             _gameStateManager = gameStateManager;
         }
 
+        /// <summary>
+        /// Activates turn management and randomly assigns the first turn.
+        /// </summary>
         public void Start()
         {
             _isActive = true;
@@ -41,11 +51,17 @@ namespace NumbersBlast.Multiplayer
                 StartOpponentTurn();
         }
 
+        /// <summary>
+        /// Deactivates turn management.
+        /// </summary>
         public void Stop()
         {
             _isActive = false;
         }
 
+        /// <summary>
+        /// Advances the turn timer by the given delta time and triggers timeout if expired.
+        /// </summary>
         public void Tick(float deltaTime)
         {
             if (!_isActive) return;
@@ -63,6 +79,9 @@ namespace NumbersBlast.Multiplayer
             }
         }
 
+        /// <summary>
+        /// Begins the player's turn, resets the timer, and transitions the game state to Idle.
+        /// </summary>
         public void StartPlayerTurn()
         {
             if (!_isActive) return;
@@ -78,6 +97,9 @@ namespace NumbersBlast.Multiplayer
             OnPlayerTurnStart?.Invoke();
         }
 
+        /// <summary>
+        /// Begins the opponent's turn, resets the timer, and transitions the game state to Processing.
+        /// </summary>
         public void StartOpponentTurn()
         {
             if (!_isActive) return;
@@ -90,6 +112,9 @@ namespace NumbersBlast.Multiplayer
             OnOpponentTurnStart?.Invoke();
         }
 
+        /// <summary>
+        /// Ends the current turn and switches to the other player's turn.
+        /// </summary>
         public void EndCurrentTurn()
         {
             if (!_isActive) return;
@@ -111,6 +136,9 @@ namespace NumbersBlast.Multiplayer
             EndCurrentTurn();
         }
 
+        /// <summary>
+        /// Calculates the score penalty for a turn timeout based on the configured penalty percentage.
+        /// </summary>
         public int GetPenaltyAmount(int currentScore)
         {
             if (currentScore <= 0) return 0;

@@ -1,5 +1,8 @@
 namespace NumbersBlast.Board
 {
+    /// <summary>
+    /// Pure data model representing the board grid and its cell states.
+    /// </summary>
     public class BoardModel
     {
         public int Rows { get; private set; }
@@ -21,11 +24,17 @@ namespace NumbersBlast.Board
             }
         }
 
+        /// <summary>
+        /// Returns true if the given row and column are within the board boundaries.
+        /// </summary>
         public bool IsInBounds(int row, int column)
         {
             return row >= 0 && row < Rows && column >= 0 && column < Columns;
         }
 
+        /// <summary>
+        /// Returns the CellData at the specified position, or null if out of bounds.
+        /// </summary>
         public CellData GetCell(int row, int column)
         {
             if (!IsInBounds(row, column)) return null;
@@ -38,6 +47,9 @@ namespace NumbersBlast.Board
             return Cells[row, column].IsEmpty;
         }
 
+        /// <summary>
+        /// Checks whether a piece with the given shape can be placed at the specified board position without overlapping.
+        /// </summary>
         public bool CanFitPiece(UnityEngine.Vector2Int[] positions, int startRow, int startCol)
         {
             for (int i = 0; i < positions.Length; i++)

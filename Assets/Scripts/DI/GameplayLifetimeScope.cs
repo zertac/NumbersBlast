@@ -15,6 +15,9 @@ using NumbersBlast.UI;
 
 namespace NumbersBlast.DI
 {
+    /// <summary>
+    /// DI scope for the gameplay scene. Registers board, piece, scoring, tutorial, feedback, and multiplayer dependencies.
+    /// </summary>
     public class GameplayLifetimeScope : LifetimeScope
     {
         [SerializeField] private BoardConfig _boardConfig;

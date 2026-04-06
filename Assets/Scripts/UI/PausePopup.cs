@@ -6,6 +6,9 @@ using NumbersBlast.StateMachine;
 
 namespace NumbersBlast.UI
 {
+    /// <summary>
+    /// Pause menu popup with resume, restart, and main menu options. Supports both single-player and multiplayer modes.
+    /// </summary>
     public class PausePopup : BasePopup
     {
         [SerializeField] private Button _resumeButton;
@@ -23,11 +26,17 @@ namespace NumbersBlast.UI
             _mainMenuButton.onClick.AddListener(OnMainMenu);
         }
 
+        /// <summary>
+        /// Injects the game state manager used to pause and resume gameplay.
+        /// </summary>
         public void SetGameStateManager(GameStateManager gameStateManager)
         {
             _gameStateManager = gameStateManager;
         }
 
+        /// <summary>
+        /// Sets whether the game is in multiplayer mode, which affects pause/resume behavior.
+        /// </summary>
         public void SetMultiplayerMode(bool isMultiplayer)
         {
             _isMultiplayer = isMultiplayer;

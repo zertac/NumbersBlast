@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace NumbersBlast.Data
 {
+    /// <summary>
+    /// ScriptableObject containing tuning parameters for all visual feedback effects such as screen shake, merge animations, and line clear visuals.
+    /// </summary>
     [CreateAssetMenu(fileName = "FeedbackConfig", menuName = "NumbersBlast/Feedback Config")]
     public class FeedbackConfig : ScriptableObject
     {

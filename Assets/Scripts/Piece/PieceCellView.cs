@@ -6,6 +6,9 @@ using NumbersBlast.Data;
 
 namespace NumbersBlast.Piece
 {
+    /// <summary>
+    /// Visual representation of a single cell within a piece, displaying its numeric value and themed background.
+    /// </summary>
     public class PieceCellView : MonoBehaviour
     {
         [SerializeField] private Image _background;
@@ -16,6 +19,9 @@ namespace NumbersBlast.Piece
 
         public RectTransform RectTransform { get; private set; }
 
+        /// <summary>
+        /// Sets the cell value and theme, then refreshes the visual appearance.
+        /// </summary>
         public void Initialize(int value, ThemeData theme)
         {
             _value = value;

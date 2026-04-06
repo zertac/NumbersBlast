@@ -7,6 +7,9 @@ using NumbersBlast.Multiplayer;
 
 namespace NumbersBlast.DI
 {
+    /// <summary>
+    /// Root DI scope that registers project-wide singletons surviving across all scenes.
+    /// </summary>
     public class ProjectLifetimeScope : LifetimeScope
     {
         [SerializeField] private AudioConfig _audioConfig;

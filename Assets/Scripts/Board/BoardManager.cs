@@ -3,6 +3,9 @@ using NumbersBlast.Data;
 
 namespace NumbersBlast.Board
 {
+    /// <summary>
+    /// Coordinates between the BoardModel and BoardView, serving as the main entry point for board operations.
+    /// </summary>
     public class BoardManager
     {
         private readonly BoardConfig _config;
@@ -10,7 +13,14 @@ namespace NumbersBlast.Board
 
         private BoardModel _model;
 
+        /// <summary>
+        /// The data model representing the current board state.
+        /// </summary>
         public BoardModel Model => _model;
+
+        /// <summary>
+        /// The configuration asset defining board dimensions, spacing, and theme.
+        /// </summary>
         public BoardConfig Config => _config;
 
         public BoardManager(BoardConfig config, BoardView view)
@@ -19,6 +29,9 @@ namespace NumbersBlast.Board
             _view = view;
         }
 
+        /// <summary>
+        /// Creates the board model and initializes the view with the configured dimensions and theme.
+        /// </summary>
         public void Initialize()
         {
             if (_config == null) { Debug.LogError("[BoardManager] BoardConfig is null!"); return; }

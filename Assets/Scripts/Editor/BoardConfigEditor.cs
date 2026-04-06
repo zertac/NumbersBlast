@@ -5,9 +5,15 @@ using NumbersBlast.Data;
 
 namespace NumbersBlast.Editor
 {
+    /// <summary>
+    /// Custom inspector for BoardConfig that validates piece shapes against the board dimensions and theme assignments.
+    /// </summary>
     [CustomEditor(typeof(BoardConfig))]
     public class BoardConfigEditor : UnityEditor.Editor
     {
+        /// <summary>
+        /// Draws the default inspector followed by validation HelpBoxes for missing references and oversized piece shapes.
+        /// </summary>
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
@@ -60,6 +66,10 @@ namespace NumbersBlast.Editor
             }
         }
 
+        /// <summary>
+        /// Performs a comprehensive validation of the BoardConfig, logging errors and warnings for missing references,
+        /// empty shapes, oversized shapes, and invalid block value ranges.
+        /// </summary>
         private void RunFullValidation(BoardConfig config)
         {
             int issues = 0;

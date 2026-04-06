@@ -1,5 +1,8 @@
 namespace NumbersBlast.Core
 {
+    /// <summary>
+    /// Global constants for scene names, PlayerPrefs keys, and gameplay configuration values.
+    /// </summary>
     public static class GameConstants
     {
         // Scene Names

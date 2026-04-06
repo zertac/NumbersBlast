@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace NumbersBlast.Tutorial
 {
+    /// <summary>
+    /// ScriptableObject holding the sequence of tutorial steps and shared tutorial settings.
+    /// </summary>
     [CreateAssetMenu(fileName = "TutorialConfig", menuName = "NumbersBlast/Tutorial Config")]
     public class TutorialConfig : ScriptableObject
     {

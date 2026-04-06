@@ -3,6 +3,9 @@ using UnityEngine.SceneManagement;
 
 namespace NumbersBlast.Core
 {
+    /// <summary>
+    /// Entry point MonoBehaviour that configures application settings (frame rate, VSync) and loads the main menu scene.
+    /// </summary>
     public class BootLoader : MonoBehaviour
     {
         private const int TargetFrameRateMobile = 60;

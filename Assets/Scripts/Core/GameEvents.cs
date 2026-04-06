@@ -4,15 +4,33 @@ using NumbersBlast.Piece;
 
 namespace NumbersBlast.Core
 {
+    /// <summary>
+    /// Central event bus for all gameplay events. Provides static events and raise methods to decouple game systems.
+    /// </summary>
     public static class GameEvents
     {
+        /// <summary>Raised when a piece is picked up from the tray.</summary>
         public static event Action<PieceView> OnPiecePickedUp;
+
+        /// <summary>Raised when a held piece is released without being placed.</summary>
         public static event Action<PieceView> OnPieceReleased;
+
+        /// <summary>Raised when a piece is successfully placed on the board.</summary>
         public static event Action<PieceView, Vector2Int> OnPiecePlaced;
+
+        /// <summary>Raised when the player's score changes, carrying the new score value.</summary>
         public static event Action<int> OnScoreChanged;
+
+        /// <summary>Raised when no valid moves remain and the game ends.</summary>
         public static event Action OnGameOver;
+
+        /// <summary>Raised when the piece tray is refilled with new pieces.</summary>
         public static event Action OnTrayRefilled;
+
+        /// <summary>Raised when any popup is opened.</summary>
         public static event Action OnPopupOpened;
+
+        /// <summary>Raised when any popup is closed.</summary>
         public static event Action OnPopupClosed;
 
         public static void PiecePickedUp(PieceView piece) => OnPiecePickedUp?.Invoke(piece);
@@ -24,6 +42,9 @@ namespace NumbersBlast.Core
         public static void PopupOpened() => OnPopupOpened?.Invoke();
         public static void PopupClosed() => OnPopupClosed?.Invoke();
 
+        /// <summary>
+        /// Unsubscribes all listeners from every event. Call during scene transitions to prevent stale references.
+        /// </summary>
         public static void ClearAll()
         {
             OnPiecePickedUp = null;

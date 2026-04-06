@@ -9,6 +9,9 @@ using NumbersBlast.Tutorial;
 
 namespace NumbersBlast.Piece
 {
+    /// <summary>
+    /// Manages the tray UI that holds spawnable pieces, handling creation, removal, and automatic refill.
+    /// </summary>
     public class PieceTray : MonoBehaviour
     {
         [SerializeField] private Transform[] _pieceSlots;
@@ -25,6 +28,9 @@ namespace NumbersBlast.Piece
         private GameStateManager _gameStateManager;
         private RectTransform[] _slotRects;
 
+        /// <summary>
+        /// Injects all required dependencies for piece spawning and drag handling.
+        /// </summary>
         // L-08: 8 parameters acknowledged. MonoBehaviour cannot use constructor injection,
         // so all dependencies must be passed via Initialize. Refactoring to a config object
         // would add complexity without meaningful benefit here.
@@ -45,6 +51,9 @@ namespace NumbersBlast.Piece
             _pieceViews = new PieceView[_pieceSlots.Length];
         }
 
+        /// <summary>
+        /// Fills empty tray slots with randomly shaped and valued pieces.
+        /// </summary>
         public void SpawnPieces()
         {
             var spawnConfig = _config.PieceSpawnConfig;
@@ -93,6 +102,9 @@ namespace NumbersBlast.Piece
             return Mathf.Min(scaleX, scaleY, GameConstants.MaxPieceTrayScale);
         }
 
+        /// <summary>
+        /// Clears the tray and spawns a single predetermined piece for the tutorial.
+        /// </summary>
         public void SpawnTutorialPiece(PieceModel model)
         {
             ClearAll();
@@ -130,6 +142,9 @@ namespace NumbersBlast.Piece
             }
         }
 
+        /// <summary>
+        /// Returns the first non-null piece view in the tray, or null if the tray is empty.
+        /// </summary>
         public PieceView GetFirstOccupiedPiece()
         {
             for (int i = 0; i < _pieceViews.Length; i++)
@@ -140,6 +155,9 @@ namespace NumbersBlast.Piece
             return null;
         }
 
+        /// <summary>
+        /// Returns the RectTransform of the first non-null piece in the tray, or null if empty.
+        /// </summary>
         public RectTransform GetFirstOccupiedPieceRect()
         {
             for (int i = 0; i < _pieceViews.Length; i++)
@@ -150,6 +168,9 @@ namespace NumbersBlast.Piece
             return null;
         }
 
+        /// <summary>
+        /// Returns the RectTransform of the slot containing the first non-null piece, or null if empty.
+        /// </summary>
         public RectTransform GetFirstOccupiedSlotRect()
         {
             for (int i = 0; i < _pieceViews.Length; i++)
@@ -160,6 +181,9 @@ namespace NumbersBlast.Piece
             return null;
         }
 
+        /// <summary>
+        /// Removes a placed piece from the tray and triggers a refill if the tray is now empty.
+        /// </summary>
         public void RemovePiece(PieceView piece)
         {
             for (int i = 0; i < _pieceViews.Length; i++)

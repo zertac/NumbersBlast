@@ -1,5 +1,8 @@
 namespace NumbersBlast.Board
 {
+    /// <summary>
+    /// Represents the data model for a single cell on the board, holding its position and numeric value.
+    /// </summary>
     public class CellData
     {
         public int Row { get; private set; }

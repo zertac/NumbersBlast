@@ -4,6 +4,9 @@ using NumbersBlast.Data;
 
 namespace NumbersBlast.Piece
 {
+    /// <summary>
+    /// Visual representation of a draggable piece, responsible for instantiating and laying out cell views.
+    /// </summary>
     public class PieceView : MonoBehaviour
     {
         [SerializeField] private GameObject _cellPrefab;
@@ -17,6 +20,9 @@ namespace NumbersBlast.Piece
         public RectTransform RectTransform { get; private set; }
         public PieceModel Model => _model;
 
+        /// <summary>
+        /// Initializes the piece view with its data model and creates the cell visuals.
+        /// </summary>
         public void Initialize(PieceModel model, BoardConfig config, float cellSize)
         {
             _model = model;

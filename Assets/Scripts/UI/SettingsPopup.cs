@@ -6,6 +6,9 @@ using NumbersBlast.Feedback;
 
 namespace NumbersBlast.UI
 {
+    /// <summary>
+    /// Settings popup that provides toggle controls for music, sound effects, and haptic feedback.
+    /// </summary>
     public class SettingsPopup : BasePopup
     {
         [SerializeField] private Button _musicToggle;
@@ -37,6 +40,9 @@ namespace NumbersBlast.UI
             _closeButton.onClick.AddListener(OnClose);
         }
 
+        /// <summary>
+        /// Injects the audio manager and refreshes toggle states to reflect current settings.
+        /// </summary>
         public void SetAudioManager(AudioManager audioManager)
         {
             _audioManager = audioManager;

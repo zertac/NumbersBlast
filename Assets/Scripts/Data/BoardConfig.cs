@@ -3,6 +3,9 @@ using NumbersBlast.Piece;
 
 namespace NumbersBlast.Data
 {
+    /// <summary>
+    /// ScriptableObject defining board dimensions, cell spacing, block value range, and references to piece spawn and theme configurations.
+    /// </summary>
     // L-17: Public fields are required here instead of properties because Unity's
     // ScriptableObject serialization system only serializes public fields (or [SerializeField]).
     [CreateAssetMenu(fileName = "BoardConfig", menuName = "NumbersBlast/Board Config")]
@@ -23,6 +26,9 @@ namespace NumbersBlast.Data
         [Header("Theme")]
         public ThemeData Theme;
 
+        /// <summary>
+        /// Checks whether the given piece shape fits within the board dimensions.
+        /// </summary>
         public bool ValidatePieceShape(PieceShapeData shape)
         {
             var size = shape.GetNormalizedSize();

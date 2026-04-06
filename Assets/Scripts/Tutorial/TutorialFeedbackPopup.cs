@@ -6,6 +6,9 @@ using NumbersBlast.UI;
 
 namespace NumbersBlast.Tutorial
 {
+    /// <summary>
+    /// Popup displayed after a tutorial step is completed, showing a success message with a check icon animation.
+    /// </summary>
     public class TutorialFeedbackPopup : BasePopup
     {
         [SerializeField] private TextMeshProUGUI _titleText;
@@ -27,6 +30,9 @@ namespace NumbersBlast.Tutorial
             _continueButton.onClick.AddListener(HandleContinue);
         }
 
+        /// <summary>
+        /// Displays the popup with the given title and description, invoking onContinue when the player taps continue.
+        /// </summary>
         public void ShowWithMessage(string title, string description, System.Action onContinue)
         {
             _onContinue = onContinue;

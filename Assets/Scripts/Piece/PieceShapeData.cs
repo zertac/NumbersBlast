@@ -2,15 +2,31 @@ using UnityEngine;
 
 namespace NumbersBlast.Piece
 {
+    /// <summary>
+    /// ScriptableObject that defines a piece shape as a grid of active/inactive cells.
+    /// </summary>
     [CreateAssetMenu(fileName = "PieceShape", menuName = "NumbersBlast/Piece Shape")]
     public class PieceShapeData : ScriptableObject
     {
+        /// <summary>
+        /// Number of rows in the shape grid.
+        /// </summary>
         public int Rows = 3;
+
+        /// <summary>
+        /// Number of columns in the shape grid.
+        /// </summary>
         public int Columns = 3;
 
+        /// <summary>
+        /// Flat array of active/inactive flags for each cell in the grid (row-major order).
+        /// </summary>
         [HideInInspector]
         public bool[] Cells = new bool[9];
 
+        /// <summary>
+        /// Resizes the grid while preserving existing cell data in the overlapping region.
+        /// </summary>
         public void ResizeGrid(int newRows, int newColumns)
         {
             if (newRows == Rows && newColumns == Columns && Cells.Length == newRows * newColumns) return;
@@ -56,6 +72,9 @@ namespace NumbersBlast.Piece
             return count;
         }
 
+        /// <summary>
+        /// Returns active cell positions normalized so the top-left active cell is at (0,0).
+        /// </summary>
         public Vector2Int[] GetNormalizedPositions()
         {
             int activeCellCount = GetActiveCellCount();
@@ -87,6 +106,9 @@ namespace NumbersBlast.Piece
             return positions;
         }
 
+        /// <summary>
+        /// Returns the bounding size (rows, columns) of the normalized shape.
+        /// </summary>
         public Vector2Int GetNormalizedSize()
         {
             var positions = GetNormalizedPositions();

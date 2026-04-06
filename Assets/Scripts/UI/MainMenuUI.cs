@@ -8,6 +8,9 @@ using NumbersBlast.Multiplayer;
 
 namespace NumbersBlast.UI
 {
+    /// <summary>
+    /// Main menu screen controller that handles navigation to single-player, multiplayer, settings, and exit.
+    /// </summary>
     public class MainMenuUI : MonoBehaviour
     {
         [SerializeField] private Button _playButton;

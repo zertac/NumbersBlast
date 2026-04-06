@@ -5,12 +5,18 @@ using NumbersBlast.Piece;
 
 namespace NumbersBlast.Editor
 {
+    /// <summary>
+    /// Custom inspector for PieceShapeData that renders an interactive grid for toggling cells on/off.
+    /// </summary>
     [CustomEditor(typeof(PieceShapeData))]
     public class PieceShapeDataEditor : UnityEditor.Editor
     {
         private const float CellSize = 40f;
         private const float Spacing = 2f;
 
+        /// <summary>
+        /// Draws the custom inspector with row/column sliders, an interactive toggle grid, active cell count, and a clear button.
+        /// </summary>
         public override void OnInspectorGUI()
         {
             var shape = (PieceShapeData)target;
@@ -45,6 +51,9 @@ namespace NumbersBlast.Editor
             }
         }
 
+        /// <summary>
+        /// Renders the interactive cell grid, handling mouse clicks to toggle individual cells on or off.
+        /// </summary>
         private void DrawGrid(PieceShapeData shape)
         {
             float totalWidth = (CellSize + Spacing) * shape.Columns;

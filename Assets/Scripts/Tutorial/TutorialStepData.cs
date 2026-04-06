@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace NumbersBlast.Tutorial
 {
+    /// <summary>
+    /// ScriptableObject defining a single tutorial step, including board state, piece shape, instruction text, and target placement.
+    /// </summary>
     [CreateAssetMenu(fileName = "TutorialStep", menuName = "NumbersBlast/Tutorial Step")]
     public class TutorialStepData : ScriptableObject
     {
@@ -28,6 +31,9 @@ namespace NumbersBlast.Tutorial
         [Header("Target Placement")]
         public Vector2Int TargetBoardPosition;
 
+        /// <summary>
+        /// Allocates the board cell values array if it is null or its size does not match the current board dimensions.
+        /// </summary>
         public void InitializeBoardIfNeeded()
         {
             int size = BoardRows * BoardColumns;
@@ -35,6 +41,9 @@ namespace NumbersBlast.Tutorial
                 BoardCellValues = new int[size];
         }
 
+        /// <summary>
+        /// Allocates the piece cell and value arrays if they are null or their size does not match the current piece dimensions.
+        /// </summary>
         public void InitializePieceIfNeeded()
         {
             int size = PieceRows * PieceColumns;
@@ -45,6 +54,9 @@ namespace NumbersBlast.Tutorial
             }
         }
 
+        /// <summary>
+        /// Returns the board cell value at the given row and column, or 0 if out of bounds.
+        /// </summary>
         public int GetBoardValue(int row, int col)
         {
             int index = row * BoardColumns + col;
@@ -52,6 +64,9 @@ namespace NumbersBlast.Tutorial
             return BoardCellValues[index];
         }
 
+        /// <summary>
+        /// Sets the board cell value at the given row and column. No-op if out of bounds.
+        /// </summary>
         public void SetBoardValue(int row, int col, int value)
         {
             int index = row * BoardColumns + col;
@@ -59,6 +74,9 @@ namespace NumbersBlast.Tutorial
             BoardCellValues[index] = value;
         }
 
+        /// <summary>
+        /// Returns whether the piece cell at the given row and column is active, or false if out of bounds.
+        /// </summary>
         public bool GetPieceCell(int row, int col)
         {
             int index = row * PieceColumns + col;
@@ -66,6 +84,9 @@ namespace NumbersBlast.Tutorial
             return PieceCells[index];
         }
 
+        /// <summary>
+        /// Sets the active state of the piece cell at the given row and column. No-op if out of bounds.
+        /// </summary>
         public void SetPieceCell(int row, int col, bool active)
         {
             int index = row * PieceColumns + col;
@@ -73,6 +94,9 @@ namespace NumbersBlast.Tutorial
             PieceCells[index] = active;
         }
 
+        /// <summary>
+        /// Returns the piece cell value at the given row and column, or 0 if out of bounds.
+        /// </summary>
         public int GetPieceValue(int row, int col)
         {
             int index = row * PieceColumns + col;
@@ -80,6 +104,9 @@ namespace NumbersBlast.Tutorial
             return PieceValues[index];
         }
 
+        /// <summary>
+        /// Sets the piece cell value at the given row and column. No-op if out of bounds.
+        /// </summary>
         public void SetPieceValue(int row, int col, int value)
         {
             int index = row * PieceColumns + col;
@@ -87,6 +114,9 @@ namespace NumbersBlast.Tutorial
             PieceValues[index] = value;
         }
 
+        /// <summary>
+        /// Returns the active piece cell positions normalized so the top-left active cell is at (0, 0).
+        /// </summary>
         public Vector2Int[] GetPieceNormalizedPositions()
         {
             int count = 0;
@@ -121,6 +151,9 @@ namespace NumbersBlast.Tutorial
             return positions;
         }
 
+        /// <summary>
+        /// Returns the values of all active piece cells in row-major order.
+        /// </summary>
         public int[] GetPieceFixedValues()
         {
             int count = 0;

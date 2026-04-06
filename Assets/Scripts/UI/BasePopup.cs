@@ -5,6 +5,9 @@ using NumbersBlast.Core;
 
 namespace NumbersBlast.UI
 {
+    /// <summary>
+    /// Abstract base class for all popup windows, providing animated show/hide transitions with dim background support.
+    /// </summary>
     [RequireComponent(typeof(CanvasGroup))]
     public abstract class BasePopup : MonoBehaviour
     {
@@ -28,6 +31,9 @@ namespace NumbersBlast.UI
             gameObject.SetActive(false);
         }
 
+        /// <summary>
+        /// Activates the popup with a fade-in and scale animation.
+        /// </summary>
         public virtual void Show()
         {
             _hideTween?.Kill();
@@ -59,6 +65,9 @@ namespace NumbersBlast.UI
             OnShow();
         }
 
+        /// <summary>
+        /// Hides the popup with a fade-out and scale-down animation, then deactivates the GameObject.
+        /// </summary>
         public virtual void Hide()
         {
             _showTween?.Kill();
